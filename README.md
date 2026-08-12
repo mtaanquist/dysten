@@ -312,8 +312,10 @@ export const CAMPAIGN_TYPES = {
 
 `accent` names a token you add to
 [`src/styles/tokens.css`](src/styles/tokens.css) — no hex belongs outside that
-file. Keep it light enough that dark ink clears 4.5:1 on it; the shared-goal
-panel and the type pill both sit on this colour.
+file. Give it the same **relative luminance** as the existing two (0.61) rather
+than eyeballing it: that is what makes the accents read as a set, and it carries
+the contrast guarantees with it, since the shared-goal panel and the type pill
+both put dark ink on this colour.
 
 **2.** Add its wording to **every** file in `src/i18n/messages/`:
 

@@ -57,10 +57,10 @@
 /* Painted in the campaign type's colour, handed in as --c-accent, so a step
    card and a bike card are told apart at a glance.
 
-   Nothing on this surface uses opacity to mute text. Both accents are light
-   enough that a 70%-opacity ink drops to 3.5:1 on the green — under AA — so the
-   hierarchy here comes from size and weight instead, and every value stays at
-   full contrast. */
+   Nothing on this surface is muted with opacity. The accents are pastels, so
+   the original panel's trick of fading white text on navy inverts badly: ink at
+   70% lands near the AA floor with no margin for a future accent. Size and
+   weight carry the hierarchy instead, and every value keeps its full 10:1. */
 .hero {
   background: var(--c-accent, var(--c-blue-deep));
   color: var(--c-accent-ink, #fff);
@@ -142,7 +142,7 @@
 }
 
 /* The rank is the one number worth picking out, and on a light accent that
-   means going darker rather than lighter. */
+   means going darker rather than lighter — 6.9:1 on either accent. */
 .statNumberAccent {
   color: var(--c-blue-deep);
 }
