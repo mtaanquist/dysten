@@ -1,6 +1,7 @@
 {
   "app": {
-    "tagline": "Aktivitetstracker"
+    "tagline": "Dysten",
+    "description": "Tilmeld dig en kampagne, registrér hvad du har lavet hver dag, og se hvor du ligger."
   },
   "common": {
     "of": "af",

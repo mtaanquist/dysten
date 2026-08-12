@@ -1,9 +1,15 @@
-# Activity Campaign Tracker
+# Dysten
 
 An internal web app for running workplace activity campaigns. People join a
 campaign, log what they did each day, and compete on a leaderboard. When a
 campaign ends it becomes part of a permanent history, with its final standings
 and the exact roster that took part.
+
+*Dysten* is Danish for "the contest" — the word these campaigns are named after
+in the first place (*Trappedysten*, *Skridt-udfordringen*). The interface calls
+itself **Dysten** in Danish and **Challenges** in English; both come from
+`app.tagline` in the language files, so an organisation can rename it without
+touching code.
 
 It ships with two kinds of campaign and is built so more can be added:
 
@@ -80,7 +86,7 @@ server.
 ```yaml
 services:
   app:
-    image: ghcr.io/mtaanquist/activitycampaigntracker:latest
+    image: ghcr.io/mtaanquist/dysten:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -157,7 +163,7 @@ docker compose down -v         # stop AND delete the database
 ```
 
 > **One container only.** The database is a SQLite file on the `data` volume, so
-> two app containers cannot share it. That is ample for a company-sized tracker.
+> two app containers cannot share it. That is ample for one company's campaigns.
 > If you ever need more, the repository's own `compose.yaml` carries a commented
 > PostgreSQL service and the three steps to switch.
 
@@ -168,8 +174,8 @@ docker compose down -v         # stop AND delete the database
 You need **Node.js 22** or newer.
 
 ```bash
-git clone https://github.com/mtaanquist/activitycampaigntracker.git
-cd activitycampaigntracker
+git clone https://github.com/mtaanquist/dysten.git
+cd dysten
 npm install
 
 cp .env.example .env      # then set APP_SECRET to anything 16+ characters
@@ -436,10 +442,10 @@ Images are published to the GitHub Container Registry on every push to `main`
 and on every version tag:
 
 ```
-ghcr.io/mtaanquist/activitycampaigntracker:latest    # newest main
-ghcr.io/mtaanquist/activitycampaigntracker:v1.2.3    # a release tag
-ghcr.io/mtaanquist/activitycampaigntracker:1.2       # tracks 1.2.x
-ghcr.io/mtaanquist/activitycampaigntracker:sha-abc123
+ghcr.io/mtaanquist/dysten:latest    # newest main
+ghcr.io/mtaanquist/dysten:v1.2.3    # a release tag
+ghcr.io/mtaanquist/dysten:1.2       # tracks 1.2.x
+ghcr.io/mtaanquist/dysten:sha-abc123
 ```
 
 Cut a release by tagging:

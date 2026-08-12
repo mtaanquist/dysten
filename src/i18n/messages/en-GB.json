@@ -1,6 +1,7 @@
 {
   "app": {
-    "tagline": "Activity Tracker"
+    "tagline": "Challenges",
+    "description": "Join a campaign, log what you did each day, and see where you stand."
   },
   "common": {
     "of": "of",

@@ -65,16 +65,16 @@ jobs:
           context: .
           push: false
           load: true
-          tags: activitycampaigntracker:ci
+          tags: dysten:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Smoke test the container
         run: |
-          docker run -d --name tracker \
+          docker run -d --name dysten \
             -e APP_SECRET=ci-only-secret-value-not-real \
             -e SEED_ON_START=true \
-            -p 3000:3000 activitycampaigntracker:ci
+            -p 3000:3000 dysten:ci
 
           # Give migrations, seeding and the server time to come up.
           for i in $(seq 1 30); do
@@ -86,9 +86,9 @@ jobs:
           done
 
           echo "Container failed to serve within 60s:"
-          docker logs tracker
+          docker logs dysten
           exit 1
 
       - name: Container logs
         if: always()
-        run: docker logs tracker || true
+        run: docker logs dysten || true

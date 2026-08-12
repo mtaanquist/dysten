@@ -1,7 +1,7 @@
 /**
  * Calendar-day helpers.
  *
- * Everything the tracker reasons about — campaign ranges, entry days, streaks —
+ * Everything this app reasons about — campaign ranges, entry days, streaks —
  * is a calendar day in the company's local timezone, never an instant. Days are
  * represented as "YYYY-MM-DD" strings, which compare and sort correctly with
  * plain string operators and never drift across a UTC boundary.
@@ -12,7 +12,7 @@ export type IsoDate = string;
 
 /**
  * The timezone that defines when "today" rolls over. Everyone on an internal
- * Danish tracker shares one, so a single setting is honest; make it a per-user
+ * Danish workplace shares one, so a single setting is honest; make it a per-user
  * field only if the company goes multi-region.
  */
 export const APP_TIMEZONE = process.env.APP_TIMEZONE || "Europe/Copenhagen";

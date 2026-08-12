@@ -22,23 +22,37 @@ const barlow = Barlow({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: ORG_NAME ? `${ORG_NAME} Activity Tracker` : "Activity Tracker",
-  description: "Join activity campaigns, log daily values and compete on the leaderboard.",
-};
+/**
+ * Signed out, the language still needs to come from somewhere: the cookie holds
+ * the last choice made on this browser, and the default is Danish.
+ */
+async function currentLocale() {
+  const user = await getCurrentUser();
+  if (user) return user.locale;
+  const store = await cookies();
+  return resolveLocale(store.get(LOCALE_COOKIE)?.value);
+}
+
+/**
+ * The browser tab follows the reader's language too — the product name is
+ * translated copy (`app.tagline`), not a literal, so it cannot be a static
+ * `metadata` export.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const t = createTranslator(await currentLocale());
+  const name = t("app.tagline");
+  return {
+    title: ORG_NAME ? `${ORG_NAME} ${name}` : name,
+    description: t("app.description"),
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#1789ce",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
-
-  // Signed out, the language still needs to come from somewhere: the cookie
-  // holds the last choice made on this browser, and the default is Danish.
-  const store = await cookies();
-  const locale = user?.locale ?? resolveLocale(store.get(LOCALE_COOKIE)?.value);
-  const t = createTranslator(locale);
+  const locale = await currentLocale();
 
   return (
     <html lang={locale} className={barlow.variable}>
@@ -46,7 +60,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <LocaleProvider locale={locale}>
           <ToastProvider>{children}</ToastProvider>
         </LocaleProvider>
-        <span className="srOnly">{t("app.tagline")}</span>
       </body>
     </html>
   );
