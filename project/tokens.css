@@ -1,0 +1,132 @@
+/* Consortio IT Activity Tracker — design tokens
+   Handoff reference. The prototype is inline-styled; these are the
+   canonical values behind it, ready to drop into the real front end. */
+
+:root {
+  /* ---- Brand ---- */
+  --c-blue: #1789CE;          /* header bars, links, active states, chart line 1 */
+  --c-blue-deep: #10405F;     /* headings, hero panels, dark surfaces */
+  --c-blue-light: #A9C7E8;    /* pills, progress fill on dark, blobs */
+  --c-blue-soft: #EEF4F9;     /* quiet pill / chip background */
+  --c-blue-tint: #EEF6FC;     /* today cell, active toggle background */
+  --c-maroon: #A93B4E;        /* primary action, rank accent, alerts */
+  --c-maroon-dark: #8E2E3F;   /* primary action hover, alert text */
+  --c-maroon-soft: #FCEEF0;   /* streak badge, gap chip background */
+  --c-maroon-line: #E4C9CE;   /* dashed border on un-logged calendar days */
+  --c-green: #2E7D5B;         /* positive rank movement only */
+
+  /* ---- Neutrals ---- */
+  --c-page: #F4F8FB;          /* app background */
+  --c-surface: #FFFFFF;       /* cards, inputs */
+  --c-surface-quiet: #F7FBFD; /* nested panels, hover rows */
+  --c-field: #F8FBFD;         /* resting form field fill */
+  --c-ink: #16232E;           /* body text */
+  --c-ink-muted: #4A5C6B;     /* secondary prose */
+  --c-ink-soft: #6B7C8C;      /* labels, metadata */
+  --c-ink-faint: #9AAAB8;     /* hints, units, table headers */
+  --c-ink-disabled: #C3CFD9;  /* future dates */
+  --c-border: #E1EAF2;        /* card + control borders */
+  --c-border-quiet: #EDF2F7;  /* inner dividers */
+  --c-border-row: #F3F7FA;    /* table row rules */
+  --c-border-field: #D8E4EE;  /* form field borders */
+  --c-grey-blob: #DCE5EC;     /* decorative organic shape */
+
+  /* ---- Chart series (in order) ---- */
+  --c-series-1: #1789CE;
+  --c-series-2: #A93B4E;
+  --c-series-3: #4FA3D9;
+  --c-series-4: #6B7C8C;
+  --c-series-5: #A9C7E8;
+
+  /* ---- Typography ---- */
+  --font-sans: Barlow, Helvetica, Arial, sans-serif;
+
+  --fs-display: 34px;   /* dashboard greeting */
+  --fs-h1: 32px;        /* page titles */
+  --fs-h2: 24px;        /* campaign name in card */
+  --fs-h3: 20px;        /* panel titles */
+  --fs-stat: 22px;      /* stat numbers in hero panel */
+  --fs-stat-lg: 44px;   /* days-remaining counter */
+  --fs-body: 15px;
+  --fs-body-sm: 14px;
+  --fs-meta: 13px;
+  --fs-label: 12px;     /* uppercase section labels */
+  --fs-micro: 11px;     /* table headers, pills */
+  --fs-nano: 10px;      /* in-cell day totals */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.15;
+  --lh-heading: 1.25;
+  --lh-body: 1.5;
+  --lh-prose: 1.55;
+
+  --ls-display: -0.02em;  /* h1 / display */
+  --ls-heading: -0.01em;  /* h2 */
+  --ls-label: 0.12em;     /* uppercase labels */
+  --ls-button: 0.12em;    /* uppercase button text */
+  --ls-brand: 0.14em;     /* wordmark tagline */
+
+  /* ---- Space (4px base) ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 14px;
+  --sp-5: 18px;
+  --sp-6: 22px;
+  --sp-7: 26px;
+  --sp-8: 30px;
+  --gap-card: 14px;       /* between stacked cards */
+  --gap-grid: 18px;       /* between column groups */
+  --pad-card: 22px 24px;  /* campaign row card */
+  --pad-panel: 24px 26px; /* content panel */
+
+  /* ---- Radii ---- */
+  --r-pill: 999px;
+  --r-panel: 20px;
+  --r-card: 18px;
+  --r-inner: 16px;
+  --r-cell: 12px;
+  --r-field: 12px;
+  --r-field-sm: 8px;
+  --r-swatch: 4px;
+
+  /* ---- Borders ---- */
+  --bd-default: 1px solid var(--c-border);
+  --bd-quiet: 1px solid var(--c-border-quiet);
+  --bd-selected: 2px solid var(--c-blue);
+  --bd-missing: 1px dashed var(--c-maroon-line);
+
+  /* ---- Elevation ---- */
+  --sh-card-hover: 0 10px 28px rgba(16, 64, 95, 0.08);
+  --sh-signin: 0 24px 60px rgba(16, 64, 95, 0.09);
+  --sh-drawer: -20px 0 60px rgba(16, 64, 95, 0.2);
+  --sh-toast: 0 12px 30px rgba(16, 64, 95, 0.28);
+  --overlay-scrim: rgba(16, 64, 95, 0.42);
+
+  /* ---- Layout ---- */
+  --page-max: 1180px;
+  --page-pad-x: 28px;
+  --header-h: 68px;
+  --drawer-w: 460px;
+  --cal-cell-min: 88px;    /* calendar column min width before horizontal scroll */
+  --cal-cell-h: 104px;
+  --touch-min: 44px;       /* mobile hit target floor */
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-enter: 0.28s;
+  --dur-drawer: 0.22s;
+
+  /* ---- Organic decoration ---- */
+  --blob-a: 58% 42% 47% 53% / 52% 46% 54% 48%;
+  --blob-b: 46% 54% 60% 40% / 55% 45% 55% 45%;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}

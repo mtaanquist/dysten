@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #F4F8FB; font-family: Barlow, Helvetica, Arial, sans-serif; color: #16232E; -webkit-font-smoothing: antialiased; }
+  a { color: #1789CE; }
+  a:hover { color: #A93B4E; }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+</style>
+</helmet>
+
+<div style="max-width: 1180px; margin: 0 auto; padding: 40px 28px 90px;">
+  <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+    <span style="font-size: 24px; font-weight: 700; color: #1789CE; letter-spacing: -0.01em;">Consortio IT</span>
+    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: #6B7C8C; font-weight: 700;">Activity Tracker</span>
+  </div>
+  <h1 style="margin: 14px 0 6px; font-size: 34px; font-weight: 700; color: #10405F; letter-spacing: -0.02em;">Component sheet</h1>
+  <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4A5C6B; max-width: 62ch; text-wrap: pretty;">Every element used in the tracker, with the token behind each value. Token names refer to <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #EEF4F9; padding: 2px 6px; border-radius: 4px;">tokens.css</span>.</p>
+
+  <!-- COLOUR -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">1 · Colour</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Blue carries structure and identity, maroon carries action and urgency. Green appears only as a positive rank delta.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px;">
+      <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="12">
+        <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 16px; overflow: hidden;">
+          <div style="height: 68px; background: {{ s.hex }}; border-bottom: 1px solid rgba(16,64,95,0.06);"></div>
+          <div style="padding: 12px 14px 14px;">
+            <div style="font-size: 13px; font-weight: 700; color: #16232E;">{{ s.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1789CE; margin-top: 3px;">{{ s.token }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9AAAB8;">{{ s.hex }}</div>
+            <div style="font-size: 12px; color: #6B7C8C; margin-top: 7px; line-height: 1.4;">{{ s.use }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- TYPE -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">2 · Typography</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Barlow throughout — 400/600/700 only. Uppercase micro-labels carry the wide tracking; body copy never does.</p>
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 8px 26px;">
+      <sc-for list="{{ typeRows }}" as="t" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid #F3F7FA;">
+          <div style="min-width: 0; font-size: {{ t.size }}; font-weight: {{ t.weight }}; letter-spacing: {{ t.tracking }}; text-transform: {{ t.transform }}; color: {{ t.color }}; line-height: 1.2;">{{ t.sample }}</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 700;">{{ t.name }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1789CE; margin-top: 2px;">{{ t.token }}</div>
+            <div style="font-size: 12px; color: #6B7C8C; margin-top: 4px; line-height: 1.4;">{{ t.use }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- BUTTONS + CONTROLS -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">3 · Actions &amp; controls</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">One maroon primary per view. Everything else is a soft blue secondary, a ghost, or a destructive outline. All pills; uppercase labels never wrap.</p>
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 26px; display: grid; gap: 26px;">
+      <div>
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #9AAAB8; font-weight: 700; margin-bottom: 12px;">Buttons</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <button style="background: #A93B4E; color: #fff; border: 0; border-radius: 999px; padding: 14px 26px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer; white-space: nowrap;" style-hover="background: #8E2E3F;">Log activity</button>
+          <button style="background: #EEF4F9; color: #10405F; border: 0; border-radius: 999px; padding: 12px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap;" style-hover="background: #A9C7E8;">Edit</button>
+          <button style="background: transparent; border: 1px solid #F0D2D7; color: #A93B4E; border-radius: 999px; padding: 12px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap;" style-hover="background: #FCEEF0;">Delete campaign</button>
+          <button style="background: transparent; border: 1.5px solid #A93B4E; color: #A93B4E; border-radius: 999px; padding: 10px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer;" style-hover="background: #A93B4E; color: #fff;">Reopen</button>
+          <button style="background: transparent; border: 0; color: #6B7C8C; font-size: 13px; font-weight: 600; cursor: pointer;" style-hover="color: #A93B4E;">Cancel</button>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9AAAB8; margin-top: 12px;">--c-maroon · --r-pill · --ls-button · hover → --c-maroon-dark</div>
+      </div>
+
+      <div style="border-top: 1px solid #EDF2F7; padding-top: 22px;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #9AAAB8; font-weight: 700; margin-bottom: 12px;">Nav, toggles, selects</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <div style="background: #1789CE; border-radius: 999px; padding: 6px; display: flex; gap: 4px;">
+            <span style="background: rgba(255,255,255,0.16); color: #fff; font-size: 14px; font-weight: 600; padding: 9px 14px; border-radius: 999px;">Dashboard</span>
+            <span style="color: #fff; opacity: 0.85; font-size: 14px; font-weight: 600; padding: 9px 14px; border-radius: 999px;">Campaign</span>
+          </div>
+          <button style="background: #10405F; color: #fff; border: 1px solid #10405F; border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;">Selected campaign</button>
+          <button style="background: #fff; color: #10405F; border: 1px solid #E1EAF2; border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;" style-hover="border-color: #1789CE;">Other campaign</button>
+          <select style="border: 1px solid #E1EAF2; background: #F8FBFD; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;">
+            <option>Dansk</option>
+            <option>English (GB)</option>
+          </select>
+          <button title="Reminders on" style="width: 30px; height: 30px; display: grid; place-items: center; border-radius: 999px; border: 1px solid #A9C7E8; background: #EEF6FC; color: #1789CE; cursor: pointer; padding: 0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+          </button>
+          <button title="Reminders off" style="width: 30px; height: 30px; display: grid; place-items: center; border-radius: 999px; border: 1px solid #E1EAF2; background: #fff; color: #9AAAB8; cursor: pointer; padding: 0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path><line x1="3" y1="3" x2="21" y2="21"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #EDF2F7; padding-top: 22px;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #9AAAB8; font-weight: 700; margin-bottom: 12px;">Fields</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+          <label style="display: block;">
+            <span style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Steps</span>
+            <input type="number" placeholder="0" style="width: 100%; box-sizing: border-box; font-size: 22px; font-weight: 600; padding: 14px 16px; border: 1px solid #D8E4EE; border-radius: 14px; background: #F8FBFD; color: #16232E;" style-focus="outline: none; border-color: #1789CE; background: #fff;" />
+            <span style="display: block; font-size: 12px; color: #9AAAB8; margin-top: 6px;">Help text carries the campaign type's unit</span>
+          </label>
+          <label style="display: block;">
+            <span style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Campaign name</span>
+            <input placeholder="Skridt-udfordringen 2027" style="width: 100%; box-sizing: border-box; font-size: 15px; padding: 11px 14px; border: 1px solid #D8E4EE; border-radius: 12px; background: #F8FBFD;" style-focus="outline: none; border-color: #1789CE; background: #fff;" />
+          </label>
+          <label style="display: block;">
+            <span style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Disabled (future date)</span>
+            <input value="—" disabled="{{ yes }}" style="width: 100%; box-sizing: border-box; font-size: 15px; padding: 11px 14px; border: 1px solid #E1EAF2; border-radius: 12px; background: #FAFBFC; color: #C3CFD9;" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">4 · Pills, badges &amp; indicators</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Blue pills classify, maroon pills pressure, grey pills inform.</p>
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 26px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <span style="background: #A9C7E8; color: #10405F; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 5px 11px; border-radius: 999px;">Step campaign</span>
+      <span style="background: #EEF4F9; color: #10405F; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 5px 11px; border-radius: 999px;">Bike-to-work</span>
+      <span style="background: #FCEEF0; color: #A93B4E; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;">12d streak</span>
+      <span style="background: #FCEEF0; color: #8E2E3F; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 600;">15,880 steps behind #7</span>
+      <span style="display: flex; align-items: center; gap: 9px; background: #A93B4E; color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600;"><span style="width: 7px; height: 7px; border-radius: 999px; background: #FCEEF0;"></span>5 days missing entries</span>
+      <span style="display: flex; align-items: center; gap: 8px; background: #F7FBFD; border: 1px solid #EDF2F7; border-radius: 999px; padding: 6px 14px 6px 6px;">
+        <span style="width: 26px; height: 26px; border-radius: 999px; background: #EEF4F9; color: #1789CE; display: grid; place-items: center; font-size: 10px; font-weight: 700;">MS</span>
+        <span style="font-size: 13px; font-weight: 600;">Roster chip</span>
+      </span>
+      <span style="font-size: 13px; font-weight: 700; color: #2E7D5B;">▲ 2</span>
+      <span style="font-size: 13px; font-weight: 700; color: #A93B4E;">▼ 1</span>
+      <span style="font-size: 13px; font-weight: 700; color: #9AAAB8;">–</span>
+      <span style="width: 34px; height: 34px; border-radius: 999px; background: #1789CE; color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 700;">MS</span>
+      <span style="width: 30px; height: 30px; border-radius: 999px; background: #EEF4F9; color: #1789CE; display: grid; place-items: center; font-size: 11px; font-weight: 700;">JK</span>
+    </div>
+  </div>
+
+  <!-- SURFACES -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">5 · Surfaces</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Three levels: white panel on the page tint, quiet panel nested inside it, deep-blue hero for numbers that should feel like a scoreboard.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; align-items: start;">
+      <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 24px 26px;">
+        <h3 style="margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #10405F;">Panel</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #4A5C6B;">Default content container. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">--r-panel</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">--bd-default</span>, no shadow at rest.</p>
+        <div style="background: #F7FBFD; border: 1px solid #EDF2F7; border-radius: 16px; padding: 16px 18px; margin-top: 16px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6B7C8C; font-weight: 700;">Nested quiet panel</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5C6B; margin-top: 4px;">--c-surface-quiet</div>
+        </div>
+      </div>
+
+      <div style="background: #10405F; color: #fff; border-radius: 20px; padding: 24px 26px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -60px; right: -50px; width: 190px; height: 170px; background: rgba(169,199,232,0.22); border-radius: 58% 42% 47% 53% / 52% 46% 54% 48%;"></div>
+        <div style="position: relative;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.7; font-weight: 700;">Shared goal</div>
+          <div style="font-size: 19px; font-weight: 700; margin-top: 4px;">Together we walk to Paris</div>
+          <div style="margin-top: 14px; height: 10px; border-radius: 999px; background: rgba(255,255,255,0.18); overflow: hidden;">
+            <div style="height: 100%; width: 69%; border-radius: 999px; background: #A9C7E8;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 9px; font-size: 12px; font-weight: 600; opacity: 0.85;"><span>822,600 of 1,200,000 steps</span><span>69%</span></div>
+          <div style="display: flex; gap: 22px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div>
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.68; font-weight: 700;">Your total</div>
+              <div style="font-size: 22px; font-weight: 700;">72,580</div>
+            </div>
+            <div>
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.68; font-weight: 700;">Your rank</div>
+              <div style="font-size: 22px; font-weight: 700; color: #A9C7E8;">#8</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 2px solid #1789CE; border-radius: 20px; padding: 24px 26px; box-shadow: 0 10px 28px rgba(16,64,95,0.08);">
+        <h3 style="margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #10405F;">Selected / hover card</h3>
+        <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #4A5C6B;">Whole card is the hit area. Selection is <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">--bd-selected</span>; hover adds <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">--sh-card-hover</span>.</p>
+        <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 90px; background: #F4F8FB; border-radius: 12px; padding: 12px;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #9AAAB8; font-weight: 700;">Page bg</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8C; margin-top: 3px;">--c-page</div>
+          </div>
+          <div style="flex: 1; min-width: 90px; background: #EEF6FC; border-radius: 12px; padding: 12px;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #9AAAB8; font-weight: 700;">Today tint</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8C; margin-top: 3px;">--c-blue-tint</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">6 · Data display</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Leaderboard rows, the entry calendar, and the cumulative chart. All grids scroll horizontally below their min width rather than crushing columns.</p>
+
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 24px 26px;">
+      <h3 style="margin: 0 0 4px; font-size: 17px; font-weight: 700; color: #10405F;">Leaderboard row</h3>
+      <div style="overflow-x: auto;">
+        <div style="min-width: 460px;">
+          <div style="display: grid; grid-template-columns: 34px minmax(0, 1.6fr) minmax(84px, 0.8fr) 58px minmax(46px, auto); gap: 8px; padding: 14px 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9AAAB8; font-weight: 700; white-space: nowrap; border-bottom: 1px solid #EDF2F7;">
+            <div>#</div><div>Name</div><div style="text-align: right;">Total</div><div style="text-align: right;">Avg/day</div><div style="text-align: right;">Move</div>
+          </div>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: 34px minmax(0, 1.6fr) minmax(84px, 0.8fr) 58px minmax(46px, auto); gap: 8px; align-items: center; padding: 12px 8px 12px 0; border-bottom: 1px solid #F3F7FA; border-radius: 10px; cursor: pointer;" style-hover="background: #F7FBFD;">
+              <div style="font-size: 17px; font-weight: 700; color: #10405F;">{{ r.rank }}</div>
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <div style="width: 30px; height: 30px; flex: 0 0 auto; border-radius: 999px; background: #EEF4F9; color: #1789CE; display: grid; place-items: center; font-size: 11px; font-weight: 700;">{{ r.initials }}</div>
+                <div style="min-width: 0;">
+                  <div style="font-size: 15px; font-weight: 600; line-height: 1.2;">{{ r.name }}</div>
+                  <div style="height: 4px; border-radius: 999px; background: #EEF4F9; margin-top: 5px; overflow: hidden;">
+                    <div style="height: 100%; background: #A9C7E8; border-radius: 999px; width: {{ r.bar }};"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 15px; font-weight: 700;">{{ r.total }}</div>
+                <div style="font-size: 11px; color: #9AAAB8;">{{ r.split }}</div>
+              </div>
+              <div style="text-align: right; font-size: 14px; color: #4A5C6B; font-weight: 600;">{{ r.avg }}</div>
+              <div style="text-align: right; font-size: 13px; font-weight: 700; color: {{ r.deltaColor }};">{{ r.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 24px 26px; margin-top: 18px;">
+      <h3 style="margin: 0 0 10px; font-size: 17px; font-weight: 700; color: #10405F;">Entry calendar cell states</h3>
+      <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6B7C8C; font-weight: 600;"><span style="width: 12px; height: 12px; border-radius: 4px; border: 1px solid #E1EAF2; background: #fff;"></span>Logged</div>
+        <div style="display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6B7C8C; font-weight: 600;"><span style="width: 12px; height: 12px; border-radius: 4px; border: 1px dashed #E4C9CE; background: #FDFBFB;"></span>Missing</div>
+        <div style="display: flex; align-items: center; gap: 7px; font-size: 12px; color: #6B7C8C; font-weight: 600;"><span style="width: 12px; height: 12px; border-radius: 4px; border: 2px solid #1789CE; background: #EEF6FC;"></span>Today</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(88px, 140px)); gap: 8px;">
+        <sc-for list="{{ cells }}" as="d" hint-placeholder-count="4">
+          <div>
+            <div style="border: {{ d.border }}; border-radius: 12px; background: {{ d.bg }}; padding: 7px 8px 8px; min-height: 104px; box-sizing: border-box; display: flex; flex-direction: column; gap: 5px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 4px;">
+                <span style="font-size: 15px; font-weight: 700; color: {{ d.numColor }};">{{ d.num }}</span>
+                <span style="font-size: 10px; color: #9AAAB8; font-weight: 600;">{{ d.total }}</span>
+              </div>
+              <input type="number" value="{{ d.v1 }}" disabled="{{ d.disabled }}" placeholder="Steps" style="width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 600; padding: 6px 7px; border: 1px solid #E1EAF2; border-radius: 8px; background: #fff; color: #16232E; text-align: right;" style-focus="outline: none; border-color: #1789CE;" />
+              <input type="number" value="{{ d.v2 }}" disabled="{{ d.disabled }}" placeholder="Calc." style="width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 600; padding: 6px 7px; border: 1px solid #EEF0F2; border-radius: 8px; background: #FBFCFD; color: #4A5C6B; text-align: right;" style-focus="outline: none; border-color: #1789CE; background: #fff;" />
+            </div>
+            <div style="font-size: 12px; color: #6B7C8C; font-weight: 600; margin-top: 8px; text-align: center;">{{ d.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 24px 26px; margin-top: 18px;">
+      <h3 style="margin: 0 0 12px; font-size: 17px; font-weight: 700; color: #10405F;">Chart series</h3>
+      <svg viewBox="0 0 600 150" style="width: 100%; height: auto; display: block;">
+        <line x1="10" y1="130" x2="590" y2="130" stroke="#E1EAF2" stroke-width="1"></line>
+        <line x1="10" y1="70" x2="590" y2="70" stroke="#F0F5F9" stroke-width="1"></line>
+        <sc-for list="{{ series }}" as="s" hint-placeholder-count="5">
+          <polyline points="{{ s.points }}" fill="none" stroke="{{ s.color }}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+        </sc-for>
+      </svg>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 12px;">
+        <sc-for list="{{ series }}" as="s" hint-placeholder-count="5">
+          <div style="display: flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4A5C6B;">
+            <span style="width: 10px; height: 10px; border-radius: 3px; background: {{ s.color }};"></span>{{ s.token }}
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">7 · Feedback &amp; overlays</h2>
+    <p style="margin: 0 0 18px; font-size: 14px; color: #6B7C8C;">Saves confirm with a toast, not a dialog. Person detail opens as a right-hand drawer over a blue scrim.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start;">
+      <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 20px; padding: 26px; display: grid; gap: 16px; justify-items: start;">
+        <div style="background: #10405F; color: #fff; padding: 13px 26px; border-radius: 999px; font-size: 14px; font-weight: 600; box-shadow: 0 12px 30px rgba(16,64,95,0.28);">Saved</div>
+        <div style="background: #FCEEF0; color: #8E2E3F; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 600;">Yesterday has no entry — backfill it in the calendar.</div>
+        <div style="background: #fff; border: 1px solid #E1EAF2; border-left: 4px solid #A93B4E; border-radius: 16px; padding: 16px 18px; font-size: 14px; color: #4A5C6B; line-height: 1.5;">Inline nudge, maroon rule on the leading edge.</div>
+      </div>
+      <div style="background: rgba(16,64,95,0.42); border-radius: 20px; padding: 20px; display: flex; justify-content: flex-end;">
+        <div style="background: #fff; border-radius: 16px; padding: 20px; width: 88%; box-shadow: -20px 0 60px rgba(16,64,95,0.2);">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 46px; height: 46px; border-radius: 999px; background: #EEF4F9; color: #1789CE; display: grid; place-items: center; font-size: 16px; font-weight: 700;">SL</div>
+            <div style="flex: 1;">
+              <div style="font-size: 19px; font-weight: 700; color: #10405F;">Drawer header</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9AAAB8;">--drawer-w · --sh-drawer · scrim --overlay-scrim</div>
+            </div>
+            <button style="background: #F1F5F9; border: 0; border-radius: 999px; width: 32px; height: 32px; font-size: 16px; color: #6B7C8C; cursor: pointer;">×</button>
+          </div>
+          <div style="margin-top: 14px; background: #F7FBFD; border-radius: 14px; padding: 14px 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6B7C8C; font-weight: 700;">Campaign</div>
+            <div style="font-size: 24px; font-weight: 700; color: #10405F; margin-top: 3px;">146,070 steps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div style="margin-top: 40px; padding-top: 26px; border-top: 2px solid #E1EAF2;">
+    <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #10405F;">8 · Rules of the system</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px;">
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6">
+        <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 16px; padding: 18px 20px;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.13em; color: #1789CE; font-weight: 700;">{{ r.label }}</div>
+          <div style="font-size: 14px; color: #4A5C6B; line-height: 1.5; margin-top: 7px; text-wrap: pretty;">{{ r.text }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() {
+    const rng = n => Math.round(n);
+    const series = [
+      { token: '--c-series-1', color: '#1789CE' },
+      { token: '--c-series-2', color: '#A93B4E' },
+      { token: '--c-series-3', color: '#4FA3D9' },
+      { token: '--c-series-4', color: '#6B7C8C' },
+      { token: '--c-series-5', color: '#A9C7E8' }
+    ].map((s, i) => {
+      let cum = 0;
+      const pts = [];
+      for (let j = 0; j <= 12; j++) {
+        cum += 6 + (i * 1.4) + ((j * (i + 3)) % 5);
+        const x = 10 + j / 12 * 580;
+        const y = 130 - cum / 130 * 115;
+        pts.push(rng(x) + ',' + rng(y));
+      }
+      return { token: s.token, color: s.color, points: pts.join(' ') };
+    });
+
+    return {
+      yes: true,
+      swatches: [
+        { name: 'Brand blue', token: '--c-blue', hex: '#1789CE', use: 'Header, links, active nav, focus ring' },
+        { name: 'Deep blue', token: '--c-blue-deep', hex: '#10405F', use: 'Headings and scoreboard panels' },
+        { name: 'Light blue', token: '--c-blue-light', hex: '#A9C7E8', use: 'Type pills, progress on dark, blobs' },
+        { name: 'Soft blue', token: '--c-blue-soft', hex: '#EEF4F9', use: 'Secondary buttons, avatars, chips' },
+        { name: 'Blue tint', token: '--c-blue-tint', hex: '#EEF6FC', use: "Today's calendar cell, bell on" },
+        { name: 'Maroon', token: '--c-maroon', hex: '#A93B4E', use: 'Primary buttons, rank accent, alerts' },
+        { name: 'Maroon dark', token: '--c-maroon-dark', hex: '#8E2E3F', use: 'Primary hover, alert text' },
+        { name: 'Maroon soft', token: '--c-maroon-soft', hex: '#FCEEF0', use: 'Streak badge, gap chip' },
+        { name: 'Page', token: '--c-page', hex: '#F4F8FB', use: 'App background' },
+        { name: 'Border', token: '--c-border', hex: '#E1EAF2', use: 'Card and control borders' },
+        { name: 'Ink', token: '--c-ink', hex: '#16232E', use: 'Body text' },
+        { name: 'Ink faint', token: '--c-ink-faint', hex: '#9AAAB8', use: 'Units, hints, table headers' },
+        { name: 'Positive', token: '--c-green', hex: '#2E7D5B', use: 'Upward rank movement only' },
+        { name: 'Grey blob', token: '--c-grey-blob', hex: '#DCE5EC', use: 'Decorative organic shape' }
+      ],
+      typeRows: [
+        { name: 'Display', token: '--fs-display / 700', size: '34px', weight: 700, tracking: '-0.02em', transform: 'none', color: '#16232E', sample: 'Mette Sørensen', use: 'Dashboard greeting' },
+        { name: 'Page title', token: '--fs-h1 / 700', size: '32px', weight: 700, tracking: '-0.02em', transform: 'none', color: '#10405F', sample: 'Previous campaigns', use: 'One per screen' },
+        { name: 'Card title', token: '--fs-h2 / 700', size: '22px', weight: 700, tracking: '-0.01em', transform: 'none', color: '#10405F', sample: 'Skridt-udfordringen 2026', use: 'Campaign name in a row card' },
+        { name: 'Panel title', token: '--fs-h3 / 700', size: '20px', weight: 700, tracking: 'normal', transform: 'none', color: '#10405F', sample: 'Leaderboard', use: 'Section heading inside a panel' },
+        { name: 'Stat', token: '--fs-stat / 700', size: '22px', weight: 700, tracking: 'normal', transform: 'none', color: '#16232E', sample: '72,580', use: 'Totals; locale-formatted' },
+        { name: 'Body', token: '--fs-body / 400', size: '15px', weight: 400, tracking: 'normal', transform: 'none', color: '#4A5C6B', sample: 'A month where the whole office walks to Paris.', use: 'Descriptions, help text' },
+        { name: 'Meta', token: '--fs-meta / 600', size: '13px', weight: 600, tracking: 'normal', transform: 'none', color: '#6B7C8C', sample: '1 Aug 2026 – 31 Aug 2026 · 19 days remaining', use: 'Dates, counts, secondary facts' },
+        { name: 'Micro label', token: '--fs-micro / 700 + --ls-label', size: '11px', weight: 700, tracking: '0.12em', transform: 'uppercase', color: '#9AAAB8', sample: 'Your rank', use: 'Field and column labels' }
+      ],
+      rows: [
+        { rank: 1, initials: 'SL', name: 'Sofie Lindberg', total: '146,070', split: '135,960 + 10,110', avg: '12,172', delta: '▲ 1', deltaColor: '#2E7D5B', bar: '100%' },
+        { rank: 2, initials: 'AB', name: 'Amalie Bech', total: '114,250', split: '104,020 + 10,230', avg: '11,425', delta: '▼ 1', deltaColor: '#A93B4E', bar: '78%' },
+        { rank: 3, initials: 'MS', name: 'Mette Sørensen', total: '72,580', split: '66,200 + 6,380', avg: '10,369', delta: '–', deltaColor: '#9AAAB8', bar: '50%' }
+      ],
+      cells: [
+        { label: 'Logged', num: '10', total: '11,250', v1: 11250, v2: 0, disabled: false, bg: '#FFFFFF', border: '1px solid #E1EAF2', numColor: '#10405F' },
+        { label: 'Missing', num: '11', total: '', v1: '', v2: '', disabled: false, bg: '#FDFBFB', border: '1px dashed #E4C9CE', numColor: '#10405F' },
+        { label: 'Today', num: '12', total: '', v1: '', v2: '', disabled: false, bg: '#EEF6FC', border: '2px solid #1789CE', numColor: '#1789CE' },
+        { label: 'Future (locked)', num: '13', total: '', v1: '', v2: '', disabled: true, bg: '#FAFBFC', border: '1px dashed #E4C9CE', numColor: '#C3CFD9' }
+      ],
+      series,
+      rules: [
+        { label: 'One primary action', text: 'A single maroon button per view. Secondary actions are soft-blue pills; tertiary are ghost text.' },
+        { label: 'Numbers are localised', text: 'Every total, average and date goes through Intl with the user’s locale — 1.200 vs 1,200, decimal comma for km in Danish.' },
+        { label: 'No hard-coded copy', text: 'All UI strings resolve from the per-language resource set, including campaign-type field labels and help text.' },
+        { label: 'Cards are the hit area', text: 'If a card leads somewhere, the whole card is clickable and shows a hover border plus lift — no separate link.' },
+        { label: 'Grids scroll, never crush', text: 'Leaderboards, rosters and the calendar keep a min width and scroll horizontally on narrow screens; inputs stay at least 44px tall.' },
+        { label: 'Blobs, not gradients', text: 'Decoration is flat organic shapes in light blue and grey at low opacity behind content. No gradients anywhere.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
