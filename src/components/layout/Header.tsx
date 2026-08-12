@@ -19,24 +19,43 @@ interface HeaderProps {
   email: string;
   canManage: boolean;
   theme: Theme;
+  /**
+   * Where "Campaign" should go. Resolved on the server so the link lands on a
+   * real campaign directly: pointing it at /campaigns instead means a redirect,
+   * and a redirect means a second round trip with a blank page in between.
+   */
+  campaignHref: string;
 }
 
+/**
+ * `match` is the path prefix that marks the item current, separate from `href`
+ * because the campaign link points at one specific campaign while every
+ * campaign page should light it up.
+ */
 const NAV = [
-  { href: "/", key: "nav.dashboard" },
-  { href: "/campaigns", key: "nav.campaign" },
-  { href: "/history", key: "nav.history" },
-  { href: "/manage", key: "nav.management", manageOnly: true },
+  { href: "/", match: "/", key: "nav.dashboard" },
+  { href: null, match: "/campaigns", key: "nav.campaign" },
+  { href: "/history", match: "/history", key: "nav.history" },
+  { href: "/manage", match: "/manage", key: "nav.management", manageOnly: true },
 ] as const;
 
-export function Header({ orgName, brandName, displayName, email, canManage, theme }: HeaderProps) {
+export function Header({
+  orgName,
+  brandName,
+  displayName,
+  email,
+  canManage,
+  theme,
+  campaignHref,
+}: HeaderProps) {
   const t = useTranslator();
   const locale = useLocale();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (match: string) =>
+    match === "/" ? pathname === "/" : pathname.startsWith(match);
 
   return (
     <header className={styles.header}>
@@ -55,10 +74,10 @@ export function Header({ orgName, brandName, displayName, email, canManage, them
         <nav className={styles.nav} aria-label={t("nav.dashboard")}>
           {NAV.filter((item) => !("manageOnly" in item && item.manageOnly) || canManage).map((item) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navLink} ${isActive(item.href) ? styles.navLinkActive : ""}`}
-              aria-current={isActive(item.href) ? "page" : undefined}
+              key={item.match}
+              href={item.href ?? campaignHref}
+              className={`${styles.navLink} ${isActive(item.match) ? styles.navLinkActive : ""}`}
+              aria-current={isActive(item.match) ? "page" : undefined}
             >
               {t(item.key)}
             </Link>
