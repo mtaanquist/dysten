@@ -83,7 +83,7 @@ export default async function SignInPage({
                   </li>
                 ))}
               </ul>
-              <Link href="/sign-in" className={styles.back}>
+              <Link href="/sign-in" className={`textLink ${styles.back}`}>
                 ← {t("common.back")}
               </Link>
             </>

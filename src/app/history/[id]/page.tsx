@@ -39,7 +39,7 @@ export default async function HistoryDetailPage({
   return (
     <AppShell user={user}>
       <div className={styles.page}>
-        <Link href="/history" className={styles.back}>
+        <Link href="/history" className={`textLink ${styles.back}`}>
           ← {t("history.backToHistory")}
         </Link>
 

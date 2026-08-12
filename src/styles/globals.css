@@ -20,11 +20,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* A bare link is blue. The blue-to-maroon hover the design specifies belongs to
+   links that read as *text* — it is set on those directly, in .textLink below.
+
+   It is deliberately not a blanket `a:hover` rule, which is what the design
+   prototype used. Almost every anchor in this app is structural rather than
+   textual — a whole card, a table row, a nav item, the masthead — and a blanket
+   rule turns maroon on all of them, including white text on the blue header.
+   Components then have to defend themselves against their own stylesheet. */
 a {
   color: var(--c-blue);
 }
 
-a:hover {
+.textLink:hover {
   color: var(--c-maroon);
 }
 

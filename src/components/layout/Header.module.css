@@ -38,8 +38,15 @@
   padding: 2px 0;
 }
 
-.brand:hover .wordmark {
-  text-decoration: underline;
+/* The masthead stays white on hover — it is a wordmark, so it neither changes
+   colour nor picks up an underline. The second line lifting to full opacity is
+   the whole signal, which is as much as a logo needs. */
+.brand:hover {
+  color: #fff;
+}
+
+.brand:hover .tagline {
+  opacity: 1;
 }
 
 .brand:focus-visible {
