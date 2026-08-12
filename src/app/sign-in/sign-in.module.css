@@ -73,7 +73,7 @@
   display: block;
   width: 100%;
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
   border: 0;
   border-radius: var(--r-pill);
   padding: 16px var(--sp-6);
@@ -88,7 +88,7 @@
 
 .primary:hover {
   background: var(--c-maroon-dark);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
 }
 
 .hint {

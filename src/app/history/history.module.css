@@ -40,7 +40,7 @@
 }
 
 .card:hover {
-  border-color: var(--c-blue-light);
+  border-color: var(--c-border-hover);
   background: var(--c-surface-hover);
   color: inherit;
 }
@@ -67,7 +67,7 @@
   font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: 0.13em;
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-weight: var(--fw-bold);
 }
 
@@ -128,7 +128,7 @@
 
 .winnerBigTotal {
   font-size: var(--fs-body);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-weight: var(--fw-semibold);
 }
 

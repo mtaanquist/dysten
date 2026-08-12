@@ -93,14 +93,14 @@
 
 .barFill {
   height: 100%;
-  background: var(--c-blue-light);
+  background: var(--c-progress);
   border-radius: var(--r-pill);
 }
 
 .streak {
   flex: 0 0 auto;
   background: var(--c-maroon-soft);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-size: var(--fs-micro);
   font-weight: var(--fw-bold);
   padding: 3px var(--sp-2);
@@ -133,7 +133,7 @@
 }
 
 .moveDown {
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }
 
 .moveNone {

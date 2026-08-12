@@ -33,7 +33,7 @@ a {
 }
 
 .textLink:hover {
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }
 
 input,

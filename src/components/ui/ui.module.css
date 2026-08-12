@@ -58,12 +58,12 @@
 
 /* Painted in the campaign type's own colour, handed in as --c-accent. */
 .pill_type {
-  background: var(--c-accent, var(--c-blue-light));
+  background: var(--c-accent, var(--c-chip-bg));
   color: var(--c-accent-ink, var(--c-heading));
 }
 
 .pill_light {
-  background: var(--c-blue-light);
+  background: var(--c-chip-bg);
 }
 
 .pill_soft {
@@ -72,14 +72,14 @@
 
 .pill_maroon {
   background: var(--c-maroon-soft);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-size: var(--fs-micro);
   padding: 4px 10px;
 }
 
 .pill_solid {
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
   font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
   padding: 7px var(--sp-4);
@@ -146,7 +146,7 @@
   right: -140px;
   width: 520px;
   height: 480px;
-  background: var(--c-blue-light);
+  background: var(--c-chip-bg);
   opacity: 0.5;
   border-radius: var(--blob-a);
 }
@@ -156,31 +156,25 @@
   left: -200px;
   width: 460px;
   height: 420px;
-  background: var(--c-grey-blob);
+  background: var(--c-blob-b);
   opacity: 0.7;
   border-radius: var(--blob-b);
 }
 
 /* ---- Progress bar ---- */
+/* The track is a tint of whatever accent it sits on, so it works on a light
+   pastel and on a dark one without either being named here. */
 .progressTrack {
   height: var(--progress-height, 9px);
   border-radius: var(--r-pill);
   overflow: hidden;
-}
-
-/* Sits on a campaign-type accent, which is a light colour: the track is a tint
-   of the surface and the fill goes darker, rather than the pale-on-navy of the
-   original. Both clear the 3:1 that a graphical element needs. */
-.progress_onAccent {
   background: var(--c-type-track);
-}
-
-.progress_onLight {
-  background: var(--c-blue-soft);
 }
 
 .progressFill {
   height: 100%;
   border-radius: var(--r-pill);
-  background: var(--c-blue-deep);
+  /* Reads against the accent it sits on: dark on a light pastel, and light on
+     the darkened accents of the dark palette. */
+  background: var(--c-type-mark);
 }

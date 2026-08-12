@@ -29,13 +29,13 @@
 }
 
 .switchActive {
-  background: var(--c-blue-deep);
-  color: var(--c-on-solid);
-  border-color: var(--c-blue-deep);
+  background: var(--c-panel-deep);
+  color: var(--c-on-dark);
+  border-color: var(--c-panel-deep);
 }
 
 .switchActive:hover {
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
 }
 
 .header {
@@ -71,7 +71,7 @@
 .countdownNumber {
   font-size: var(--fs-stat-lg);
   font-weight: var(--fw-bold);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   line-height: 1;
 }
 
@@ -85,7 +85,7 @@
 }
 
 .endedLabel {
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }
 
 /* The shared goal sits above the calendar — it breaks up the white panels and

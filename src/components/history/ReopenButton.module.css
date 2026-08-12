@@ -1,7 +1,7 @@
 .button {
   background: transparent;
   border: 1.5px solid var(--c-maroon);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   border-radius: var(--r-pill);
   padding: 10px 20px;
   font-size: var(--fs-micro);
@@ -14,7 +14,7 @@
 
 .button:hover {
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
 }
 
 .button:disabled {
@@ -27,6 +27,6 @@
   font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: var(--ls-button);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   white-space: nowrap;
 }

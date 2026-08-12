@@ -29,7 +29,7 @@
 
 .swatchMissing {
   border: var(--bd-missing);
-  background: var(--c-surface-missing);
+  background: var(--c-cell-missing);
 }
 
 .swatchToday {
@@ -104,7 +104,7 @@
 
 .cellMissing {
   border: var(--bd-missing);
-  background: var(--c-surface-missing);
+  background: var(--c-cell-missing);
 }
 
 .cellToday {
@@ -113,7 +113,7 @@
 }
 
 .cellFuture {
-  background: var(--c-surface-disabled);
+  background: var(--c-cell-future);
 }
 
 .cellHead {
@@ -143,7 +143,7 @@
 
 .adminMark {
   font-size: var(--fs-nano);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   cursor: help;
 }
 
@@ -179,7 +179,7 @@
 .inputPrimary:disabled,
 .inputSecondary:disabled {
   color: var(--c-ink-disabled);
-  background: var(--c-surface-disabled);
+  background: var(--c-cell-future);
   cursor: not-allowed;
 }
 

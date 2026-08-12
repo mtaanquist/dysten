@@ -56,7 +56,7 @@
 }
 
 .bellOn {
-  border: 1px solid var(--c-blue-light);
+  border: 1px solid var(--c-border-hover);
   background: var(--c-blue-tint);
   color: var(--c-blue);
 }

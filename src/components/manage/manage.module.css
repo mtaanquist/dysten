@@ -55,7 +55,7 @@
 
 .primary {
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
   border: 0;
   border-radius: var(--r-pill);
   padding: 13px var(--sp-6);
@@ -88,7 +88,7 @@
 }
 
 .ghost:hover {
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }
 
 /* ---- Campaign list ---- */
@@ -179,14 +179,14 @@
 }
 
 .secondary:hover {
-  background: var(--c-blue-light);
+  background: var(--c-chip-bg);
   color: var(--c-heading);
 }
 
 .destructive {
   background: transparent;
   border: 1px solid var(--c-maroon-outline);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }
 
 .destructive:hover {
@@ -236,7 +236,7 @@
 .chipRemove {
   background: transparent;
   border: 0;
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
   cursor: pointer;
@@ -280,7 +280,7 @@
 /* ---- Roles ---- */
 .adminOnly {
   font-size: var(--fs-meta);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-weight: var(--fw-semibold);
   margin: 2px 0 var(--sp-3);
 }

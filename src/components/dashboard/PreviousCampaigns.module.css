@@ -76,7 +76,7 @@
 }
 
 .row:hover {
-  border-color: var(--c-blue-light);
+  border-color: var(--c-border-hover);
   background: var(--c-surface-hover);
   color: inherit;
 }
@@ -117,5 +117,5 @@
 .placement {
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-bold);
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
 }

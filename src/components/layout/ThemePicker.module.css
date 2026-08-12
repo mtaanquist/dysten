@@ -18,7 +18,7 @@
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
-  color: var(--c-on-brand);
+  color: var(--c-on-dark);
   opacity: 0.7;
   cursor: pointer;
 }
@@ -34,13 +34,13 @@
 /* The chosen one is filled rather than merely brighter: on a header that is
    already one flat colour, opacity alone is too quiet to answer "which is on?". */
 .optionActive {
-  background: var(--c-on-brand);
+  background: var(--c-on-dark);
   color: var(--c-blue);
   opacity: 1;
 }
 
 .option:focus-visible {
-  outline: 2px solid var(--c-on-brand);
+  outline: 2px solid var(--c-on-dark);
   outline-offset: 2px;
 }
 

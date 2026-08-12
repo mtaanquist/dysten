@@ -62,7 +62,7 @@
    70% lands near the AA floor with no margin for a future accent. Size and
    weight carry the hierarchy instead, and every value keeps its full 10:1. */
 .hero {
-  background: var(--c-accent, var(--c-blue-deep));
+  background: var(--c-accent, var(--c-panel-deep));
   color: var(--c-accent-ink, #fff);
   border-radius: var(--r-inner);
   padding: 20px var(--sp-6);
@@ -141,10 +141,12 @@
   line-height: 1.2;
 }
 
-/* The rank is the one number worth picking out, and on a light accent that
-   means going darker rather than lighter — 6.9:1 on either accent. */
+/* The rank is the one number worth picking out. Which direction that means
+   depends on the ground: darker than a light pastel, lighter than a dark one.
+   That is the same inversion the progress fill needs, so it is the same token —
+   and it is not --c-heading, which follows the page rather than the accent. */
 .statNumberAccent {
-  color: var(--c-heading);
+  color: var(--c-type-mark);
 }
 
 .statSuffix {
@@ -158,7 +160,7 @@
   align-items: center;
   gap: 9px;
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
   border-radius: var(--r-pill);
   padding: 7px var(--sp-4);
   font-size: var(--fs-meta);

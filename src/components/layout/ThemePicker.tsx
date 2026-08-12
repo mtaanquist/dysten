@@ -90,13 +90,13 @@ function Icon({ theme }: { theme: Theme }) {
     );
   }
 
-  // System: a sun whose right-hand side is bitten out by a moon, so the pair
-  // reads as one mark rather than two icons crammed into a button.
+  // System: a display. Sun-and-moon marks read as "both" or "twilight" rather
+  // than "ask the machine"; a monitor is what macOS, GitHub and VS Code all
+  // use for this, and conventions are worth more than invention on a 15px icon.
   return (
     <svg {...common}>
-      <path d="M12 7.2a4.8 4.8 0 0 0 0 9.6" />
-      <path d="M12 2.8v2M4.6 4.6 6 6M2.8 12h2M4.6 19.4 6 18M12 19.2v2" />
-      <path d="M21.2 14.6A6.2 6.2 0 0 1 13 6.4a5 5 0 1 0 8.2 8.2Z" />
+      <rect x="2.6" y="4.2" width="18.8" height="12.4" rx="2" />
+      <path d="M12 16.6v3.2M8.4 19.8h7.2" />
     </svg>
   );
 }

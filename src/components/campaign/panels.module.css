@@ -3,7 +3,7 @@
    the two read as the same campaign. See CampaignCard.module.css for why
    nothing here is muted with opacity. */
 .goal {
-  background: var(--c-accent, var(--c-blue-deep));
+  background: var(--c-accent, var(--c-panel-deep));
   color: var(--c-accent-ink, #fff);
   border-radius: var(--r-panel);
   padding: var(--sp-6) 28px;

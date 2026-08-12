@@ -39,7 +39,7 @@
   align-self: flex-start;
   margin-top: 6px;
   background: var(--c-maroon);
-  color: var(--c-on-solid);
+  color: var(--c-on-dark);
   border: 0;
   border-radius: var(--r-pill);
   padding: 12px var(--sp-6);

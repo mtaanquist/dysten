@@ -169,7 +169,7 @@
 }
 
 .adminNote {
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   text-transform: none;
 }
 
@@ -198,14 +198,14 @@
 
 .input:disabled {
   color: var(--c-ink-disabled);
-  background: var(--c-surface-disabled);
+  background: var(--c-cell-future);
   cursor: not-allowed;
 }
 
 .delete {
   background: transparent;
   border: 0;
-  color: var(--c-maroon);
+  color: var(--c-maroon-fg);
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
   line-height: 1;

@@ -82,18 +82,15 @@ export function Blobs() {
 }
 
 /** A horizontal progress bar. `fraction` is clamped to 0–1 by the caller. */
-export function ProgressBar({
-  fraction,
-  tone = "onAccent",
-  height = 9,
-}: {
-  fraction: number;
-  tone?: "onAccent" | "onLight";
-  height?: number;
-}) {
+/**
+ * The shared-goal bar. Only ever drawn on a campaign-type accent panel, so it
+ * takes its colours from the accent rather than offering a light/dark variant
+ * nothing asked for.
+ */
+export function ProgressBar({ fraction, height = 9 }: { fraction: number; height?: number }) {
   const style = { "--progress-height": `${height}px` } as CSSProperties;
   return (
-    <div className={`${styles.progressTrack} ${styles[`progress_${tone}`]}`} style={style}>
+    <div className={styles.progressTrack} style={style}>
       <div className={styles.progressFill} style={{ width: `${Math.round(fraction * 100)}%` }} />
     </div>
   );

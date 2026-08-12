@@ -1,6 +1,6 @@
 .header {
-  background: var(--c-blue);
-  color: var(--c-on-brand);
+  background: var(--c-header);
+  color: var(--c-on-dark);
   position: relative;
   z-index: 3;
 }
@@ -42,7 +42,7 @@
    colour nor picks up an underline. The second line lifting to full opacity is
    the whole signal, which is as much as a logo needs. */
 .brand:hover {
-  color: var(--c-on-brand);
+  color: var(--c-on-dark);
 }
 
 .brand:hover .tagline {
@@ -50,7 +50,7 @@
 }
 
 .brand:focus-visible {
-  outline: 2px solid var(--c-on-brand);
+  outline: 2px solid var(--c-on-dark);
   outline-offset: 3px;
 }
 
@@ -78,7 +78,7 @@
 .navLink {
   background: transparent;
   border: 0;
-  color: var(--c-on-brand);
+  color: var(--c-on-dark);
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-semibold);
   padding: 9px var(--sp-4);
@@ -91,7 +91,7 @@
 .navLink:hover {
   background: var(--c-on-brand-wash);
   opacity: 1;
-  color: var(--c-on-brand);
+  color: var(--c-on-dark);
 }
 
 .navLinkActive {
@@ -112,7 +112,7 @@
 
 .language {
   background: var(--c-on-brand-wash);
-  color: var(--c-on-brand);
+  color: var(--c-on-dark);
   border: 0;
   border-radius: var(--r-pill);
   padding: 7px 10px;
@@ -192,7 +192,7 @@
 }
 
 .signOut:hover {
-  background: var(--c-blue-light);
+  background: var(--c-chip-bg);
 }
 
 @media (max-width: 640px) {
