@@ -386,6 +386,14 @@ export interface PersonDetail {
   campaignId: string;
   campaignName: string;
   campaignType: string;
+  campaignStart: IsoDate;
+  campaignEnd: IsoDate;
+  /**
+   * Whether this campaign accepts writes at all right now — active, or ended
+   * and reopened for corrections. Answered here rather than at each call site
+   * so the campaign page and the history page cannot drift apart.
+   */
+  editable: boolean;
   total: number;
   rows: { date: IsoDate; value1: number; value2: number; total: number; editedByAdmin: boolean }[];
 }
@@ -397,7 +405,15 @@ export async function getPersonDetail(
   const [campaign, person] = await Promise.all([
     prisma.campaign.findUnique({
       where: { id: campaignId },
-      select: { id: true, name: true, type: true },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        startDate: true,
+        endDate: true,
+        closedEarlyAt: true,
+        reopenedForCorrections: true,
+      },
     }),
     prisma.user.findUnique({
       where: { id: personId },
@@ -423,6 +439,9 @@ export async function getPersonDetail(
     campaignId: campaign.id,
     campaignName: campaign.name,
     campaignType: campaign.type,
+    campaignStart: campaign.startDate,
+    campaignEnd: campaign.endDate,
+    editable: entriesEditable(campaign),
     total: round(entries.reduce((sum, entry) => sum + entry.value1 + entry.value2, 0)),
     rows: entries.map((entry) => ({
       date: entry.date,

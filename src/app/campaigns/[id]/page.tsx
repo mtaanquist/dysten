@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { canAdminister } from "@/lib/permissions";
 import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
@@ -136,7 +137,14 @@ export default async function CampaignPage({
         </div>
       </div>
 
-      {personDetail ? <PersonDrawer detail={personDetail} closeHref={`/campaigns/${id}`} /> : null}
+      {personDetail ? (
+        <PersonDrawer
+          detail={personDetail}
+          closeHref={`/campaigns/${id}`}
+          canCorrect={canAdminister(user)}
+          today={today()}
+        />
+      ) : null}
     </AppShell>
   );
 }

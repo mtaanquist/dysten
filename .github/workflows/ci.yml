@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   check:
-    name: Typecheck and build
+    name: Typecheck, test and build
     runs-on: ubuntu-latest
     env:
       # Prisma needs the variable present to generate a client. Nothing
@@ -34,6 +34,14 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # The scoring rules are pure functions and need no database, so they run
+      # here rather than against the migrated one below.
+      - name: Test
+        run: npm test
 
       - name: Verify migrations apply to an empty database
         run: npx prisma migrate deploy

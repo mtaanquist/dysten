@@ -1,0 +1,6 @@
+# Next serves this directory's contents from the site root.
+#
+# It is empty today — Barlow is fetched by next/font at build time and lands in
+# .next/static, so nothing here is needed yet. The directory is tracked because
+# the Dockerfile's runner stage copies it, and a missing directory fails the
+# image build rather than being skipped.

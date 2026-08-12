@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Role } from "@prisma/client";
 import { useFormatters, useTranslator } from "@/i18n/provider";
 import { CAMPAIGN_TYPE_KEYS } from "@/lib/campaign-types";
@@ -50,13 +50,10 @@ export function CampaignForm({
   const router = useRouter();
   const { showToast } = useToast();
   const [pending, startTransition] = useTransition();
+  // The caller keys this component on the campaign being edited, so switching
+  // campaigns remounts the form and this initial value is re-read. No effect
+  // needs to copy the prop into state afterwards.
   const [draft, setDraft] = useState<DraftState>(editing ?? EMPTY_DRAFT);
-
-  // Following an "edit" link swaps which campaign is loaded; the form has to
-  // follow rather than keep showing the previous one's values.
-  useEffect(() => {
-    setDraft(editing ?? EMPTY_DRAFT);
-  }, [editing]);
 
   const update = (field: keyof DraftState) => (value: string) =>
     setDraft((previous) => ({ ...previous, [field]: value }));
@@ -215,8 +212,8 @@ export function CampaignAdminList({
             </div>
             <div className={styles.campaignType}>{t(`campaignTypes.${campaign.type}.name` as never)}</div>
             <div className={styles.campaignMeta}>
-              {format.dateRange(campaign.startDate, campaign.endDate)} · {campaign.participantCount}{" "}
-              {t("campaign.participants")}
+              {format.dateRange(campaign.startDate, campaign.endDate)} ·{" "}
+              {t("campaign.participantCount", { count: campaign.participantCount })}
             </div>
 
             <div className={styles.campaignActions}>

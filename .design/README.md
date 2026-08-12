@@ -36,7 +36,8 @@ Opening them directly from the filesystem also works in most browsers.
 - **Company name.** The exported originals carried a specific company's name in
   the wordmark and in seeded e-mail addresses. Both have been replaced with
   neutral placeholders here. In the application the wordmark comes from
-  `NEXT_PUBLIC_ORG_NAME`.
+  `ORG_NAME` — deliberately not a `NEXT_PUBLIC_` variable, so that one published
+  image serves any organisation. See [`src/lib/branding.ts`](../src/lib/branding.ts).
 
 The conversation that produced these designs is not stored in the repository.
 Several decisions from it are worth knowing, because the final files are their

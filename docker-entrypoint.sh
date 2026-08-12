@@ -5,7 +5,7 @@ set -e
 # migrations that already exist — it never generates or resets one — so it is
 # safe to run on every start, including when nothing has changed.
 echo "Applying database migrations…"
-./node_modules/.bin/prisma migrate deploy
+node ./cli/node_modules/prisma/build/index.js migrate deploy
 
 # Optional demo data. Off by default, and deliberately so: seeding clears the
 # existing rows first, which would wipe real data on a restart.

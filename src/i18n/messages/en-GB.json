@@ -79,6 +79,8 @@
     "myEntries": "My daily entries",
     "leaderboard": "Leaderboard",
     "participants": "Participants",
+    "participantCount_one": "{count} participant",
+    "participantCount_other": "{count} participants",
     "progress": "Cumulative progress, top 5",
     "highlights": "Highlights",
     "bestDay": "Best single day",
@@ -101,7 +103,10 @@
     "noEntries": "No entries logged in this campaign.",
     "notParticipating": "You are not on this campaign's roster.",
     "editedByAdmin": "edited by admin",
-    "entriesLocked": "This campaign has ended — entries are read-only."
+    "entriesLocked": "This campaign has ended — entries are read-only.",
+    "correctEntries": "Correct entries",
+    "correctEntriesHint": "Anything you change here is saved against this person and marked as an admin correction.",
+    "deleteEntry": "Delete entry"
   },
   "history": {
     "title": "Past campaigns",
@@ -139,6 +144,7 @@
   },
   "toast": {
     "saved": "Saved",
+    "entryDeleted": "Entry deleted",
     "joined": "You are in",
     "campaignCreated": "Campaign created",
     "campaignUpdated": "Campaign updated",

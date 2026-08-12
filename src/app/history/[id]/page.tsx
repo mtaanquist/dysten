@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getHistoryDetail, getPersonDetail } from "@/lib/queries";
-import { canReopenCampaign } from "@/lib/permissions";
+import { canAdminister, canReopenCampaign } from "@/lib/permissions";
+import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
 import { createFormatters } from "@/lib/format";
 import { AppShell } from "@/components/layout/AppShell";
@@ -113,7 +114,18 @@ export default async function HistoryDetailPage({
         </div>
       </div>
 
-      {personDetail ? <PersonDrawer detail={personDetail} closeHref={`/history/${id}`} /> : null}
+      {/* This is where reopening a campaign pays off: a finished campaign that
+          an admin has reopened is editable again, and the drawer is the surface
+          for it. `editable` is decided by the query, so this page and the
+          campaign page cannot disagree about what "reopened" means. */}
+      {personDetail ? (
+        <PersonDrawer
+          detail={personDetail}
+          closeHref={`/history/${id}`}
+          canCorrect={canAdminister(user)}
+          today={today()}
+        />
+      ) : null}
     </AppShell>
   );
 }

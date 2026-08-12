@@ -10,6 +10,23 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
+# ---- Prisma CLI -------------------------------------------------------------
+# The container applies its own migrations on start, which needs the Prisma CLI
+# at runtime. `next build --standalone` traces the *client* but never the CLI,
+# and the CLI has its own dependency tree (@prisma/config pulls in `effect`,
+# among others), so cherry-picking directories out of the build's node_modules
+# produces a binary that cannot load itself.
+#
+# Installing it alone, at the version package.json already pins, gives a small
+# self-contained closure to copy — without dragging the whole dev dependency
+# tree into the final image.
+FROM base AS prisma-cli
+WORKDIR /cli
+COPY package.json /tmp/app-package.json
+RUN npm init -y > /dev/null \
+ && npm install --no-audit --no-fund \
+      "prisma@$(node -p "require('/tmp/app-package.json').devDependencies.prisma")"
+
 # ---- Build ------------------------------------------------------------------
 FROM base AS builder
 WORKDIR /app
@@ -43,24 +60,26 @@ RUN addgroup --system --gid 1001 nodejs \
 
 # Next's standalone output ships its own minimal node_modules, so the whole
 # dependency tree stays out of the final image.
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+#
+# Ownership is set on the way in. A `chown -R` afterwards would rewrite every
+# file into a second layer and roughly double the image.
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# The Prisma CLI and engines, needed so the container can apply its own
-# migrations on start. `standalone` traces the client but not the CLI.
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder /app/prisma ./prisma
+# The Prisma CLI, kept in its own node_modules so Node's resolution finds the
+# CLI's dependencies from it. The entrypoint runs build/index.js — the package's
+# declared bin — directly: COPY dereferences the .bin/prisma symlink into a lone
+# file, which then hunts for its sibling wasm in the wrong directory.
+COPY --from=prisma-cli --chown=nextjs:nodejs /cli/node_modules ./cli/node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # The SQLite file lives on a volume mounted here. Created up front and owned by
 # the app user so the first write does not fail on a read-only parent.
-RUN mkdir -p /data && chown -R nextjs:nodejs /data /app
+RUN mkdir -p /data && chown nextjs:nodejs /data
 
 USER nextjs
 EXPOSE 3000

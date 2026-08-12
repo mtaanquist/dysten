@@ -52,6 +52,11 @@ export default async function ManagePage({
 
         <div className={styles.columns}>
           <CampaignForm
+            // Following an "edit" link must load that campaign's values rather
+            // than keep the previous one's. Keying on the campaign remounts the
+            // form, which is React's own answer to "reset state when a prop
+            // changes" — cheaper and less surprising than an effect.
+            key={editing?.id ?? "new"}
             editing={
               editing
                 ? {

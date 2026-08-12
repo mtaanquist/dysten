@@ -100,6 +100,13 @@
   margin: var(--sp-6) 0 var(--sp-2);
 }
 
+.hint {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--c-ink-soft);
+}
+
 .empty {
   font-size: var(--fs-body-sm);
   color: var(--c-ink-soft);
@@ -113,11 +120,21 @@
   min-width: 360px;
 }
 
+/* The correction view adds a delete column, so it needs a little more room
+   than the read-only table before the drawer starts scrolling sideways. */
+.tableEditing {
+  min-width: 390px;
+}
+
 .headRow,
 .row {
   display: grid;
   grid-template-columns: 1fr 74px 74px 84px;
   gap: var(--sp-2);
+}
+
+.rowEditing {
+  grid-template-columns: 1fr 72px 72px 68px 26px;
 }
 
 .headRow {
@@ -158,4 +175,52 @@
 
 .rowTotal {
   font-weight: var(--fw-bold);
+}
+
+/* Matches the entry calendar's primary field, so a correction looks like the
+   logging it replaces rather than like a different kind of control. */
+.input {
+  width: 100%;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  padding: 6px 7px;
+  border: var(--bd-default);
+  border-radius: var(--r-field-sm);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  text-align: right;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--c-blue);
+}
+
+.input:disabled {
+  color: var(--c-ink-disabled);
+  background: var(--c-surface-disabled);
+  cursor: not-allowed;
+}
+
+.delete {
+  background: transparent;
+  border: 0;
+  color: var(--c-maroon);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+
+.delete:hover {
+  background: var(--c-maroon-soft);
+}
+
+@media (max-width: 640px) {
+  .input {
+    min-height: 38px;
+    font-size: var(--fs-body-sm);
+  }
 }

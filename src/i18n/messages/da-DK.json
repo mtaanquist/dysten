@@ -79,6 +79,8 @@
     "myEntries": "Mine daglige registreringer",
     "leaderboard": "Stillingen",
     "participants": "Deltagere",
+    "participantCount_one": "{count} deltager",
+    "participantCount_other": "{count} deltagere",
     "progress": "Akkumuleret udvikling, top 5",
     "highlights": "Højdepunkter",
     "bestDay": "Bedste enkelte dag",
@@ -101,7 +103,10 @@
     "noEntries": "Ingen registreringer i denne kampagne.",
     "notParticipating": "Du er ikke på denne kampagnes deltagerliste.",
     "editedByAdmin": "rettet af administrator",
-    "entriesLocked": "Kampagnen er afsluttet — registreringer kan ikke ændres."
+    "entriesLocked": "Kampagnen er afsluttet — registreringer kan ikke ændres.",
+    "correctEntries": "Ret registreringer",
+    "correctEntriesHint": "Alt du ændrer her gemmes på denne person og markeres som rettet af administrator.",
+    "deleteEntry": "Slet registrering"
   },
   "history": {
     "title": "Tidligere kampagner",
@@ -139,6 +144,7 @@
   },
   "toast": {
     "saved": "Gemt",
+    "entryDeleted": "Registrering slettet",
     "joined": "Du er med",
     "campaignCreated": "Kampagne oprettet",
     "campaignUpdated": "Kampagne opdateret",

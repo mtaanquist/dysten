@@ -31,8 +31,8 @@ export default async function HistoryPage() {
                   <Pill tone="soft">{t(`campaignTypes.${campaign.type}.name` as never)}</Pill>
                   <div className={styles.name}>{campaign.name}</div>
                   <div className={styles.meta}>
-                    {format.dateRange(campaign.startDate, campaign.endDate)} · {campaign.participantCount}{" "}
-                    {t("campaign.participants")}
+                    {format.dateRange(campaign.startDate, campaign.endDate)} ·{" "}
+                    {t("campaign.participantCount", { count: campaign.participantCount })}
                   </div>
                 </div>
                 <div className={styles.winnerBlock}>

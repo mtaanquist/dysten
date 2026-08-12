@@ -26,3 +26,4 @@ next-env.d.ts
 
 # Design handoff bundle — kept locally as reference, not versioned
 design/
+scratchpad/

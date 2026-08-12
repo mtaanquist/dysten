@@ -47,10 +47,15 @@ calendar where you type your two numbers into any day in the range — including
 days you forgot. Then highlights (best single day, longest streak, biggest
 climber this week), the leaderboard with movement arrows and streak badges, a
 cumulative progress chart for the leading five, and the full roster. Tapping
-anyone opens their day-by-day figures.
+anyone opens their day-by-day figures — and for an admin, on a campaign that
+still accepts entries, those figures are editable. Every day in the range gets a
+row, including days that were never logged, because that is usually what needs
+correcting. Anything an admin changes is stamped as their correction and says so
+wherever it appears.
 
 **History.** Every finished campaign, its final standings with the winner
-highlighted, and the roster exactly as it stood at the end.
+highlighted, and the roster exactly as it stood at the end. An admin who reopens
+one for corrections gets the same editable day-by-day panel there.
 
 **Management.** For captains and admins: create and edit campaigns, manage
 rosters, close a campaign early. Admins can additionally assign roles, delete
@@ -176,6 +181,8 @@ Other scripts:
 | `npm run build` | Production build |
 | `npm start` | Serve a production build |
 | `npm run typecheck` | TypeScript, no emit |
+| `npm test` | The scoring rules, via `node:test`. No database needed |
+| `npm run lint` | ESLint. Next 16 removed `next lint`, so this is the CLI directly |
 | `npm run db:migrate` | Create a migration after editing the schema |
 | `npm run db:seed` | Reset to the demo data |
 | `npm run db:studio` | Browse the database in a GUI |
