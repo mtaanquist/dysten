@@ -1,6 +1,7 @@
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { resolveLocale } from "@/i18n/config";
+import { resolveTheme } from "@/lib/theme";
 import { devAuthProvider } from "./dev-provider";
 import { entraAuthProvider } from "./entra-provider";
 import type { AuthProvider, ExternalIdentity, SessionUser } from "./types";
@@ -89,6 +90,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     displayName: user.displayName,
     role: user.role,
     locale: resolveLocale(user.locale),
+    theme: resolveTheme(user.theme),
     remindersEnabled: user.remindersEnabled,
   };
 }

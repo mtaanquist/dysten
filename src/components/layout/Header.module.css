@@ -1,6 +1,6 @@
 .header {
   background: var(--c-blue);
-  color: #fff;
+  color: var(--c-on-brand);
   position: relative;
   z-index: 3;
 }
@@ -42,7 +42,7 @@
    colour nor picks up an underline. The second line lifting to full opacity is
    the whole signal, which is as much as a logo needs. */
 .brand:hover {
-  color: #fff;
+  color: var(--c-on-brand);
 }
 
 .brand:hover .tagline {
@@ -50,7 +50,7 @@
 }
 
 .brand:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--c-on-brand);
   outline-offset: 3px;
 }
 
@@ -78,7 +78,7 @@
 .navLink {
   background: transparent;
   border: 0;
-  color: #fff;
+  color: var(--c-on-brand);
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-semibold);
   padding: 9px var(--sp-4);
@@ -89,13 +89,13 @@
 }
 
 .navLink:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--c-on-brand-wash);
   opacity: 1;
-  color: #fff;
+  color: var(--c-on-brand);
 }
 
 .navLinkActive {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--c-on-brand-wash);
   opacity: 1;
 }
 
@@ -111,8 +111,8 @@
 }
 
 .language {
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  background: var(--c-on-brand-wash);
+  color: var(--c-on-brand);
   border: 0;
   border-radius: var(--r-pill);
   padding: 7px 10px;
@@ -166,7 +166,7 @@
 .menuName {
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .menuEmail {
@@ -181,7 +181,7 @@
   width: 100%;
   background: var(--c-blue-soft);
   border: 0;
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   border-radius: var(--r-pill);
   padding: 10px var(--sp-5);
   font-size: var(--fs-micro);

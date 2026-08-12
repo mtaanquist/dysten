@@ -7,6 +7,8 @@ import { useLocale, useTranslator } from "@/i18n/provider";
 import { LOCALES, LOCALE_LABELS } from "@/i18n/config";
 import { setLocale, signOut } from "@/app/actions/session";
 import { Avatar } from "@/components/ui";
+import type { Theme } from "@/lib/theme";
+import { ThemePicker } from "./ThemePicker";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -16,6 +18,7 @@ interface HeaderProps {
   displayName: string;
   email: string;
   canManage: boolean;
+  theme: Theme;
 }
 
 const NAV = [
@@ -25,7 +28,7 @@ const NAV = [
   { href: "/manage", key: "nav.management", manageOnly: true },
 ] as const;
 
-export function Header({ orgName, brandName, displayName, email, canManage }: HeaderProps) {
+export function Header({ orgName, brandName, displayName, email, canManage, theme }: HeaderProps) {
   const t = useTranslator();
   const locale = useLocale();
   const pathname = usePathname();
@@ -63,6 +66,8 @@ export function Header({ orgName, brandName, displayName, email, canManage }: He
         </nav>
 
         <div className={styles.tools}>
+          <ThemePicker theme={theme} />
+
           <label className={styles.languageLabel}>
             <span className="srOnly">{t("profile.language")}</span>
             <select

@@ -41,6 +41,10 @@
   },
   "profile": {
     "language": "Language",
+    "theme": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Match my device",
     "signOut": "Sign out",
     "remindersOn": "E-mail reminders on",
     "remindersOff": "E-mail reminders off",

@@ -7,7 +7,7 @@
   font-size: var(--fs-h1);
   font-weight: var(--fw-bold);
   letter-spacing: var(--ls-display);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .empty {
@@ -41,14 +41,14 @@
 
 .card:hover {
   border-color: var(--c-blue-light);
-  background: #fbfdfe;
+  background: var(--c-surface-hover);
   color: inherit;
 }
 
 .name {
   font-size: 21px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   margin-top: 10px;
 }
 
@@ -74,7 +74,7 @@
 .winnerName {
   font-size: 19px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   margin-top: 2px;
 }
 
@@ -105,7 +105,7 @@
   margin: var(--sp-3) 0 var(--sp-1);
   font-size: 30px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   letter-spacing: var(--ls-display);
 }
 
@@ -196,7 +196,7 @@
 .rank {
   font-size: 17px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .person {

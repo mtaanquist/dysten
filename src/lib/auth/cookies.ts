@@ -11,6 +11,9 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 export const SESSION_COOKIE = "atk_session";
 export const LOCALE_COOKIE = "atk_locale";
+/** Mirrors the stored theme so the sign-in page, which has no user, still
+    renders in the right one. */
+export const THEME_COOKIE = "atk_theme";
 
 function secret(): string {
   const value = process.env.APP_SECRET;

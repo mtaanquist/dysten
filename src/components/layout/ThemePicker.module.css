@@ -1,0 +1,71 @@
+/* One pill holding three icon buttons, sized to sit level with the language
+   select beside it. */
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background: var(--c-on-brand-wash);
+}
+
+.option {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--c-on-brand);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.option:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+/* The chosen one is filled rather than merely brighter: on a header that is
+   already one flat colour, opacity alone is too quiet to answer "which is on?". */
+.optionActive {
+  background: var(--c-on-brand);
+  color: var(--c-blue);
+  opacity: 1;
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--c-on-brand);
+  outline-offset: 2px;
+}
+
+/* On the sign-in card there is no blue ground to sit on, so the pill borrows
+   the page's own quiet surface instead. */
+.groupLight {
+  background: var(--c-blue-soft);
+}
+
+.groupLight .option {
+  color: var(--c-ink-soft);
+}
+
+.groupLight .optionActive {
+  background: var(--c-surface);
+  color: var(--c-blue);
+}
+
+.groupLight .option:focus-visible {
+  outline-color: var(--c-blue);
+}
+
+@media (max-width: 640px) {
+  .option {
+    width: 30px;
+    height: 30px;
+  }
+}

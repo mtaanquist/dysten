@@ -40,7 +40,7 @@
 .name {
   font-size: 21px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .email {
@@ -50,7 +50,7 @@
 }
 
 .close {
-  background: #f1f5f9;
+  background: var(--c-surface-mute);
   border: 0;
   border-radius: var(--r-pill);
   width: 32px;
@@ -66,7 +66,7 @@
 
 .close:hover {
   background: var(--c-blue-soft);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .summary {
@@ -87,7 +87,7 @@
 .summaryValue {
   font-size: 26px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   margin-top: var(--sp-1);
 }
 

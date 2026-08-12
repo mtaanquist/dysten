@@ -55,7 +55,7 @@
 
 .primary {
   background: var(--c-maroon);
-  color: #fff;
+  color: var(--c-on-solid);
   border: 0;
   border-radius: var(--r-pill);
   padding: 13px var(--sp-6);
@@ -133,7 +133,7 @@
 .campaignName {
   font-size: 16px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 /* Type gets its own row so it never collides with a long campaign name. */
@@ -175,12 +175,12 @@
 .secondary {
   background: var(--c-blue-soft);
   border: 0;
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .secondary:hover {
   background: var(--c-blue-light);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .destructive {
@@ -263,12 +263,12 @@
   align-items: center;
   gap: 7px;
   background: var(--c-surface);
-  border: 1px dashed #c9d9e6;
+  border: 1px dashed var(--c-border-dashed);
   border-radius: var(--r-pill);
   padding: 7px var(--sp-4);
   font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   cursor: pointer;
 }
 

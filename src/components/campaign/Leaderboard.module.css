@@ -59,7 +59,7 @@
 .rank {
   font-size: 17px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .person {

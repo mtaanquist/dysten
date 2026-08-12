@@ -41,6 +41,10 @@
   },
   "profile": {
     "language": "Sprog",
+    "theme": "Udseende",
+    "themeLight": "Lyst",
+    "themeDark": "Mørkt",
+    "themeSystem": "Følg min enhed",
     "signOut": "Log ud",
     "remindersOn": "E-mailpåmindelser slået til",
     "remindersOff": "E-mailpåmindelser slået fra",

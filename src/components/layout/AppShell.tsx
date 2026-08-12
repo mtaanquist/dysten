@@ -23,6 +23,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           displayName={user.displayName}
           email={user.email}
           canManage={atLeast(user.role, Role.CAPTAIN)}
+          theme={user.theme}
         />
         <main className={styles.container}>{children}</main>
       </div>

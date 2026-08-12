@@ -55,7 +55,7 @@
   font-size: var(--fs-meta);
   text-transform: uppercase;
   letter-spacing: var(--ls-label);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   font-weight: var(--fw-bold);
   margin-bottom: 10px;
 }
@@ -126,7 +126,7 @@
 .dayNumber {
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .dayNumberFuture {
@@ -165,7 +165,7 @@
 
 .inputSecondary {
   border: 1px solid var(--c-border-input-quiet);
-  background: #fbfcfd;
+  background: var(--c-field-quiet);
   color: var(--c-ink-muted);
 }
 

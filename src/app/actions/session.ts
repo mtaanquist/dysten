@@ -5,9 +5,16 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { COOKIE_OPTIONS, LOCALE_COOKIE, SESSION_COOKIE, signValue } from "@/lib/auth/cookies";
+import {
+  COOKIE_OPTIONS,
+  LOCALE_COOKIE,
+  SESSION_COOKIE,
+  THEME_COOKIE,
+  signValue,
+} from "@/lib/auth/cookies";
 import { devAuthProvider } from "@/lib/auth/dev-provider";
 import { isLocale } from "@/i18n/config";
+import { isTheme } from "@/lib/theme";
 
 /**
  * Development sign-in: adopt a seeded account.
@@ -50,6 +57,25 @@ export async function setLocale(locale: string) {
   const user = await getCurrentUser();
   if (user) {
     await prisma.user.update({ where: { id: user.id }, data: { locale } });
+  }
+
+  revalidatePath("/", "layout");
+}
+
+/**
+ * Light, dark or system. Saved against the account like the language, with the
+ * cookie mirroring it so the sign-in page — which has no user — still renders
+ * in the chosen theme.
+ */
+export async function setTheme(theme: string) {
+  if (!isTheme(theme)) return;
+
+  const store = await cookies();
+  store.set(THEME_COOKIE, theme, { ...COOKIE_OPTIONS, httpOnly: false });
+
+  const user = await getCurrentUser();
+  if (user) {
+    await prisma.user.update({ where: { id: user.id }, data: { theme } });
   }
 
   revalidatePath("/", "layout");

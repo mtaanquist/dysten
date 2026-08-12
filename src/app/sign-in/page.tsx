@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, authProvider } from "@/lib/auth";
-import { LOCALE_COOKIE } from "@/lib/auth/cookies";
+import { LOCALE_COOKIE, THEME_COOKIE } from "@/lib/auth/cookies";
 import { resolveLocale } from "@/i18n/config";
+import { resolveTheme } from "@/lib/theme";
+import { ThemePicker } from "@/components/layout/ThemePicker";
 import { createTranslator } from "@/i18n/translate";
 import { signInAsUser } from "@/app/actions/session";
 import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
@@ -23,6 +25,8 @@ export default async function SignInPage({
   const { accounts } = await searchParams;
   const store = await cookies();
   const locale = resolveLocale(store.get(LOCALE_COOKIE)?.value);
+  // Nobody is signed in here, so both preferences come from this browser.
+  const theme = resolveTheme(store.get(THEME_COOKIE)?.value);
   const t = createTranslator(locale);
 
   const provider = authProvider();
@@ -102,6 +106,7 @@ export default async function SignInPage({
           )}
 
           <div className={styles.language}>
+            <ThemePicker theme={theme} variant="light" />
             <LanguagePicker locale={locale} variant="light" />
           </div>
         </div>

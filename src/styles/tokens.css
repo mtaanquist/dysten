@@ -1,12 +1,47 @@
-/* Activity Campaign Tracker — design tokens
-   Ported verbatim from the design handoff. These are the canonical values
-   behind every component; nothing in the app should hard-code a hex, a radius
-   or a shadow that appears here. */
+/* Dysten — design tokens
+   The canonical values behind every component; nothing else in the app
+   hard-codes a colour, a radius or a shadow.
+
+   ---------------------------------------------------------------------------
+   Two palettes, three states
+   ---------------------------------------------------------------------------
+   The light palette is defined on a bare `:root`, so it is what any element
+   gets by default. The dark palette is applied twice, and it has to be:
+
+     @media (prefers-color-scheme: dark) — when the reader's OS asks for dark
+       and they have not overridden it here. The `:not([data-theme="light"])`
+       guard is what lets an explicit light choice beat the OS.
+
+     [data-theme="dark"]                 — when they have chosen dark outright,
+       whatever the OS says.
+
+   "System" is the absence of the attribute, so it needs no rule of its own.
+   The attribute is written server-side in the root layout from the stored
+   preference, which is why the theme is right in the very first paint rather
+   than flickering once a script runs.
+
+   `color-scheme` is what makes the parts we do not style — native selects, the
+   date picker, scrollbars, form autofill — follow along. This app leans on all
+   of those, so it is not optional.
+
+   The dark values below are PROVISIONAL: structure first, so the toggle works
+   and every surface is reachable. They are meant to be replaced wholesale by
+   the palette coming from the design work, which is a single edit to the two
+   blocks at the foot of this file. Only two things there are load-bearing:
+   the type accents darken (a pastel glares on a dark ground, and the ink on
+   them has to flip), and --c-on-solid stops being white. */
 
 :root {
+  color-scheme: light;
+
   /* ---- Brand ---- */
   --c-blue: #1789ce;          /* header bars, links, active states, chart line 1 */
-  --c-blue-deep: #10405f;     /* headings, hero panels, dark surfaces */
+  --c-blue-deep: #10405f;     /* hero panels and other dark surfaces */
+  /* Headings were the same navy as the dark panels, which works only while the
+     page is light. On a dark ground the two have to move in opposite
+     directions — the panel stays dark, the heading has to lift off it — so
+     they are separate tokens even though they are the same colour here. */
+  --c-heading: #10405f;       /* page titles, panel titles, campaign names */
   --c-blue-light: #a9c7e8;    /* pills, progress fill on dark, blobs */
   --c-blue-soft: #eef4f9;     /* quiet pill / chip background */
   --c-blue-tint: #eef6fc;     /* today cell, active toggle background */
@@ -36,6 +71,20 @@
   --c-border-input-quiet: #eef0f2; /* secondary calendar input */
   --c-grid-line: #f0f5f9;     /* chart gridlines */
   --c-grey-blob: #dce5ec;     /* decorative organic shape */
+
+  /* ---- On coloured surfaces ----
+     Text and washes that sit on a brand-coloured ground rather than on the
+     page. Named rather than written as #fff at each site, because "white"
+     stops being the answer the moment the ground beneath it changes — which is
+     the whole premise of a second theme. */
+  --c-on-brand: #ffffff;            /* text on the blue header */
+  --c-on-brand-wash: rgb(255 255 255 / 0.16);  /* hover/active pill in the header */
+  --c-on-brand-blob: rgb(255 255 255 / 0.22);  /* decorative shape on a coloured panel */
+  --c-on-solid: #ffffff;            /* text on a filled maroon or deep-blue control */
+  --c-surface-hover: #fbfdfe;       /* row and card hover ground */
+  --c-surface-mute: #f1f5f9;        /* quiet circular control, e.g. the drawer close */
+  --c-field-quiet: #fbfcfd;         /* secondary calendar input */
+  --c-border-dashed: #c9d9e6;       /* dashed "add participant" outline */
 
   /* ---- Campaign type accents ----
      One colour per campaign type, so a step campaign and a bike campaign are
@@ -153,4 +202,152 @@
   /* ---- Organic decoration ---- */
   --blob-a: 58% 42% 47% 53% / 52% 46% 54% 48%;
   --blob-b: 46% 54% 60% 40% / 55% 45% 55% 45%;
+}
+
+/* ---------------------------------------------------------------------------
+   Dark palette
+   Kept identical in both blocks below; they are generated together rather than
+   hand-maintained, because two copies that drift is the obvious failure here.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  /* The OS asks for dark, and the reader has not explicitly chosen light. */
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    /* Brand */
+    --c-blue:           #4aa8e4;  /* header bars, links, active states */
+    --c-blue-deep:      #0d2b3e;  /* deep ground, hero panels */
+    --c-heading:        #dbe7f2;  /* lifts off the ground rather than sinking into it */
+    --c-blue-light:     #7fb4de;  /* pills, progress fill */
+    --c-blue-soft:      #1b2c3a;  /* quiet pill / chip background */
+    --c-blue-tint:      #152b3b;  /* today cell, active toggle background */
+    --c-maroon:         #d1596d;  /* primary action, rank accent, alerts */
+    --c-maroon-dark:    #e0768a;  /* primary action hover — lighter, not darker */
+    --c-maroon-soft:    #3a2129;  /* streak badge, gap chip background */
+    --c-maroon-line:    #5c3a42;  /* dashed border on un-logged days */
+    --c-maroon-outline: #5c3a42;  /* destructive button border */
+    --c-green:          #4fb98a;  /* positive rank movement only */
+
+    /* Neutrals */
+    --c-page:               #0f1720;  /* app background */
+    --c-surface:            #16212c;  /* cards, inputs */
+    --c-surface-quiet:      #1b2836;  /* nested panels, hover rows */
+    --c-surface-missing:    #1d1a1d;  /* un-logged calendar day */
+    --c-surface-disabled:   #141c25;  /* future calendar day */
+    --c-field:              #1b2836;  /* resting form field fill */
+    --c-ink:                #e8eef4;  /* body text */
+    --c-ink-muted:          #b8c6d3;  /* secondary prose */
+    --c-ink-soft:           #96a6b5;  /* labels, metadata */
+    --c-ink-faint:          #75899a;  /* hints, units, table headers */
+    --c-ink-disabled:       #4a5c6b;  /* future dates */
+    --c-border:             #2a3a4a;  /* card + control borders */
+    --c-border-quiet:       #22303e;  /* inner dividers */
+    --c-border-row:         #1e2b38;  /* table row rules */
+    --c-border-field:       #33465a;  /* form field borders */
+    --c-border-input-quiet: #26333f;  /* secondary calendar input */
+    --c-grid-line:          #22303e;  /* chart gridlines */
+    --c-grey-blob:          #1b2836;  /* decorative organic shape */
+
+    /* On coloured surfaces */
+    --c-on-brand:      #ffffff;  /* text on the blue header */
+    --c-on-brand-wash: rgb(255 255 255 / 0.14);  /* hover/active pill in the header */
+    --c-on-brand-blob: rgb(255 255 255 / 0.10);  /* decorative shape on a coloured panel */
+    --c-on-solid:      #0f1720;  /* text on a filled control — dark, not white */
+    --c-surface-hover: #1e2b38;  /* row and card hover ground */
+    --c-surface-mute:  #22303e;  /* quiet circular control */
+    --c-field-quiet:   #18242f;  /* secondary calendar input */
+    --c-border-dashed: #3a4c5e;  /* dashed add-participant outline */
+
+    /* Campaign type accents */
+    --c-type-step:  #2f6b46;  /* deepened so light text sits on it */
+    --c-type-bike:  #7a3a54;  /* ditto — a pastel would glare here */
+    --c-type-ink:   var(--c-ink);  /* and the ink flips with it */
+    --c-type-track: rgb(255 255 255 / 0.16);
+    --c-type-line:  rgb(255 255 255 / 0.20);
+
+    /* Chart series */
+    --c-series-1: #4aa8e4;
+    --c-series-2: #d1596d;
+    --c-series-3: #7fc4ea;
+    --c-series-4: #8fa3b5;
+    --c-series-5: #5f7f9e;
+
+    /* Elevation — shadows read as darker, not softer, on a dark ground */
+    --sh-card-hover: 0 10px 28px rgb(0 0 0 / 0.45);
+    --sh-signin:     0 24px 60px rgb(0 0 0 / 0.55);
+    --sh-drawer:     -20px 0 60px rgb(0 0 0 / 0.6);
+    --sh-toast:      0 12px 30px rgb(0 0 0 / 0.6);
+    --overlay-scrim: rgb(0 0 0 / 0.62);
+  }
+}
+
+/* An explicit choice of dark, whatever the OS prefers. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+    /* Brand */
+    --c-blue:           #4aa8e4;  /* header bars, links, active states */
+    --c-blue-deep:      #0d2b3e;  /* deep ground, hero panels */
+    --c-heading:        #dbe7f2;  /* lifts off the ground rather than sinking into it */
+    --c-blue-light:     #7fb4de;  /* pills, progress fill */
+    --c-blue-soft:      #1b2c3a;  /* quiet pill / chip background */
+    --c-blue-tint:      #152b3b;  /* today cell, active toggle background */
+    --c-maroon:         #d1596d;  /* primary action, rank accent, alerts */
+    --c-maroon-dark:    #e0768a;  /* primary action hover — lighter, not darker */
+    --c-maroon-soft:    #3a2129;  /* streak badge, gap chip background */
+    --c-maroon-line:    #5c3a42;  /* dashed border on un-logged days */
+    --c-maroon-outline: #5c3a42;  /* destructive button border */
+    --c-green:          #4fb98a;  /* positive rank movement only */
+
+    /* Neutrals */
+    --c-page:               #0f1720;  /* app background */
+    --c-surface:            #16212c;  /* cards, inputs */
+    --c-surface-quiet:      #1b2836;  /* nested panels, hover rows */
+    --c-surface-missing:    #1d1a1d;  /* un-logged calendar day */
+    --c-surface-disabled:   #141c25;  /* future calendar day */
+    --c-field:              #1b2836;  /* resting form field fill */
+    --c-ink:                #e8eef4;  /* body text */
+    --c-ink-muted:          #b8c6d3;  /* secondary prose */
+    --c-ink-soft:           #96a6b5;  /* labels, metadata */
+    --c-ink-faint:          #75899a;  /* hints, units, table headers */
+    --c-ink-disabled:       #4a5c6b;  /* future dates */
+    --c-border:             #2a3a4a;  /* card + control borders */
+    --c-border-quiet:       #22303e;  /* inner dividers */
+    --c-border-row:         #1e2b38;  /* table row rules */
+    --c-border-field:       #33465a;  /* form field borders */
+    --c-border-input-quiet: #26333f;  /* secondary calendar input */
+    --c-grid-line:          #22303e;  /* chart gridlines */
+    --c-grey-blob:          #1b2836;  /* decorative organic shape */
+
+    /* On coloured surfaces */
+    --c-on-brand:      #ffffff;  /* text on the blue header */
+    --c-on-brand-wash: rgb(255 255 255 / 0.14);  /* hover/active pill in the header */
+    --c-on-brand-blob: rgb(255 255 255 / 0.10);  /* decorative shape on a coloured panel */
+    --c-on-solid:      #0f1720;  /* text on a filled control — dark, not white */
+    --c-surface-hover: #1e2b38;  /* row and card hover ground */
+    --c-surface-mute:  #22303e;  /* quiet circular control */
+    --c-field-quiet:   #18242f;  /* secondary calendar input */
+    --c-border-dashed: #3a4c5e;  /* dashed add-participant outline */
+
+    /* Campaign type accents */
+    --c-type-step:  #2f6b46;  /* deepened so light text sits on it */
+    --c-type-bike:  #7a3a54;  /* ditto — a pastel would glare here */
+    --c-type-ink:   var(--c-ink);  /* and the ink flips with it */
+    --c-type-track: rgb(255 255 255 / 0.16);
+    --c-type-line:  rgb(255 255 255 / 0.20);
+
+    /* Chart series */
+    --c-series-1: #4aa8e4;
+    --c-series-2: #d1596d;
+    --c-series-3: #7fc4ea;
+    --c-series-4: #8fa3b5;
+    --c-series-5: #5f7f9e;
+
+    /* Elevation — shadows read as darker, not softer, on a dark ground */
+    --sh-card-hover: 0 10px 28px rgb(0 0 0 / 0.45);
+    --sh-signin:     0 24px 60px rgb(0 0 0 / 0.55);
+    --sh-drawer:     -20px 0 60px rgb(0 0 0 / 0.6);
+    --sh-toast:      0 12px 30px rgb(0 0 0 / 0.6);
+    --overlay-scrim: rgb(0 0 0 / 0.62);
 }

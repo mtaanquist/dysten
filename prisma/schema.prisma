@@ -34,6 +34,10 @@ model User {
   role      Role    @default(MEMBER)
   /// BCP-47 tag chosen in profile settings; see src/i18n/config.ts.
   locale    String  @default("da-DK")
+  /// "light" | "dark" | "system". Default follows the reader's OS; see
+  /// src/lib/theme.ts. Stored per person, like locale, so it follows them
+  /// between devices rather than living only in one browser.
+  theme     String  @default("system")
   /// Opt-in e-mail nudge when yesterday has no entry during an active campaign.
   remindersEnabled Boolean @default(true)
 

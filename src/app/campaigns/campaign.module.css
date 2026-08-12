@@ -12,7 +12,7 @@
 
 .switch {
   background: var(--c-surface);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   border: var(--bd-default);
   border-radius: var(--r-pill);
   padding: 9px var(--sp-5);
@@ -25,17 +25,17 @@
 
 .switch:hover {
   border-color: var(--c-blue);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .switchActive {
   background: var(--c-blue-deep);
-  color: #fff;
+  color: var(--c-on-solid);
   border-color: var(--c-blue-deep);
 }
 
 .switchActive:hover {
-  color: #fff;
+  color: var(--c-on-solid);
 }
 
 .header {
@@ -54,7 +54,7 @@
   margin: var(--sp-3) 0 var(--sp-1);
   font-size: var(--fs-h1);
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   letter-spacing: var(--ls-display);
 }
 

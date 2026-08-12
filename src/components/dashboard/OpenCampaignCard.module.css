@@ -19,7 +19,7 @@
   margin: 0;
   font-size: 19px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .meta {
@@ -39,7 +39,7 @@
   align-self: flex-start;
   margin-top: 6px;
   background: var(--c-maroon);
-  color: #fff;
+  color: var(--c-on-solid);
   border: 0;
   border-radius: var(--r-pill);
   padding: 12px var(--sp-6);

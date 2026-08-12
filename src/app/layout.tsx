@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Barlow } from "next/font/google";
 import { cookies } from "next/headers";
 import { getCurrentUser } from "@/lib/auth";
-import { LOCALE_COOKIE } from "@/lib/auth/cookies";
+import { LOCALE_COOKIE, THEME_COOKIE } from "@/lib/auth/cookies";
 import { resolveLocale } from "@/i18n/config";
+import { resolveTheme, themeAttribute } from "@/lib/theme";
 import { LocaleProvider } from "@/i18n/provider";
 import { createTranslator } from "@/i18n/translate";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -33,6 +34,14 @@ async function currentLocale() {
   return resolveLocale(store.get(LOCALE_COOKIE)?.value);
 }
 
+/** Same story for the theme: the account's choice, else this browser's. */
+async function currentTheme() {
+  const user = await getCurrentUser();
+  if (user) return user.theme;
+  const store = await cookies();
+  return resolveTheme(store.get(THEME_COOKIE)?.value);
+}
+
 /**
  * The browser tab follows the reader's language too — the product name is
  * translated copy (`app.tagline`), not a literal, so it cannot be a static
@@ -48,15 +57,26 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * The browser chrome — the address bar on Android, the status bar on iOS —
+ * takes its colour from here, so it needs one value per palette or it stays
+ * light blue behind a dark page.
+ */
 export const viewport: Viewport = {
-  themeColor: "#1789ce",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1789ce" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d2b3e" },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await currentLocale();
+  const [locale, theme] = await Promise.all([currentLocale(), currentTheme()]);
 
   return (
-    <html lang={locale} className={barlow.variable}>
+    // No attribute at all for "system" — that is what hands the decision to
+    // prefers-color-scheme in tokens.css. Written here on the server, so the
+    // first paint is already correct rather than corrected.
+    <html lang={locale} data-theme={themeAttribute(theme) ?? undefined} className={barlow.variable}>
       <body>
         <LocaleProvider locale={locale}>
           <ToastProvider>{children}</ToastProvider>

@@ -14,7 +14,7 @@
 
 .button:hover {
   background: var(--c-maroon);
-  color: #fff;
+  color: var(--c-on-solid);
 }
 
 .button:disabled {

@@ -32,7 +32,7 @@
 }
 
 .avatar_solid {
-  background: #fff;
+  background: var(--c-surface);
   color: var(--c-blue);
 }
 
@@ -53,13 +53,13 @@
   text-transform: uppercase;
   letter-spacing: var(--ls-label);
   padding: 5px 11px;
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 /* Painted in the campaign type's own colour, handed in as --c-accent. */
 .pill_type {
   background: var(--c-accent, var(--c-blue-light));
-  color: var(--c-accent-ink, var(--c-blue-deep));
+  color: var(--c-accent-ink, var(--c-heading));
 }
 
 .pill_light {
@@ -79,7 +79,7 @@
 
 .pill_solid {
   background: var(--c-maroon);
-  color: #fff;
+  color: var(--c-on-solid);
   font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
   padding: 7px var(--sp-4);
@@ -116,14 +116,14 @@
   margin: 0;
   font-size: var(--fs-h3);
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 .panelTitleSm {
   margin: 0;
   font-size: 17px;
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
 }
 
 /* ---- Decorative blobs ---- */

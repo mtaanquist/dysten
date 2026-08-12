@@ -61,7 +61,7 @@
 .highlightValue {
   font-size: var(--fs-h2);
   font-weight: var(--fw-bold);
-  color: var(--c-blue-deep);
+  color: var(--c-heading);
   margin-top: var(--sp-2);
 }
 

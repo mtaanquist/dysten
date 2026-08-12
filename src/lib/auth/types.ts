@@ -1,5 +1,6 @@
 import type { Role } from "@prisma/client";
 import type { Locale } from "@/i18n/config";
+import type { Theme } from "@/lib/theme";
 
 /** The identity an auth provider hands back, before it's matched to a User row. */
 export interface ExternalIdentity {
@@ -16,6 +17,7 @@ export interface SessionUser {
   /** The role stored against the account; what every permission check reads. */
   role: Role;
   locale: Locale;
+  theme: Theme;
   remindersEnabled: boolean;
 }
 
