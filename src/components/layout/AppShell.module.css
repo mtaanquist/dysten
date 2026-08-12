@@ -1,0 +1,27 @@
+.root {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.stack {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  display: block;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  /* The side padding the design settled on — History and Management get it
+     from here rather than each page re-declaring its own. */
+  padding: var(--sp-7) var(--page-pad-x) 70px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: var(--sp-5) var(--sp-4) 56px;
+  }
+}

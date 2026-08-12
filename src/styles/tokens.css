@@ -1,49 +1,55 @@
-/* Consortio IT Activity Tracker — design tokens
-   Handoff reference. The prototype is inline-styled; these are the
-   canonical values behind it, ready to drop into the real front end. */
+/* Activity Campaign Tracker — design tokens
+   Ported verbatim from the design handoff. These are the canonical values
+   behind every component; nothing in the app should hard-code a hex, a radius
+   or a shadow that appears here. */
 
 :root {
   /* ---- Brand ---- */
-  --c-blue: #1789CE;          /* header bars, links, active states, chart line 1 */
-  --c-blue-deep: #10405F;     /* headings, hero panels, dark surfaces */
-  --c-blue-light: #A9C7E8;    /* pills, progress fill on dark, blobs */
-  --c-blue-soft: #EEF4F9;     /* quiet pill / chip background */
-  --c-blue-tint: #EEF6FC;     /* today cell, active toggle background */
-  --c-maroon: #A93B4E;        /* primary action, rank accent, alerts */
-  --c-maroon-dark: #8E2E3F;   /* primary action hover, alert text */
-  --c-maroon-soft: #FCEEF0;   /* streak badge, gap chip background */
-  --c-maroon-line: #E4C9CE;   /* dashed border on un-logged calendar days */
-  --c-green: #2E7D5B;         /* positive rank movement only */
+  --c-blue: #1789ce;          /* header bars, links, active states, chart line 1 */
+  --c-blue-deep: #10405f;     /* headings, hero panels, dark surfaces */
+  --c-blue-light: #a9c7e8;    /* pills, progress fill on dark, blobs */
+  --c-blue-soft: #eef4f9;     /* quiet pill / chip background */
+  --c-blue-tint: #eef6fc;     /* today cell, active toggle background */
+  --c-maroon: #a93b4e;        /* primary action, rank accent, alerts */
+  --c-maroon-dark: #8e2e3f;   /* primary action hover, alert text */
+  --c-maroon-soft: #fceef0;   /* streak badge, gap chip background */
+  --c-maroon-line: #e4c9ce;   /* dashed border on un-logged calendar days */
+  --c-maroon-outline: #f0d2d7;/* destructive button border */
+  --c-green: #2e7d5b;         /* positive rank movement only */
 
   /* ---- Neutrals ---- */
-  --c-page: #F4F8FB;          /* app background */
-  --c-surface: #FFFFFF;       /* cards, inputs */
-  --c-surface-quiet: #F7FBFD; /* nested panels, hover rows */
-  --c-field: #F8FBFD;         /* resting form field fill */
-  --c-ink: #16232E;           /* body text */
-  --c-ink-muted: #4A5C6B;     /* secondary prose */
-  --c-ink-soft: #6B7C8C;      /* labels, metadata */
-  --c-ink-faint: #9AAAB8;     /* hints, units, table headers */
-  --c-ink-disabled: #C3CFD9;  /* future dates */
-  --c-border: #E1EAF2;        /* card + control borders */
-  --c-border-quiet: #EDF2F7;  /* inner dividers */
-  --c-border-row: #F3F7FA;    /* table row rules */
-  --c-border-field: #D8E4EE;  /* form field borders */
-  --c-grey-blob: #DCE5EC;     /* decorative organic shape */
+  --c-page: #f4f8fb;          /* app background */
+  --c-surface: #ffffff;       /* cards, inputs */
+  --c-surface-quiet: #f7fbfd; /* nested panels, hover rows */
+  --c-surface-missing: #fdfbfb; /* un-logged calendar day */
+  --c-surface-disabled: #fafbfc; /* future calendar day */
+  --c-field: #f8fbfd;         /* resting form field fill */
+  --c-ink: #16232e;           /* body text */
+  --c-ink-muted: #4a5c6b;     /* secondary prose */
+  --c-ink-soft: #6b7c8c;      /* labels, metadata */
+  --c-ink-faint: #9aaab8;     /* hints, units, table headers */
+  --c-ink-disabled: #c3cfd9;  /* future dates */
+  --c-border: #e1eaf2;        /* card + control borders */
+  --c-border-quiet: #edf2f7;  /* inner dividers */
+  --c-border-row: #f3f7fa;    /* table row rules */
+  --c-border-field: #d8e4ee;  /* form field borders */
+  --c-border-input-quiet: #eef0f2; /* secondary calendar input */
+  --c-grid-line: #f0f5f9;     /* chart gridlines */
+  --c-grey-blob: #dce5ec;     /* decorative organic shape */
 
   /* ---- Chart series (in order) ---- */
-  --c-series-1: #1789CE;
-  --c-series-2: #A93B4E;
-  --c-series-3: #4FA3D9;
-  --c-series-4: #6B7C8C;
-  --c-series-5: #A9C7E8;
+  --c-series-1: #1789ce;
+  --c-series-2: #a93b4e;
+  --c-series-3: #4fa3d9;
+  --c-series-4: #6b7c8c;
+  --c-series-5: #a9c7e8;
 
   /* ---- Typography ---- */
-  --font-sans: Barlow, Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-barlow), Barlow, Helvetica, Arial, sans-serif;
 
   --fs-display: 34px;   /* dashboard greeting */
   --fs-h1: 32px;        /* page titles */
-  --fs-h2: 24px;        /* campaign name in card */
+  --fs-h2: 22px;        /* campaign name in card */
   --fs-h3: 20px;        /* panel titles */
   --fs-stat: 22px;      /* stat numbers in hero panel */
   --fs-stat-lg: 44px;   /* days-remaining counter */
@@ -81,7 +87,7 @@
   --sp-8: 30px;
   --gap-card: 14px;       /* between stacked cards */
   --gap-grid: 18px;       /* between column groups */
-  --pad-card: 22px 24px;  /* campaign row card */
+  --pad-card: 20px 22px;  /* campaign row card */
   --pad-panel: 24px 26px; /* content panel */
 
   /* ---- Radii ---- */
@@ -124,9 +130,4 @@
   /* ---- Organic decoration ---- */
   --blob-a: 58% 42% 47% 53% / 52% 46% 54% 48%;
   --blob-b: 46% 54% 60% 40% / 55% 45% 55% 45%;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
 }

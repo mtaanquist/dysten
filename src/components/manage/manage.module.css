@@ -1,0 +1,327 @@
+.form {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.field {
+  display: block;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 6px;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  font-size: var(--fs-body);
+  padding: 11px var(--sp-4);
+  border: 1px solid var(--c-border-field);
+  border-radius: var(--r-field);
+  background: var(--c-field);
+  color: var(--c-ink);
+  min-height: var(--touch-min);
+}
+
+.textarea {
+  resize: vertical;
+  line-height: var(--lh-body);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--c-blue);
+  background: var(--c-surface);
+}
+
+.dateRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-3);
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: var(--sp-1);
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: var(--c-maroon);
+  color: #fff;
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 13px var(--sp-6);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: var(--touch-min);
+}
+
+.primary:hover {
+  background: var(--c-maroon-dark);
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.ghost {
+  background: transparent;
+  border: 0;
+  color: var(--c-ink-soft);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ghost:hover {
+  color: var(--c-maroon);
+}
+
+/* ---- Campaign list ---- */
+.campaignList {
+  display: grid;
+  gap: 10px;
+  margin-top: var(--sp-3);
+}
+
+.campaignRow {
+  border: var(--bd-quiet);
+  border-radius: var(--sp-4);
+  padding: var(--sp-4) var(--sp-4);
+}
+
+.campaignHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  flex: 0 0 auto;
+}
+
+.statusActive {
+  background: var(--c-blue);
+}
+
+.statusUpcoming {
+  background: var(--c-ink-soft);
+}
+
+.statusEnded {
+  background: var(--c-ink-faint);
+}
+
+.campaignName {
+  font-size: 16px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+/* Type gets its own row so it never collides with a long campaign name. */
+.campaignType {
+  font-size: var(--fs-label);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+  margin-top: 2px;
+}
+
+.campaignMeta {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  margin-top: 3px;
+}
+
+.campaignActions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.secondary,
+.destructive {
+  border-radius: var(--r-pill);
+  padding: 8px var(--sp-4);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  /* The pill labels must never wrap mid-word. */
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.secondary {
+  background: var(--c-blue-soft);
+  border: 0;
+  color: var(--c-blue-deep);
+}
+
+.secondary:hover {
+  background: var(--c-blue-light);
+  color: var(--c-blue-deep);
+}
+
+.destructive {
+  background: transparent;
+  border: 1px solid var(--c-maroon-outline);
+  color: var(--c-maroon);
+}
+
+.destructive:hover {
+  background: var(--c-maroon-soft);
+}
+
+.secondary:disabled,
+.destructive:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* ---- Roster ---- */
+.rosterCampaign {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  margin: 2px 0 var(--sp-3);
+}
+
+.emptyNote {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-faint);
+  margin: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--c-surface-quiet);
+  border: var(--bd-quiet);
+  border-radius: var(--r-pill);
+  padding: 5px var(--sp-2) 5px 6px;
+}
+
+.chipName {
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+}
+
+.chipRemove {
+  background: transparent;
+  border: 0;
+  color: var(--c-maroon);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  padding: 0 var(--sp-1);
+}
+
+.addSection {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: var(--bd-quiet);
+}
+
+.addLabel {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-bold);
+  margin-bottom: 10px;
+}
+
+.addChip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--c-surface);
+  border: 1px dashed #c9d9e6;
+  border-radius: var(--r-pill);
+  padding: 7px var(--sp-4);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  color: var(--c-blue-deep);
+  cursor: pointer;
+}
+
+.addChip:hover {
+  border-color: var(--c-blue);
+  background: var(--c-surface-quiet);
+}
+
+/* ---- Roles ---- */
+.adminOnly {
+  font-size: var(--fs-meta);
+  color: var(--c-maroon);
+  font-weight: var(--fw-semibold);
+  margin: 2px 0 var(--sp-3);
+}
+
+.roleList {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--c-border-row);
+}
+
+.roleText {
+  flex: 1;
+  min-width: 0;
+}
+
+.roleName {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.roleEmail {
+  font-size: var(--fs-label);
+  color: var(--c-ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleSelect {
+  border: var(--bd-default);
+  background: var(--c-field);
+  border-radius: var(--r-pill);
+  padding: 7px 10px;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}

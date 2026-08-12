@@ -1,0 +1,38 @@
+.page {
+  animation: fadeUp var(--dur-enter) var(--ease-out) both;
+}
+
+.section {
+  margin-top: var(--sp-7);
+}
+
+.sectionLabel {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-brand);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-bold);
+}
+
+.cardStack {
+  display: grid;
+  gap: var(--gap-card);
+}
+
+.openGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--gap-card);
+}
+
+.empty {
+  margin: 0;
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-card);
+  padding: var(--sp-6);
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-muted);
+  line-height: var(--lh-body);
+}

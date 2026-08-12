@@ -1,0 +1,29 @@
+.page {
+  animation: fadeUp var(--dur-enter) var(--ease-out) both;
+}
+
+.title {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-display);
+  color: var(--c-blue-deep);
+}
+
+.subtitle {
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-soft);
+  margin: 0 0 20px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+  align-items: start;
+}
+
+.sideStack {
+  display: grid;
+  gap: var(--gap-grid);
+}

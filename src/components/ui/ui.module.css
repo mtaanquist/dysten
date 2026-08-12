@@ -1,0 +1,176 @@
+/* ---- Avatar ---- */
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--r-pill);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+.avatar_sm {
+  width: 26px;
+  height: 26px;
+  font-size: var(--fs-nano);
+}
+
+.avatar_md {
+  width: 30px;
+  height: 30px;
+  font-size: var(--fs-micro);
+}
+
+.avatar_lg {
+  width: 46px;
+  height: 46px;
+  font-size: 16px;
+}
+
+.avatar_soft {
+  background: var(--c-blue-soft);
+  color: var(--c-blue);
+}
+
+.avatar_solid {
+  background: #fff;
+  color: var(--c-blue);
+}
+
+/* ---- Pill ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border-radius: var(--r-pill);
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+}
+
+.pill_light,
+.pill_soft {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  padding: 5px 11px;
+  color: var(--c-blue-deep);
+}
+
+.pill_light {
+  background: var(--c-blue-light);
+}
+
+.pill_soft {
+  background: var(--c-blue-soft);
+}
+
+.pill_maroon {
+  background: var(--c-maroon-soft);
+  color: var(--c-maroon);
+  font-size: var(--fs-micro);
+  padding: 4px 10px;
+}
+
+.pill_solid {
+  background: var(--c-maroon);
+  color: #fff;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  padding: 7px var(--sp-4);
+}
+
+/* ---- Section label ---- */
+.sectionLabel {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-brand);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-bold);
+}
+
+.sectionLabelFaint {
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-label);
+  color: var(--c-ink-faint);
+}
+
+/* ---- Panel ---- */
+.panel {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-panel);
+  padding: var(--pad-panel);
+}
+
+.panelTight {
+  padding: var(--sp-5) var(--sp-6);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+.panelTitleSm {
+  margin: 0;
+  font-size: 17px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+/* ---- Decorative blobs ---- */
+.blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blobA,
+.blobB {
+  position: absolute;
+  display: block;
+}
+
+.blobA {
+  top: -180px;
+  right: -140px;
+  width: 520px;
+  height: 480px;
+  background: var(--c-blue-light);
+  opacity: 0.5;
+  border-radius: var(--blob-a);
+}
+
+.blobB {
+  top: 420px;
+  left: -200px;
+  width: 460px;
+  height: 420px;
+  background: var(--c-grey-blob);
+  opacity: 0.7;
+  border-radius: var(--blob-b);
+}
+
+/* ---- Progress bar ---- */
+.progressTrack {
+  height: var(--progress-height, 9px);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.progress_onDark {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.progress_onLight {
+  background: var(--c-blue-soft);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--c-blue-light);
+}

@@ -1,0 +1,62 @@
+.card {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-card);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pills {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+.meta {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.description {
+  margin: 0;
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-muted);
+  line-height: var(--lh-body);
+}
+
+.join {
+  align-self: flex-start;
+  margin-top: 6px;
+  background: var(--c-maroon);
+  color: #fff;
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 12px var(--sp-6);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: var(--touch-min);
+}
+
+.join:hover {
+  background: var(--c-maroon-dark);
+}
+
+.join:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}

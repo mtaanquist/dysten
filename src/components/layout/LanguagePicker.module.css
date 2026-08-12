@@ -1,0 +1,17 @@
+.wrapper {
+  display: inline-flex;
+}
+
+.select {
+  border-radius: var(--r-pill);
+  padding: 8px var(--sp-4);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+.light {
+  border: var(--bd-default);
+  background: var(--c-field);
+  color: var(--c-ink);
+}

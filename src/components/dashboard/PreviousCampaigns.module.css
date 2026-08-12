@@ -1,0 +1,118 @@
+.section {
+  margin-top: var(--sp-8);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-brand);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-bold);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pagerButton {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  color: var(--c-blue-deep);
+  border-radius: var(--r-pill);
+  padding: 7px var(--sp-4);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.pagerButton:hover {
+  border-color: var(--c-blue);
+  color: var(--c-blue-deep);
+}
+
+.pagerDisabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pageLabel {
+  font-size: var(--fs-label);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.rows {
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-inner);
+  padding: var(--sp-4) 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.row:hover {
+  border-color: var(--c-blue-light);
+  background: #fbfdfe;
+  color: inherit;
+}
+
+.main {
+  min-width: 200px;
+  flex: 1;
+}
+
+.name {
+  font-size: 17px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+.meta {
+  font-size: var(--fs-label);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+  margin-top: 2px;
+}
+
+.cellLabel {
+  font-size: var(--fs-nano);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-bold);
+}
+
+.winner {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink);
+}
+
+.placement {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-bold);
+  color: var(--c-maroon);
+}

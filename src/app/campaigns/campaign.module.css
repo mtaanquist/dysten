@@ -1,0 +1,150 @@
+.page {
+  animation: fadeUp var(--dur-enter) var(--ease-out) both;
+}
+
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.switch {
+  background: var(--c-surface);
+  color: var(--c-blue-deep);
+  border: var(--bd-default);
+  border-radius: var(--r-pill);
+  padding: 9px var(--sp-5);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.switch:hover {
+  border-color: var(--c-blue);
+  color: var(--c-blue-deep);
+}
+
+.switchActive {
+  background: var(--c-blue-deep);
+  color: #fff;
+  border-color: var(--c-blue-deep);
+}
+
+.switchActive:hover {
+  color: #fff;
+}
+
+.header {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-panel);
+  padding: var(--sp-7) 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: var(--sp-3) 0 var(--sp-1);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+  letter-spacing: var(--ls-display);
+}
+
+.range {
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.countdown {
+  text-align: right;
+}
+
+.countdownNumber {
+  font-size: var(--fs-stat-lg);
+  font-weight: var(--fw-bold);
+  color: var(--c-maroon);
+  line-height: 1;
+}
+
+.countdownLabel,
+.endedLabel {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-bold);
+}
+
+.endedLabel {
+  color: var(--c-maroon);
+}
+
+/* The shared goal sits above the calendar — it breaks up the white panels and
+   gives the page something to open on. */
+.goalSlot:not(:empty) {
+  margin-top: var(--sp-4);
+}
+
+.entries {
+  margin-top: var(--sp-5);
+}
+
+.entriesHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.entriesMeta {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.notMember {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-soft);
+}
+
+.highlightSlot {
+  margin-top: var(--sp-4);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+  margin-top: var(--sp-5);
+  align-items: start;
+}
+
+.sideStack {
+  display: grid;
+  gap: var(--gap-grid);
+}
+
+.leaderboardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+.leaderboardHint {
+  font-size: var(--fs-label);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}

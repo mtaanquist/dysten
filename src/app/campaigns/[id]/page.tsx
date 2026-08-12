@@ -1,0 +1,142 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
+import { today } from "@/lib/dates";
+import { createTranslator } from "@/i18n/translate";
+import { createFormatters } from "@/lib/format";
+import { AppShell } from "@/components/layout/AppShell";
+import { Panel, PanelTitle, Pill } from "@/components/ui";
+import { EntryCalendar } from "@/components/campaign/EntryCalendar";
+import { Leaderboard } from "@/components/campaign/Leaderboard";
+import { PersonDrawer } from "@/components/campaign/PersonDrawer";
+import { GoalPanel, Highlights, ParticipantList, ProgressChart } from "@/components/campaign/panels";
+import styles from "../campaign.module.css";
+
+export default async function CampaignPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ person?: string }>;
+}) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
+
+  const { id } = await params;
+  const { person } = await searchParams;
+
+  const [detail, switcher] = await Promise.all([
+    getCampaignDetail(id, user.id),
+    getCampaignSwitcher(),
+  ]);
+  if (!detail) notFound();
+
+  const t = createTranslator(user.locale);
+  const format = createFormatters(user.locale);
+  const { summary } = detail;
+
+  const personDetail = person ? await getPersonDetail(id, person) : null;
+
+  return (
+    <AppShell user={user}>
+      <div className={styles.page}>
+        {switcher.length > 1 ? (
+          <nav className={styles.switcher} aria-label={t("nav.campaign")}>
+            {switcher.map((option) => (
+              <Link
+                key={option.id}
+                href={`/campaigns/${option.id}`}
+                className={`${styles.switch} ${option.id === id ? styles.switchActive : ""}`}
+                aria-current={option.id === id ? "page" : undefined}
+              >
+                {option.name}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
+
+        <header className={styles.header}>
+          <div>
+            <Pill>{t(`campaignTypes.${summary.type}.name` as never)}</Pill>
+            <h1 className={styles.title}>{summary.name}</h1>
+            <div className={styles.range}>{format.dateRange(summary.startDate, summary.endDate)}</div>
+          </div>
+          <div className={styles.countdown}>
+            {summary.status === "ended" ? (
+              <div className={styles.endedLabel}>{t("campaign.ended")}</div>
+            ) : (
+              <>
+                <div className={styles.countdownNumber}>
+                  {summary.status === "upcoming" ? summary.daysUntilStart : summary.daysRemaining}
+                </div>
+                <div className={styles.countdownLabel}>
+                  {t("campaign.daysRemaining", {
+                    count: summary.status === "upcoming" ? summary.daysUntilStart : summary.daysRemaining,
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </header>
+
+        <div className={styles.goalSlot}>
+          <GoalPanel summary={summary} />
+        </div>
+
+        <Panel className={styles.entries}>
+          <div className={styles.entriesHead}>
+            <PanelTitle>
+              {t("campaign.myEntries")} — {summary.name}
+            </PanelTitle>
+            <div className={styles.entriesMeta}>
+              {t(`campaignTypes.${summary.type}.field1` as never)} ·{" "}
+              {t(`campaignTypes.${summary.type}.field2` as never)} —{" "}
+              {t(`campaignTypes.${summary.type}.unit` as never)}
+            </div>
+          </div>
+
+          {summary.isParticipant ? (
+            <EntryCalendar
+              campaignId={summary.id}
+              type={summary.type}
+              startDate={summary.startDate}
+              endDate={summary.endDate}
+              today={today()}
+              editable={summary.editable}
+              entries={detail.myEntries}
+            />
+          ) : (
+            <p className={styles.notMember}>{t("campaign.notParticipating")}</p>
+          )}
+        </Panel>
+
+        <div className={styles.highlightSlot}>
+          <Highlights items={detail.highlights} type={summary.type} />
+        </div>
+
+        <div className={styles.columns}>
+          <Panel>
+            <div className={styles.leaderboardHead}>
+              <PanelTitle>{t("campaign.leaderboard")}</PanelTitle>
+              <span className={styles.leaderboardHint}>{t("campaign.dayByDay")} →</span>
+            </div>
+            <Leaderboard
+              rows={detail.standings}
+              type={summary.type}
+              gap={detail.gap}
+              basePath={`/campaigns/${id}`}
+            />
+          </Panel>
+
+          <div className={styles.sideStack}>
+            <ProgressChart series={detail.series} type={summary.type} />
+            <ParticipantList participants={detail.roster} basePath={`/campaigns/${id}`} />
+          </div>
+        </div>
+      </div>
+
+      {personDetail ? <PersonDrawer detail={personDetail} closeHref={`/campaigns/${id}`} /> : null}
+    </AppShell>
+  );
+}

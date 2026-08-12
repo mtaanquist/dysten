@@ -1,0 +1,32 @@
+.button {
+  background: transparent;
+  border: 1.5px solid var(--c-maroon);
+  color: var(--c-maroon);
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: var(--c-maroon);
+  color: #fff;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.reopened {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  color: var(--c-maroon);
+  white-space: nowrap;
+}

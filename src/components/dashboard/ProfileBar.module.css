@@ -1,0 +1,98 @@
+.bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.greeting {
+  font-size: var(--fs-meta);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-brand);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.name {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-display);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.email {
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.bell {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+.bell:hover {
+  border-color: var(--c-blue);
+}
+
+.bell:disabled {
+  cursor: progress;
+}
+
+.bellOn {
+  border: 1px solid var(--c-blue-light);
+  background: var(--c-blue-tint);
+  color: var(--c-blue);
+}
+
+.bellOff {
+  border: var(--bd-default);
+  background: var(--c-surface);
+  color: var(--c-ink-faint);
+}
+
+.viewAs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-pill);
+  padding: 7px var(--sp-2) 7px 16px;
+}
+
+.viewAsLabel {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+
+.viewAsSelect {
+  border: 0;
+  background: var(--c-blue-soft);
+  border-radius: var(--r-pill);
+  padding: 7px var(--sp-3);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink);
+  cursor: pointer;
+}

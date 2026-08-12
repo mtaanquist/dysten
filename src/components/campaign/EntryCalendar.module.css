@@ -1,0 +1,193 @@
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-label);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--r-swatch);
+  flex: 0 0 auto;
+}
+
+.swatchLogged {
+  border: var(--bd-default);
+  background: var(--c-surface);
+}
+
+.swatchMissing {
+  border: var(--bd-missing);
+  background: var(--c-surface-missing);
+}
+
+.swatchToday {
+  border: var(--bd-selected);
+  background: var(--c-blue-tint);
+}
+
+.locked {
+  margin: var(--sp-4) 0 0;
+  background: var(--c-maroon-soft);
+  color: var(--c-maroon-dark);
+  border-radius: var(--r-field);
+  padding: 11px var(--sp-4);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.month {
+  margin-top: var(--sp-5);
+}
+
+.monthName {
+  font-size: var(--fs-meta);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--c-blue-deep);
+  font-weight: var(--fw-bold);
+  margin-bottom: 10px;
+}
+
+/* Grids scroll rather than crush: below the min width the calendar slides
+   sideways instead of squeezing two inputs into 40px. */
+.scroller {
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--cal-cell-min), 1fr));
+  gap: var(--sp-2);
+  min-width: 660px;
+}
+
+.weekday {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-bold);
+  text-align: center;
+  padding-bottom: 2px;
+}
+
+.cellSlot {
+  min-height: var(--cal-cell-h);
+}
+
+.cell {
+  border-radius: var(--r-cell);
+  padding: 7px var(--sp-2) var(--sp-2);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cellLogged {
+  border: var(--bd-default);
+  background: var(--c-surface);
+}
+
+.cellMissing {
+  border: var(--bd-missing);
+  background: var(--c-surface-missing);
+}
+
+.cellToday {
+  border: var(--bd-selected);
+  background: var(--c-blue-tint);
+}
+
+.cellFuture {
+  background: var(--c-surface-disabled);
+}
+
+.cellHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-1);
+}
+
+.dayNumber {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+.dayNumberFuture {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--c-ink-disabled);
+}
+
+.dayTotal {
+  font-size: var(--fs-nano);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+}
+
+.adminMark {
+  font-size: var(--fs-nano);
+  color: var(--c-maroon);
+  cursor: help;
+}
+
+.inputPrimary,
+.inputSecondary {
+  width: 100%;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  padding: 6px 7px;
+  border-radius: var(--r-field-sm);
+  text-align: right;
+}
+
+.inputPrimary {
+  border: var(--bd-default);
+  background: var(--c-surface);
+  color: var(--c-ink);
+}
+
+.inputSecondary {
+  border: 1px solid var(--c-border-input-quiet);
+  background: #fbfcfd;
+  color: var(--c-ink-muted);
+}
+
+.inputPrimary:focus,
+.inputSecondary:focus {
+  outline: none;
+  border-color: var(--c-blue);
+  background: var(--c-surface);
+}
+
+.inputPrimary:disabled,
+.inputSecondary:disabled {
+  color: var(--c-ink-disabled);
+  background: var(--c-surface-disabled);
+  cursor: not-allowed;
+}
+
+/* On a phone the fields become the tap target the spec asks for. */
+@media (max-width: 640px) {
+  .inputPrimary,
+  .inputSecondary {
+    min-height: 38px;
+    font-size: var(--fs-body-sm);
+  }
+}

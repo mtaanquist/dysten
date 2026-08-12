@@ -30,7 +30,7 @@
     <header style="background: #1789CE; color: #fff; position: relative; z-index: 3;">
       <div style="max-width: 1180px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px; min-height: 68px; box-sizing: border-box;">
         <div style="display: flex; align-items: baseline; gap: 10px; margin-right: 8px; flex: 0 0 auto; white-space: nowrap;">
-          <span style="font-size: 21px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;">Consortio IT</span>
+          <span style="font-size: 21px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;">Acme</span>
           <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.82; white-space: nowrap;">{{ T.tagline }}</span>
         </div>
         <nav style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 300px; justify-content: flex-end;">
@@ -639,7 +639,7 @@
   <div style="position: relative; z-index: 2; min-height: 100vh; display: grid; place-items: center; padding: 40px 24px;">
     <div style="background: #fff; border: 1px solid #E1EAF2; border-radius: 24px; padding: 46px 44px; max-width: 460px; width: 100%; box-shadow: 0 24px 60px rgba(16,64,95,0.09);">
       <div style="display: flex; align-items: baseline; gap: 10px;">
-        <span style="font-size: 24px; font-weight: 700; color: #1789CE; letter-spacing: -0.01em;">Consortio IT</span>
+        <span style="font-size: 24px; font-weight: 700; color: #1789CE; letter-spacing: -0.01em;">Acme</span>
         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: #6B7C8C; font-weight: 700;">{{ T.tagline }}</span>
       </div>
       <h1 style="margin: 26px 0 10px; font-size: 30px; font-weight: 700; color: #10405F; letter-spacing: -0.02em; line-height: 1.15;">{{ T.signInTitle }}</h1>
@@ -687,7 +687,7 @@ class Component extends DCLogic {
   static STR = {
     'en-GB': {
       tagline: 'Activity Tracker', signInTitle: 'Sign in to keep score',
-      signInSub: 'Use your Consortio IT work account. Your name and e-mail come from Microsoft 365.',
+      signInSub: 'Use your work account. Your name and e-mail come from Microsoft 365.',
       signInBtn: 'Sign in with Microsoft 365', signInHint: 'Single sign-on · Entra ID',
       navDash: 'Dashboard', navCamp: 'Campaign', navHist: 'History', navManage: 'Management',
       hello: 'Hello', roleMember: 'Member', roleCaptain: 'Team captain', roleAdmin: 'Admin',
@@ -725,7 +725,7 @@ class Component extends DCLogic {
     },
     'da-DK': {
       tagline: 'Aktivitetstracker', signInTitle: 'Log ind og hold styr på stillingen',
-      signInSub: 'Brug din Consortio IT-arbejdskonto. Navn og e-mail hentes fra Microsoft 365.',
+      signInSub: 'Brug din Acme-arbejdskonto. Navn og e-mail hentes fra Microsoft 365.',
       signInBtn: 'Log ind med Microsoft 365', signInHint: 'Single sign-on · Entra ID',
       navDash: 'Overblik', navCamp: 'Kampagne', navHist: 'Historik', navManage: 'Administration',
       hello: 'Hej', roleMember: 'Deltager', roleCaptain: 'Holdkaptajn', roleAdmin: 'Administrator',
@@ -763,7 +763,7 @@ class Component extends DCLogic {
     }
   };
 
-  KEY = 'consortio.tracker.v4';
+  KEY = 'activity.tracker.v4';
   TODAY = '2026-08-12';
 
   state = {};
@@ -805,21 +805,21 @@ class Component extends DCLogic {
 
   seedData() {
     const people = [
-      ['u1', 'Mette Sørensen', 'mette.sorensen@consortio.dk', 'admin'],
-      ['u2', 'Jonas Krogh', 'jonas.krogh@consortio.dk', 'captain'],
-      ['u3', 'Amalie Bech', 'amalie.bech@consortio.dk', 'member'],
-      ['u4', 'Rasmus Dahl', 'rasmus.dahl@consortio.dk', 'member'],
-      ['u5', 'Sofie Lindberg', 'sofie.lindberg@consortio.dk', 'member'],
-      ['u6', 'Thomas Nygaard', 'thomas.nygaard@consortio.dk', 'member'],
-      ['u7', 'Camilla Holm', 'camilla.holm@consortio.dk', 'captain'],
-      ['u8', 'Peter Vestergaard', 'peter.vestergaard@consortio.dk', 'member'],
-      ['u9', 'Line Aagaard', 'line.aagaard@consortio.dk', 'member'],
-      ['u10', 'Frederik Storm', 'frederik.storm@consortio.dk', 'member']
+      ['u1', 'Mette Sørensen', 'mette.sorensen@example.com', 'admin'],
+      ['u2', 'Jonas Krogh', 'jonas.krogh@example.com', 'captain'],
+      ['u3', 'Amalie Bech', 'amalie.bech@example.com', 'member'],
+      ['u4', 'Rasmus Dahl', 'rasmus.dahl@example.com', 'member'],
+      ['u5', 'Sofie Lindberg', 'sofie.lindberg@example.com', 'member'],
+      ['u6', 'Thomas Nygaard', 'thomas.nygaard@example.com', 'member'],
+      ['u7', 'Camilla Holm', 'camilla.holm@example.com', 'captain'],
+      ['u8', 'Peter Vestergaard', 'peter.vestergaard@example.com', 'member'],
+      ['u9', 'Line Aagaard', 'line.aagaard@example.com', 'member'],
+      ['u10', 'Frederik Storm', 'frederik.storm@example.com', 'member']
     ].map(p => ({ id: p[0], name: p[1], email: p[2], role: p[3] }));
 
     const campaigns = [
       { id: 'c1', name: 'Skridt-udfordringen 2026', type: 'step', start: '2026-08-01', end: '2026-08-31', status: 'active', goal: 1200000, goalName: 'Sammen går vi til Paris', desc: 'En måned hvor hele huset går, cykler og svømmer sig til Paris. Registrér hver dag inden midnat.', roster: ['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u9'] },
-      { id: 'c2', name: 'Cykel til arbejde 2026', type: 'bike', start: '2026-08-03', end: '2026-09-13', status: 'active', goal: 4000, goalName: 'Consortio rundt om Danmark', desc: 'Seks uger på to hjul. Km til og fra arbejde plus fritidsture.', roster: ['u1', 'u2', 'u4', 'u7', 'u9'] },
+      { id: 'c2', name: 'Cykel til arbejde 2026', type: 'bike', start: '2026-08-03', end: '2026-09-13', status: 'active', goal: 4000, goalName: 'Hele vejen rundt om Danmark', desc: 'Seks uger på to hjul. Km til og fra arbejde plus fritidsture.', roster: ['u1', 'u2', 'u4', 'u7', 'u9'] },
       { id: 'c5', name: 'Trappedysten oktober', type: 'step', start: '2026-10-01', end: '2026-10-31', status: 'upcoming', goal: 600000, goalName: 'Op på Himmelbjerget 100 gange', desc: 'Kort og intens oktoberdyst — tilmelding er åben nu.', roster: ['u2'] },
       { id: 'c3', name: 'Skridtkampen 2025', type: 'step', start: '2025-08-01', end: '2025-08-31', status: 'ended', goal: 1000000, goalName: 'Til Berlin og hjem', desc: 'Sidste års skridtdyst.', roster: ['u1', 'u2', 'u3', 'u5', 'u6', 'u8', 'u10'] },
       { id: 'c4', name: 'Cykel til arbejde 2025', type: 'bike', start: '2025-09-01', end: '2025-09-30', status: 'ended', goal: 0, goalName: '', desc: 'Pendlerdyst på cykel.', roster: ['u2', 'u4', 'u7', 'u8', 'u9'] }

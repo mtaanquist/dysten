@@ -1,0 +1,33 @@
+node_modules
+.next
+out
+build
+dist
+
+.git
+.github
+.gitignore
+
+# Design references — documentation, not part of the image.
+.design
+design
+
+# Local state and secrets never belong in a build context.
+.env
+.env.local
+.env*.local
+*.db
+*.db-journal
+prisma/dev.db*
+
+Dockerfile
+compose.yaml
+compose.*.yaml
+README.md
+*.md
+!prisma/**/*.md
+
+.DS_Store
+*.tsbuildinfo
+.vscode
+.idea

@@ -1,0 +1,253 @@
+.page {
+  animation: fadeUp var(--dur-enter) var(--ease-out) both;
+}
+
+.title {
+  margin: 0 0 var(--sp-5);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-display);
+  color: var(--c-blue-deep);
+}
+
+.empty {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-card);
+  padding: var(--sp-6);
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-muted);
+}
+
+.list {
+  display: grid;
+  gap: var(--gap-card);
+}
+
+.card {
+  background: var(--c-surface);
+  border: var(--bd-default);
+  border-radius: var(--r-card);
+  padding: var(--sp-6) var(--sp-7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  cursor: pointer;
+  flex-wrap: wrap;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--c-blue-light);
+  background: #fbfdfe;
+  color: inherit;
+}
+
+.name {
+  font-size: 21px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+  margin-top: 10px;
+}
+
+.meta {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-semibold);
+  margin-top: 2px;
+}
+
+.winnerBlock {
+  text-align: right;
+}
+
+.winnerLabel {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--c-maroon);
+  font-weight: var(--fw-bold);
+}
+
+.winnerName {
+  font-size: 19px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+  margin-top: 2px;
+}
+
+.winnerTotal {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+}
+
+/* ---- Detail ---- */
+.back {
+  background: transparent;
+  border: 0;
+  color: var(--c-blue);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-bold);
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: var(--sp-4);
+  display: inline-block;
+  text-decoration: none;
+}
+
+.detailHeader {
+  padding: var(--sp-7) 28px;
+}
+
+.detailTitle {
+  margin: var(--sp-3) 0 var(--sp-1);
+  font-size: 30px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+  letter-spacing: var(--ls-display);
+}
+
+.winnerBanner {
+  margin-top: 20px;
+  background: var(--c-maroon-soft);
+  border-radius: var(--r-inner);
+  padding: var(--sp-5) var(--sp-6);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+}
+
+.winnerBig {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--c-maroon-dark);
+}
+
+.winnerBigTotal {
+  font-size: var(--fs-body);
+  color: var(--c-maroon);
+  font-weight: var(--fw-semibold);
+}
+
+.reopenSlot {
+  margin-left: auto;
+}
+
+.detailColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap-grid);
+  margin-top: var(--sp-5);
+  align-items: start;
+}
+
+.scroller {
+  overflow-x: auto;
+}
+
+.standings {
+  min-width: 420px;
+}
+
+.standingsHead,
+.standingsRow {
+  display: grid;
+  grid-template-columns: 34px 1fr 100px 76px;
+  gap: var(--sp-2);
+}
+
+.standingsHead {
+  padding: var(--sp-3) 0 var(--sp-2);
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--c-border-quiet);
+}
+
+.standingsRow {
+  align-items: center;
+  padding: var(--sp-3) var(--sp-2) var(--sp-3) 0;
+  border-bottom: 1px solid var(--c-border-row);
+  cursor: pointer;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.standingsRow:hover {
+  background: var(--c-surface-quiet);
+  color: inherit;
+}
+
+.winnerRow {
+  background: var(--c-maroon-soft);
+}
+
+.right {
+  text-align: right;
+}
+
+.rank {
+  font-size: 17px;
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.personName {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.total {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+}
+
+.split {
+  font-size: var(--fs-micro);
+  color: var(--c-ink-faint);
+}
+
+.average {
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-muted);
+  font-weight: var(--fw-semibold);
+}
+
+.roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.rosterChip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--c-surface-quiet);
+  border: var(--bd-quiet);
+  border-radius: var(--r-pill);
+  padding: 6px var(--sp-4) 6px 6px;
+}
+
+.rosterName {
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+}

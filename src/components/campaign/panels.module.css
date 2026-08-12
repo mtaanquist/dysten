@@ -1,0 +1,159 @@
+/* ---- Shared goal ---- */
+.goal {
+  background: var(--c-blue-deep);
+  color: #fff;
+  border-radius: var(--r-panel);
+  padding: var(--sp-6) 28px;
+}
+
+.goalHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.goalLabel {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-brand);
+  opacity: 0.7;
+  font-weight: var(--fw-bold);
+}
+
+.goalName {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  margin-top: 3px;
+}
+
+.goalTotals {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  opacity: 0.9;
+}
+
+.goalBar {
+  margin-top: var(--sp-4);
+}
+
+/* ---- Highlights ---- */
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap-card);
+}
+
+.highlight {
+  border-radius: var(--r-card);
+}
+
+.highlightLabel {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--c-ink-soft);
+  font-weight: var(--fw-bold);
+}
+
+.highlightValue {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--c-blue-deep);
+  margin-top: var(--sp-2);
+}
+
+.highlightWho {
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+  margin-top: 3px;
+}
+
+/* ---- Chart ---- */
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: var(--sp-4);
+}
+
+.chartAxis {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-micro);
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+  margin-top: var(--sp-1);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-meta);
+  color: var(--c-ink-muted);
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+
+.legendTotal {
+  color: var(--c-ink-faint);
+  font-weight: var(--fw-semibold);
+}
+
+.empty {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-body-sm);
+  color: var(--c-ink-soft);
+}
+
+/* ---- Roster ---- */
+.roster {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+}
+
+.rosterRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px var(--sp-2);
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rosterRow:hover {
+  background: var(--c-surface-quiet);
+  color: inherit;
+}
+
+.rosterText {
+  min-width: 0;
+  flex: 1;
+}
+
+.rosterName {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.rosterSub {
+  font-size: var(--fs-label);
+  color: var(--c-ink-faint);
+}

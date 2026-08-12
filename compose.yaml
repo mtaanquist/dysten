@@ -1,0 +1,98 @@
+# Activity Campaign Tracker
+#
+#   docker compose up -d --build      build and run locally
+#   docker compose logs -f app        follow the logs
+#
+# To run a published image instead of building, replace the `build:` block with
+#   image: ghcr.io/mtaanquist/activitycampaigntracker:latest
+#
+# Note the single replica: the database is a SQLite file on the `data` volume,
+# and two containers cannot share it safely. Scaling out means moving to
+# PostgreSQL — see the commented service at the bottom.
+
+services:
+  app:
+    build:
+      context: .
+    # image: ghcr.io/mtaanquist/activitycampaigntracker:latest
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      # The database file, on the mounted volume.
+      DATABASE_URL: "file:/data/app.db"
+
+      # Wordmark in the header and on the sign-in card.
+      ORG_NAME: "${ORG_NAME:-Acme}"
+
+      # Signs session cookies. Generate with: openssl rand -base64 32
+      # Required — the app refuses to start in production without it.
+      APP_SECRET: "${APP_SECRET:?set APP_SECRET in .env, e.g. openssl rand -base64 32}"
+
+      # Decides when "today" rolls over for daily entries.
+      APP_TIMEZONE: "${APP_TIMEZONE:-Europe/Copenhagen}"
+
+      # "dev" is the account-picker sign-in; "entra" is Microsoft 365.
+      AUTH_PROVIDER: "${AUTH_PROVIDER:-dev}"
+      # Needed only while AUTH_PROVIDER=dev in a production build.
+      ALLOW_DEV_AUTH: "${ALLOW_DEV_AUTH:-true}"
+
+      # Addresses provisioned as admins on first sign-in.
+      SEED_ADMIN_EMAILS: "${SEED_ADMIN_EMAILS:-}"
+
+      # Set true for one run to load the demo campaigns. It clears existing
+      # data first, so leave it off for anything real.
+      SEED_ON_START: "${SEED_ON_START:-false}"
+
+      # Entra ID — see src/lib/auth/entra-provider.ts.
+      ENTRA_TENANT_ID: "${ENTRA_TENANT_ID:-}"
+      ENTRA_CLIENT_ID: "${ENTRA_CLIENT_ID:-}"
+      ENTRA_CLIENT_SECRET: "${ENTRA_CLIENT_SECRET:-}"
+
+      # Reminder delivery. Both transports are stubs until implemented.
+      SMTP_URL: "${SMTP_URL:-}"
+      TEAMS_WEBHOOK_URL: "${TEAMS_WEBHOOK_URL:-}"
+      NOTIFICATIONS_RUN_TOKEN: "${NOTIFICATIONS_RUN_TOKEN:-}"
+    volumes:
+      - data:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/sign-in').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  data:
+
+# ---------------------------------------------------------------------------
+# Moving to PostgreSQL, when one replica is no longer enough:
+#
+#   1. In prisma/schema.prisma set `provider = "postgresql"`.
+#   2. Delete prisma/migrations and re-run `npx prisma migrate dev --name init`.
+#   3. Point DATABASE_URL at the service below and drop the `data` volume.
+#
+#   db:
+#     image: postgres:17-alpine
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: tracker
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+#       POSTGRES_DB: tracker
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U tracker"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#
+# and give the app:
+#   DATABASE_URL: "postgresql://tracker:${POSTGRES_PASSWORD}@db:5432/tracker"
+#   depends_on:
+#     db:
+#       condition: service_healthy

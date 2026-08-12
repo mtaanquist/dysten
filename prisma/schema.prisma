@@ -1,0 +1,124 @@
+// Activity Campaign Tracker — data model
+//
+// Dates that represent a *calendar day* (campaign start/end, an entry's day)
+// are stored as "YYYY-MM-DD" strings, not DateTime. A daily-entry app is
+// entirely about which local calendar day a value belongs to; storing those as
+// timestamps invites an entry logged at 23:00 in Copenhagen landing on the
+// previous day once it round-trips through UTC. ISO-8601 strings also sort and
+// range-compare correctly with plain lexicographic comparison, so date-window
+// queries stay simple. Timestamps that are genuine instants (createdAt,
+// updatedAt) remain DateTime.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MEMBER
+  CAPTAIN
+  ADMIN
+}
+
+model User {
+  id        String  @id @default(cuid())
+  /// Comes from Microsoft 365 (Entra ID). The stable identity key.
+  email     String  @unique
+  displayName String
+  /// Entra object id, once the real auth provider is wired up.
+  externalId String? @unique
+  role      Role    @default(MEMBER)
+  /// BCP-47 tag chosen in profile settings; see src/i18n/config.ts.
+  locale    String  @default("da-DK")
+  /// Opt-in e-mail nudge when yesterday has no entry during an active campaign.
+  remindersEnabled Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  lastSeenAt DateTime?
+
+  participations   Participation[]
+  entries          Entry[]         @relation("EntryAuthor")
+  entriesEdited    Entry[]         @relation("EntryAdminEditor")
+  campaignsCreated Campaign[]      @relation("CampaignCreator")
+}
+
+model Campaign {
+  id          String  @id @default(cuid())
+  name        String
+  description String  @default("")
+  /// Key into the campaign-type registry (src/lib/campaign-types.ts): "step",
+  /// "bike", … A new type is a registry entry plus translation keys — the
+  /// value columns below stay neutral, so no migration is needed.
+  type        String
+
+  /// "YYYY-MM-DD" — inclusive on both ends.
+  startDate String
+  endDate   String
+
+  /// Optional collective target, in the campaign type's unit.
+  goalValue Float?
+  goalName  String?
+
+  /// Set when a captain/admin closes the campaign before its end date.
+  /// Status is otherwise derived from the dates — see src/lib/campaign-status.ts.
+  closedEarlyAt DateTime?
+  /// An admin reopening an ended campaign unlocks entry editing without
+  /// putting the campaign back on everyone's dashboard as "active".
+  reopenedForCorrections Boolean @default(false)
+
+  createdById String?
+  createdBy   User?   @relation("CampaignCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  /// The roster lives with the campaign, so history shows exactly who took part.
+  participants Participation[]
+  entries      Entry[]
+
+  @@index([startDate, endDate])
+}
+
+model Participation {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt   DateTime @default(now())
+
+  @@unique([campaignId, userId])
+  @@index([userId])
+}
+
+model Entry {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation("EntryAuthor", fields: [userId], references: [id], onDelete: Cascade)
+
+  /// "YYYY-MM-DD". Must fall inside the campaign range; enforced in the
+  /// service layer, which also holds the one-entry-per-day rule below.
+  date String
+
+  /// Neutral value columns. What they *mean* is the campaign type's business:
+  /// steps walked / steps converted, or km commuted / km in spare time.
+  value1 Float @default(0)
+  value2 Float @default(0)
+
+  /// Set when someone other than the entry's owner saved it, so the UI can
+  /// show the "edited by admin" marker the spec asks for.
+  editedByAdmin Boolean @default(false)
+  editedById    String?
+  editedBy      User?   @relation("EntryAdminEditor", fields: [editedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([campaignId, userId, date])
+  @@index([campaignId, date])
+}
