@@ -12,3 +12,19 @@
  * The tagline beside it is translated copy and comes from the language files.
  */
 export const ORG_NAME = process.env.ORG_NAME?.trim() || "Acme";
+
+/**
+ * An optional sub-brand that sits *above* the organisation — a staff social
+ * club, a wellbeing group, whichever body actually runs the campaigns.
+ *
+ * When it is set the header and the sign-in card become a two-line lockup:
+ *
+ *     Fedtnessklubben     <- the brand, in the wordmark's size
+ *     CONSORTIO IT        <- the organisation, in the tagline's size
+ *
+ * and the product's own name steps aside, because once a real name is on the
+ * masthead, "Dysten" underneath it is noise. It still titles the browser tab.
+ *
+ * Unset, the header is exactly as before: organisation beside product name.
+ */
+export const BRAND_NAME = process.env.BRAND_NAME?.trim() || null;

@@ -3,7 +3,7 @@ import { Role } from "@prisma/client";
 import { atLeast } from "@/lib/auth";
 import type { SessionUser } from "@/lib/auth/types";
 import { Blobs } from "@/components/ui";
-import { ORG_NAME } from "@/lib/branding";
+import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
 import { Header } from "./Header";
 import styles from "./AppShell.module.css";
 
@@ -19,6 +19,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
       <div className={styles.stack}>
         <Header
           orgName={ORG_NAME}
+          brandName={BRAND_NAME}
           displayName={user.displayName}
           email={user.email}
           canManage={atLeast(user.role, Role.CAPTAIN)}

@@ -7,7 +7,7 @@ import { LOCALE_COOKIE } from "@/lib/auth/cookies";
 import { resolveLocale } from "@/i18n/config";
 import { createTranslator } from "@/i18n/translate";
 import { signInAsUser } from "@/app/actions/session";
-import { ORG_NAME } from "@/lib/branding";
+import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
 import { Avatar, Blobs } from "@/components/ui";
 import { LanguagePicker } from "@/components/layout/LanguagePicker";
 import styles from "./sign-in.module.css";
@@ -43,9 +43,11 @@ export default async function SignInPage({
       <Blobs />
       <div className={styles.center}>
         <div className={styles.card}>
-          <div className={styles.brand}>
-            <span className={styles.wordmark}>{ORG_NAME}</span>
-            <span className={styles.tagline}>{t("app.tagline")}</span>
+          {/* Same lockup as the header: sub-brand over organisation, or the
+              organisation beside the product name when there is no sub-brand. */}
+          <div className={`${styles.brand} ${BRAND_NAME ? styles.brandStacked : ""}`}>
+            <span className={styles.wordmark}>{BRAND_NAME ?? ORG_NAME}</span>
+            <span className={styles.tagline}>{BRAND_NAME ? ORG_NAME : t("app.tagline")}</span>
           </div>
 
           {showPicker ? (

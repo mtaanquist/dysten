@@ -93,6 +93,7 @@ services:
     environment:
       DATABASE_URL: "file:/data/app.db"
       ORG_NAME: "${ORG_NAME}"
+      BRAND_NAME: "${BRAND_NAME}"
       APP_SECRET: "${APP_SECRET}"
       APP_TIMEZONE: "${APP_TIMEZONE}"
       AUTH_PROVIDER: "${AUTH_PROVIDER}"
@@ -109,8 +110,12 @@ volumes:
 **2. Put this next to it in `.env`:**
 
 ```dotenv
-# The name shown in the header and on the sign-in page.
+# The organisation shown in the header and on the sign-in page.
 ORG_NAME=Acme
+
+# Optional. A club or group that runs the campaigns, shown in larger type with
+# the organisation beneath it. Leave empty for just the organisation.
+BRAND_NAME=
 
 # Signs session cookies. Generate your own with:  openssl rand -base64 32
 # Required. Must be at least 16 characters. Do not share it or reuse it.
@@ -210,7 +215,8 @@ same published image serves any organisation.
 | Variable | Default | What it does |
 | --- | --- | --- |
 | `DATABASE_URL` | — | SQLite file location. In Docker: `file:/data/app.db` |
-| `ORG_NAME` | `Acme` | Name in the header and on the sign-in card |
+| `ORG_NAME` | `Acme` | Organisation in the header and on the sign-in card |
+| `BRAND_NAME` | unset | Optional sub-brand shown above the organisation, in larger type |
 | `APP_SECRET` | — | **Required.** Signs session cookies; 16+ characters |
 | `APP_TIMEZONE` | `Europe/Copenhagen` | When "today" rolls over |
 | `APP_TODAY` | unset | Pins the app's idea of today (`YYYY-MM-DD`). For demos and tests only |

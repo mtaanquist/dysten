@@ -7,7 +7,7 @@ import { resolveLocale } from "@/i18n/config";
 import { LocaleProvider } from "@/i18n/provider";
 import { createTranslator } from "@/i18n/translate";
 import { ToastProvider } from "@/components/ui/Toast";
-import { ORG_NAME } from "@/lib/branding";
+import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
 import "@/styles/globals.css";
 
 /**
@@ -40,9 +40,10 @@ async function currentLocale() {
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = createTranslator(await currentLocale());
-  const name = t("app.tagline");
+  // The tab shows whoever runs this, then what it is — the sub-brand when there
+  // is one, since that is the more identifying half in a strip of tabs.
   return {
-    title: ORG_NAME ? `${ORG_NAME} ${name}` : name,
+    title: `${BRAND_NAME ?? ORG_NAME} · ${t("app.tagline")}`,
     description: t("app.description"),
   };
 }

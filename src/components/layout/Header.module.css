@@ -28,6 +28,16 @@
   border-radius: var(--r-field-sm);
 }
 
+/* Two-line lockup when a sub-brand is set: the club takes the wordmark's size
+   and the organisation takes the tagline's, so the hierarchy comes from the
+   type scale that already exists rather than from a new pair of sizes. */
+.brandStacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 2px 0;
+}
+
 .brand:hover .wordmark {
   text-decoration: underline;
 }

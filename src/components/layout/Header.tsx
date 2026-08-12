@@ -11,6 +11,8 @@ import styles from "./Header.module.css";
 
 interface HeaderProps {
   orgName: string;
+  /** Optional sub-brand shown above the organisation. See lib/branding.ts. */
+  brandName?: string | null;
   displayName: string;
   email: string;
   canManage: boolean;
@@ -23,7 +25,7 @@ const NAV = [
   { href: "/manage", key: "nav.management", manageOnly: true },
 ] as const;
 
-export function Header({ orgName, displayName, email, canManage }: HeaderProps) {
+export function Header({ orgName, brandName, displayName, email, canManage }: HeaderProps) {
   const t = useTranslator();
   const locale = useLocale();
   const pathname = usePathname();
@@ -36,9 +38,15 @@ export function Header({ orgName, displayName, email, canManage }: HeaderProps) 
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.brand} aria-label={t("nav.dashboard")}>
-          <span className={styles.wordmark}>{orgName}</span>
-          <span className={styles.tagline}>{t("app.tagline")}</span>
+        {/* With a sub-brand the lockup stacks — club over organisation — and the
+            product name drops out. Without one it is the original single line. */}
+        <Link
+          href="/"
+          className={`${styles.brand} ${brandName ? styles.brandStacked : ""}`}
+          aria-label={t("nav.dashboard")}
+        >
+          <span className={styles.wordmark}>{brandName ?? orgName}</span>
+          <span className={styles.tagline}>{brandName ? orgName : t("app.tagline")}</span>
         </Link>
 
         <nav className={styles.nav} aria-label={t("nav.dashboard")}>

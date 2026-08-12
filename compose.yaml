@@ -24,6 +24,7 @@ services:
 
       # Wordmark in the header and on the sign-in card.
       ORG_NAME: "${ORG_NAME:-Acme}"
+      BRAND_NAME: "${BRAND_NAME:-}"
 
       # Signs session cookies. Generate with: openssl rand -base64 32
       # Required — the app refuses to start in production without it.
