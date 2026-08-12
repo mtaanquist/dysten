@@ -1,3 +1,12 @@
+/* Says out loud what the ordering means, so nobody reads a bike leaderboard as
+   a distance ranking gone wrong. */
+.rankNote {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-body);
+  color: var(--c-ink-soft);
+}
+
 .scroller {
   overflow-x: auto;
 }

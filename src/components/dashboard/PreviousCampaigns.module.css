@@ -1,5 +1,7 @@
+/* Sits in the dashboard's lower two-column grid, which owns the spacing above
+   it — hence no margin of its own. */
 .section {
-  margin-top: var(--sp-8);
+  min-width: 0;
 }
 
 .head {
@@ -65,8 +67,8 @@
   border-radius: var(--r-inner);
   padding: var(--sp-4) 20px;
   display: flex;
-  align-items: center;
-  gap: 20px;
+  align-items: baseline;
+  gap: 8px 20px;
   flex-wrap: wrap;
   cursor: pointer;
   text-decoration: none;
@@ -79,9 +81,10 @@
   color: inherit;
 }
 
+/* In a half-width column the three cells stack rather than squeeze. */
 .main {
-  min-width: 200px;
-  flex: 1;
+  min-width: 160px;
+  flex: 1 1 100%;
 }
 
 .name {

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getHistoryDetail, getPersonDetail } from "@/lib/queries";
 import { canAdminister, canReopenCampaign } from "@/lib/permissions";
+import { accentStyle, ranksByActiveDays } from "@/lib/campaign-types";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
 import { createFormatters } from "@/lib/format";
@@ -31,6 +32,7 @@ export default async function HistoryDetailPage({
   const t = createTranslator(user.locale);
   const format = createFormatters(user.locale);
   const unit = t(`campaignTypes.${detail.type}.unit` as never);
+  const byDays = ranksByActiveDays(detail.type);
 
   const personDetail = person ? await getPersonDetail(id, person) : null;
 
@@ -42,7 +44,9 @@ export default async function HistoryDetailPage({
         </Link>
 
         <Panel className={styles.detailHeader}>
-          <Pill tone="soft">{t(`campaignTypes.${detail.type}.name` as never)}</Pill>
+          <Pill tone="type" style={accentStyle(detail.type)}>
+            {t(`campaignTypes.${detail.type}.name` as never)}
+          </Pill>
           <h1 className={styles.detailTitle}>{detail.name}</h1>
           <div className={styles.meta}>{format.dateRange(detail.startDate, detail.endDate)}</div>
 
@@ -50,7 +54,9 @@ export default async function HistoryDetailPage({
             <div className={styles.winnerLabel}>{t("history.winner")}</div>
             <div className={styles.winnerBig}>{detail.winnerName ?? "–"}</div>
             <div className={styles.winnerBigTotal}>
-              {format.value(detail.type, detail.winnerTotal)} {unit}
+              {byDays
+                ? t("campaign.daysOutCount", { count: detail.winnerScore })
+                : `${format.value(detail.type, detail.winnerScore)} ${unit}`}
             </div>
 
             {canReopenCampaign(user) ? (
@@ -69,7 +75,9 @@ export default async function HistoryDetailPage({
                 <div className={styles.standingsHead}>
                   <div>{t("campaign.rank")}</div>
                   <div>{t("campaign.name")}</div>
-                  <div className={styles.right}>{t("campaign.total")}</div>
+                  <div className={styles.right}>
+                    {byDays ? t("campaign.daysOut") : t("campaign.total")}
+                  </div>
                   <div className={styles.right}>{t("campaign.averagePerDay")}</div>
                 </div>
 
@@ -86,9 +94,13 @@ export default async function HistoryDetailPage({
                       <span className={styles.personName}>{row.displayName}</span>
                     </div>
                     <div className={styles.right}>
-                      <div className={styles.total}>{format.value(detail.type, row.total)}</div>
+                      <div className={styles.total}>
+                        {byDays ? row.activeDays : format.value(detail.type, row.total)}
+                      </div>
                       <div className={styles.split}>
-                        {format.value(detail.type, row.value1)} + {format.value(detail.type, row.value2)}
+                        {byDays
+                          ? `${format.value(detail.type, row.total)} ${unit}`
+                          : `${format.value(detail.type, row.value1)} + ${format.value(detail.type, row.value2)}`}
                       </div>
                     </div>
                     <div className={`${styles.right} ${styles.average}`}>

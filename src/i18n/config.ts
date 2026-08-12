@@ -21,10 +21,14 @@ export const MESSAGES: Record<Locale, Messages> = {
   "en-GB": enGB,
 };
 
-/** Human-readable names, always shown in their own language. */
+/**
+ * Human-readable names, always shown in their own language. The tag stays
+ * `en-GB` — it drives date order and decimal separators — but the label says
+ * plain "English", because the region is not a choice anyone is making here.
+ */
 export const LOCALE_LABELS: Record<Locale, string> = {
   "da-DK": "Dansk",
-  "en-GB": "English (GB)",
+  "en-GB": "English",
 };
 
 export function isLocale(value: unknown): value is Locale {

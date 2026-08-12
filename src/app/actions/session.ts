@@ -3,16 +3,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import {
-  COOKIE_OPTIONS,
-  LOCALE_COOKIE,
-  SESSION_COOKIE,
-  VIEW_ROLE_COOKIE,
-  signValue,
-} from "@/lib/auth/cookies";
+import { COOKIE_OPTIONS, LOCALE_COOKIE, SESSION_COOKIE, signValue } from "@/lib/auth/cookies";
 import { devAuthProvider } from "@/lib/auth/dev-provider";
 import { isLocale } from "@/i18n/config";
 
@@ -33,8 +26,6 @@ export async function signInAsUser(userId: string) {
   const store = await cookies();
   store.set(SESSION_COOKIE, signValue(user.id), COOKIE_OPTIONS);
   store.set(LOCALE_COOKIE, user.locale, { ...COOKIE_OPTIONS, httpOnly: false });
-  // A fresh session starts at the user's real role, never a stale preview.
-  store.delete(VIEW_ROLE_COOKIE);
 
   redirect("/");
 }
@@ -42,27 +33,7 @@ export async function signInAsUser(userId: string) {
 export async function signOut() {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
-  store.delete(VIEW_ROLE_COOKIE);
   redirect("/sign-in");
-}
-
-/**
- * The dashboard's "View as" control. Only ever downgrades: the value is
- * re-checked against the user's real role in getCurrentUser, so writing this
- * cookie by hand cannot escalate anything.
- */
-export async function setViewRole(role: string) {
-  const user = await getCurrentUser();
-  if (!user) return;
-
-  const store = await cookies();
-  if (role === user.role || !(role in Role)) {
-    store.delete(VIEW_ROLE_COOKIE);
-  } else {
-    store.set(VIEW_ROLE_COOKIE, signValue(role), COOKIE_OPTIONS);
-  }
-
-  revalidatePath("/", "layout");
 }
 
 /**

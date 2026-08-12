@@ -36,10 +36,10 @@ export function Header({ orgName, displayName, email, canManage }: HeaderProps) 
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <div className={styles.brand}>
+        <Link href="/" className={styles.brand} aria-label={t("nav.dashboard")}>
           <span className={styles.wordmark}>{orgName}</span>
           <span className={styles.tagline}>{t("app.tagline")}</span>
-        </div>
+        </Link>
 
         <nav className={styles.nav} aria-label={t("nav.dashboard")}>
           {NAV.filter((item) => !("manageOnly" in item && item.manageOnly) || canManage).map((item) => (

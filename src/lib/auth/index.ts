@@ -1,8 +1,6 @@
-import { cookies } from "next/headers";
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { resolveLocale } from "@/i18n/config";
-import { VIEW_ROLE_COOKIE, unsignValue } from "./cookies";
 import { devAuthProvider } from "./dev-provider";
 import { entraAuthProvider } from "./entra-provider";
 import type { AuthProvider, ExternalIdentity, SessionUser } from "./types";
@@ -75,14 +73,7 @@ export async function provisionUser(identity: ExternalIdentity) {
   });
 }
 
-/**
- * The signed-in user, or null.
- *
- * `effectiveRole` honours the dashboard's "View as" control, but only ever
- * downward — a captain can preview the app as a member, nobody can preview
- * upward. Because permission checks read `effectiveRole`, the preview is
- * genuine rather than cosmetic, and it can never widen access.
- */
+/** The signed-in user, or null. */
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const provider = authProvider();
   if (!provider.isConfigured()) return null;
@@ -92,19 +83,11 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   const user = await provisionUser(identity);
 
-  const store = await cookies();
-  const requested = unsignValue(store.get(VIEW_ROLE_COOKIE)?.value);
-  const viewRole =
-    requested && requested in ROLE_RANK && ROLE_RANK[requested as Role] < ROLE_RANK[user.role]
-      ? (requested as Role)
-      : user.role;
-
   return {
     id: user.id,
     email: user.email,
     displayName: user.displayName,
     role: user.role,
-    effectiveRole: viewRole,
     locale: resolveLocale(user.locale),
     remindersEnabled: user.remindersEnabled,
   };

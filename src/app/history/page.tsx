@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getHistoryList } from "@/lib/queries";
+import { accentStyle, ranksByActiveDays } from "@/lib/campaign-types";
 import { createTranslator } from "@/i18n/translate";
 import { createFormatters } from "@/lib/format";
 import { AppShell } from "@/components/layout/AppShell";
@@ -28,7 +29,9 @@ export default async function HistoryPage() {
             {campaigns.map((campaign) => (
               <Link key={campaign.id} href={`/history/${campaign.id}`} className={styles.card}>
                 <div>
-                  <Pill tone="soft">{t(`campaignTypes.${campaign.type}.name` as never)}</Pill>
+                  <Pill tone="type" style={accentStyle(campaign.type)}>
+                    {t(`campaignTypes.${campaign.type}.name` as never)}
+                  </Pill>
                   <div className={styles.name}>{campaign.name}</div>
                   <div className={styles.meta}>
                     {format.dateRange(campaign.startDate, campaign.endDate)} ·{" "}
@@ -39,8 +42,9 @@ export default async function HistoryPage() {
                   <div className={styles.winnerLabel}>{t("history.winner")}</div>
                   <div className={styles.winnerName}>{campaign.winnerName ?? "–"}</div>
                   <div className={styles.winnerTotal}>
-                    {format.value(campaign.type, campaign.winnerTotal)}{" "}
-                    {t(`campaignTypes.${campaign.type}.unit` as never)}
+                    {ranksByActiveDays(campaign.type)
+                      ? t("campaign.daysOutCount", { count: campaign.winnerScore })
+                      : `${format.value(campaign.type, campaign.winnerScore)} ${t(`campaignTypes.${campaign.type}.unit` as never)}`}
                   </div>
                 </div>
               </Link>

@@ -47,12 +47,19 @@
 }
 
 .pill_light,
-.pill_soft {
+.pill_soft,
+.pill_type {
   font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: var(--ls-label);
   padding: 5px 11px;
   color: var(--c-blue-deep);
+}
+
+/* Painted in the campaign type's own colour, handed in as --c-accent. */
+.pill_type {
+  background: var(--c-accent, var(--c-blue-light));
+  color: var(--c-accent-ink, var(--c-blue-deep));
 }
 
 .pill_light {
@@ -161,8 +168,11 @@
   overflow: hidden;
 }
 
-.progress_onDark {
-  background: rgba(255, 255, 255, 0.18);
+/* Sits on a campaign-type accent, which is a light colour: the track is a tint
+   of the surface and the fill goes darker, rather than the pale-on-navy of the
+   original. Both clear the 3:1 that a graphical element needs. */
+.progress_onAccent {
+  background: var(--c-type-track);
 }
 
 .progress_onLight {
@@ -172,5 +182,5 @@
 .progressFill {
   height: 100%;
   border-radius: var(--r-pill);
-  background: var(--c-blue-light);
+  background: var(--c-blue-deep);
 }

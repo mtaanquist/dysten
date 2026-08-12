@@ -72,6 +72,8 @@ export interface CampaignSummary {
   myTotal: number;
   myRank: number | null;
   myAverage: number;
+  /** Days the user actually got out — what decides the rank on a bike campaign. */
+  myActiveDays: number;
   myStreak: number;
   myMissingDays: number;
   totalParticipantsRanked: number;
@@ -134,6 +136,7 @@ export function buildCampaignSummary(
     myTotal: mine?.total ?? 0,
     myRank: mine && mine.daysLogged > 0 ? mine.rank : null,
     myAverage: mine?.average ?? 0,
+    myActiveDays: mine?.activeDays ?? 0,
     myStreak: participation ? currentStreak(entries, userId, horizon) : 0,
     myMissingDays:
       participation && status !== "upcoming"
@@ -167,7 +170,8 @@ export interface PastCampaignRow {
   startDate: IsoDate;
   endDate: IsoDate;
   winnerName: string | null;
-  winnerTotal: number;
+  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  winnerScore: number;
   myRank: number | null;
   participantCount: number;
 }
@@ -208,7 +212,7 @@ export async function getDashboardData(userId: string, pastPage = 0): Promise<Da
       startDate: campaign.startDate,
       endDate: campaign.endDate,
       winnerName: winner?.displayName ?? null,
-      winnerTotal: winner?.total ?? 0,
+      winnerScore: winner?.score ?? 0,
       myRank: mine && mine.daysLogged > 0 ? mine.rank : null,
       participantCount: campaign.participants.length,
     } satisfies PastCampaignRow;
@@ -229,7 +233,7 @@ export interface LeaderboardRow extends Standing {
   email?: string;
   movement: RankMovement;
   streak: number;
-  /** Share of the leader's total, for the inline bar. */
+  /** Share of the leader's ranking score, for the inline bar. */
   barFraction: number;
   isMe: boolean;
 }
@@ -245,13 +249,8 @@ export interface HighlightItem {
 
 export interface CampaignDetail {
   summary: CampaignSummary;
+  /** Everyone on the campaign, ranked — people who have logged nothing included. */
   standings: LeaderboardRow[];
-  roster: {
-    id: string;
-    displayName: string;
-    email: string;
-    daysLogged: number;
-  }[];
   series: CumulativeSeries[];
   highlights: HighlightItem[];
   gap: { amount: number; rank: number } | null;
@@ -281,7 +280,9 @@ export async function getCampaignDetail(
   const yesterday = computeStandings(roster, entries, addDays(horizon, -1), campaign.type);
   const movements = rankMovements(standings, yesterday);
 
-  const leaderTotal = standings[0]?.total ?? 0;
+  // The bar shows share of the leader on whatever the campaign ranks by, so it
+  // always agrees with the order the rows are in.
+  const leaderScore = standings[0]?.score ?? 0;
   const emails = new Map(roster.map((p) => [p.id, p.email ?? ""]));
 
   const leaderboard: LeaderboardRow[] = standings.map((row) => ({
@@ -289,7 +290,7 @@ export async function getCampaignDetail(
     email: emails.get(row.userId),
     movement: movements.get(row.userId) ?? { delta: 0, direction: "none" },
     streak: currentStreak(entries, row.userId, horizon),
-    barFraction: leaderTotal > 0 ? Math.max(0.04, row.total / leaderTotal) : 0.04,
+    barFraction: leaderScore > 0 ? Math.max(0.04, row.score / leaderScore) : 0.04,
     isMe: row.userId === userId,
   }));
 
@@ -337,12 +338,6 @@ export async function getCampaignDetail(
   return {
     summary,
     standings: leaderboard,
-    roster: roster.map((participant) => ({
-      id: participant.id,
-      displayName: participant.displayName,
-      email: participant.email ?? "",
-      daysLogged: standings.find((row) => row.userId === participant.id)?.daysLogged ?? 0,
-    })),
     series: cumulativeSeries(standings, entries, campaign.startDate, horizon, campaign.type),
     highlights,
     gap: gapToNextRank(standings, userId, campaign.type),
@@ -463,7 +458,8 @@ export interface HistoryRow {
   endDate: IsoDate;
   participantCount: number;
   winnerName: string | null;
-  winnerTotal: number;
+  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  winnerScore: number;
 }
 
 export async function getHistoryList(): Promise<HistoryRow[]> {
@@ -491,7 +487,7 @@ export async function getHistoryList(): Promise<HistoryRow[]> {
         endDate: campaign.endDate,
         participantCount: campaign.participants.length,
         winnerName: winner?.displayName ?? null,
-        winnerTotal: winner?.total ?? 0,
+        winnerScore: winner?.score ?? 0,
       };
     });
 }
@@ -505,7 +501,8 @@ export interface HistoryDetail {
   endDate: IsoDate;
   reopenedForCorrections: boolean;
   winnerName: string | null;
-  winnerTotal: number;
+  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  winnerScore: number;
   standings: Standing[];
   roster: { id: string; displayName: string }[];
 }
@@ -534,7 +531,7 @@ export async function getHistoryDetail(campaignId: string): Promise<HistoryDetai
     endDate: campaign.endDate,
     reopenedForCorrections: campaign.reopenedForCorrections,
     winnerName: standings[0]?.displayName ?? null,
-    winnerTotal: standings[0]?.total ?? 0,
+    winnerScore: standings[0]?.score ?? 0,
     standings,
     roster: campaign.participants.map((participation) => ({
       id: participation.user.id,

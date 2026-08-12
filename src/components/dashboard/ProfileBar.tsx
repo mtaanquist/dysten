@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { Role } from "@prisma/client";
 import { useTranslator } from "@/i18n/provider";
-import { setViewRole, toggleReminders } from "@/app/actions/session";
+import { toggleReminders } from "@/app/actions/session";
 import { useToast } from "@/components/ui/Toast";
 import styles from "./ProfileBar.module.css";
 
@@ -12,20 +12,16 @@ import styles from "./ProfileBar.module.css";
  *
  * The reminder opt-in is a bell / crossed-bell toggle sitting next to the
  * e-mail address, which is where the design moved it from a checkbox row.
- * "View as" only appears for captains and admins, and only ever lets them
- * preview a *lesser* role.
  */
 export function ProfileBar({
   displayName,
   email,
   role,
-  effectiveRole,
   remindersEnabled,
 }: {
   displayName: string;
   email: string;
   role: Role;
-  effectiveRole: Role;
   remindersEnabled: boolean;
 }) {
   const t = useTranslator();
@@ -33,12 +29,9 @@ export function ProfileBar({
   const [pending, startTransition] = useTransition();
 
   const roleKey =
-    effectiveRole === Role.ADMIN ? "roles.admin" : effectiveRole === Role.CAPTAIN ? "roles.captain" : "roles.member";
+    role === Role.ADMIN ? "roles.admin" : role === Role.CAPTAIN ? "roles.captain" : "roles.member";
 
   const reminderLabel = remindersEnabled ? t("profile.remindersOn") : t("profile.remindersOff");
-
-  // Only a captain or admin has anything to preview.
-  const canPreview = role !== Role.MEMBER;
 
   return (
     <div className={styles.bar}>
@@ -67,27 +60,6 @@ export function ProfileBar({
           </button>
         </div>
       </div>
-
-      {canPreview ? (
-        <label className={styles.viewAs}>
-          <span className={styles.viewAsLabel}>{t("profile.viewAs")}</span>
-          <select
-            className={styles.viewAsSelect}
-            value={effectiveRole}
-            disabled={pending}
-            onChange={(event) => {
-              const next = event.target.value;
-              startTransition(() => {
-                void setViewRole(next);
-              });
-            }}
-          >
-            <option value={Role.MEMBER}>{t("roles.member")}</option>
-            <option value={Role.CAPTAIN}>{t("roles.captain")}</option>
-            {role === Role.ADMIN ? <option value={Role.ADMIN}>{t("roles.admin")}</option> : null}
-          </select>
-        </label>
-      ) : null}
     </div>
   );
 }

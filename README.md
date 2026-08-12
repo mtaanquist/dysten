@@ -8,10 +8,16 @@ and the exact roster that took part.
 It ships with two kinds of campaign and is built so more can be added:
 
 - **Step campaign** — steps actually walked, plus steps converted from other
-  activities like cycling or sport.
-- **Bike-to-work campaign** — kilometres commuted, plus kilometres in spare time.
+  activities like cycling or sport. Most steps wins.
+- **Bike-to-work campaign** — kilometres commuted, plus kilometres in spare
+  time. **Most days out wins**, not most kilometres: how far you live from the
+  office is not an achievement. The distance is still logged and shown, it just
+  does not decide the standings.
 
-The interface is fully translated into **English (GB)** and **Danish**, and
+Each type carries its own colour through the type pill and the shared-goal
+panel, so a dashboard showing both tells them apart at a glance.
+
+The interface is fully translated into **English** and **Danish**, and
 defaults to Danish. Each person picks their own language and it is remembered.
 
 ---
@@ -38,16 +44,17 @@ defaults to Danish. Each person picks their own language and it is remembered.
 
 **Dashboard.** Every campaign you have joined, one card each — because a step
 campaign and a bike campaign can run at the same time. Each card shows the
-campaign's shared goal, your total, your rank, your daily average, and how many
-days you still owe an entry for. Campaigns you could join sit below, and
-finished campaigns below that, paginated.
+campaign's shared goal, your total, your rank, the figure your rank is built on,
+and how many days you still owe an entry for. Campaigns you could join and
+finished campaigns share the row below, side by side.
 
 **Campaign page.** The shared goal across the top, then a month-by-month
 calendar where you type your two numbers into any day in the range — including
 days you forgot. Then highlights (best single day, longest streak, biggest
-climber this week), the leaderboard with movement arrows and streak badges, a
-cumulative progress chart for the leading five, and the full roster. Tapping
-anyone opens their day-by-day figures — and for an admin, on a campaign that
+climber this week), the leaderboard with movement arrows and streak badges, and
+a cumulative progress chart for the leading five. The leaderboard is the roster:
+everyone on the campaign appears, including people who have logged nothing yet.
+Tapping anyone opens their day-by-day figures — and for an admin, on a campaign that
 still accepts entries, those figures are editable. Every day in the range gets a
 row, including days that were never logged, because that is usually what needs
 correcting. Anything an admin changes is stamped as their correction and says so
@@ -279,27 +286,34 @@ and partners should not appear on the leaderboard, set `ENTRA_ALLOW_GUESTS=false
 The **first person to sign in becomes an admin.** After that, admins promote
 people from the management screen. `SEED_ADMIN_EMAILS` can pre-authorise more.
 
-Captains and admins get a **"View as"** control on the dashboard, to see the app
-as a lesser role. It only ever goes *down* — permission checks use the previewed
-role, so the preview is genuine and can never widen someone's access.
+Every check reads the role stored against the account, in one place —
+[`src/lib/permissions.ts`](src/lib/permissions.ts). A hidden button and a
+rejected request cannot disagree, because the component and the server action
+call the same function.
 
 ---
 
 ## Adding a campaign type
 
-A campaign type decides what the two numbers on each day mean. Adding one takes
-two edits and **no database migration**, because entries store two neutral
-values and the type decides how to read them.
+A campaign type decides what the two numbers on each day mean, **how the winner
+is decided**, and what colour the campaign wears. Adding one takes two edits and
+**no database migration**, because entries store two neutral values and the type
+decides how to read them.
 
 **1.** Add it to [`src/lib/campaign-types.ts`](src/lib/campaign-types.ts):
 
 ```ts
 export const CAMPAIGN_TYPES = {
-  step: { key: "step", decimals: 0, inputStep: 10 },
-  bike: { key: "bike", decimals: 1, inputStep: 0.1 },
-  swim: { key: "swim", decimals: 0, inputStep: 50 },   // new
+  step: { key: "step", decimals: 0, inputStep: 10, rankBy: "total",      accent: "var(--c-type-step)" },
+  bike: { key: "bike", decimals: 1, inputStep: 0.1, rankBy: "activeDays", accent: "var(--c-type-bike)" },
+  swim: { key: "swim", decimals: 0, inputStep: 50, rankBy: "total",      accent: "var(--c-type-swim)" }, // new
 } as const satisfies Record<string, CampaignTypeDefinition>;
 ```
+
+`accent` names a token you add to
+[`src/styles/tokens.css`](src/styles/tokens.css) — no hex belongs outside that
+file. Keep it light enough that dark ink clears 4.5:1 on it; the shared-goal
+panel and the type pill both sit on this colour.
 
 **2.** Add its wording to **every** file in `src/i18n/messages/`:
 
@@ -318,6 +332,24 @@ export const CAMPAIGN_TYPES = {
 
 It now appears in the campaign type dropdown. `decimals` controls both display
 and rounding on save; `inputStep` sets the step on the number inputs.
+
+### Deciding the winner
+
+`rankBy` picks what the standings sort on, and everything that compares people —
+the leaderboard, the gap to the rank above, the progress chart, the winner in
+the history — follows it from that one word.
+
+- **`total`** — most logged wins. Right when the number is comparable between
+  people, as steps are.
+- **`activeDays`** — most days *out* wins, and the amount is only ever shown.
+  Right for cycling to work: how far you live from the office is not an
+  achievement, and ranking on kilometres hands the campaign to whoever has the
+  longest commute. A day counts when something was actually ridden, so logging a
+  zero buys nothing, and two people on the same number of days genuinely tie
+  rather than being split by distance.
+
+A shared goal is always a raw amount either way — "together we ride around
+Denmark" is a distance the group covers, whoever ends up winning.
 
 ---
 
@@ -437,9 +469,10 @@ src/
     messages/          One JSON file per language — all user-facing text
   lib/
     auth/              Sign-in seam: dev provider, Entra provider
-    campaign-types.ts  The extensible type registry
+    campaign-types.ts  The extensible type registry: fields, ranking, colour
     campaign-status.ts Status derived from dates, plus the two overrides
     scoring.ts         Totals, tied ranks, streaks, highlights
+    scoring.test.ts    The competitive rules, tested without a database
     queries.ts         Read models for the screens
     notifications/     Reminder events and channels
     dates.ts           Calendar-day handling
@@ -467,6 +500,10 @@ A few decisions worth knowing before you change things:
   everyone's dashboard.
 - **Ranks are computed at read time** and shared on ties. Correcting a
   three-year-old entry cannot leave a stale standing behind.
+- **What the winner is decided on lives in the type registry**, as one `rankBy`
+  word. Every comparison — the sort, the gap, the chart, the winner in the
+  history — reads the `score` that word produces, so the rule is stated once and
+  a new campaign type cannot half-adopt it.
 - **Scoring is pure functions** in `scoring.ts`, taking data as arguments. The
   competitive rules — the part people will argue about — are testable without a
   database, and the leaderboard, chart and highlights all read from one query.

@@ -54,9 +54,16 @@
   text-wrap: pretty;
 }
 
+/* Painted in the campaign type's colour, handed in as --c-accent, so a step
+   card and a bike card are told apart at a glance.
+
+   Nothing on this surface uses opacity to mute text. Both accents are light
+   enough that a 70%-opacity ink drops to 3.5:1 on the green — under AA — so the
+   hierarchy here comes from size and weight instead, and every value stays at
+   full contrast. */
 .hero {
-  background: var(--c-blue-deep);
-  color: #fff;
+  background: var(--c-accent, var(--c-blue-deep));
+  color: var(--c-accent-ink, #fff);
   border-radius: var(--r-inner);
   padding: 20px var(--sp-6);
   position: relative;
@@ -69,7 +76,7 @@
   right: -50px;
   width: 190px;
   height: 170px;
-  background: rgba(169, 199, 232, 0.22);
+  background: rgb(255 255 255 / 0.22);
   border-radius: var(--blob-a);
 }
 
@@ -81,7 +88,6 @@
   font-size: var(--fs-micro);
   text-transform: uppercase;
   letter-spacing: var(--ls-brand);
-  opacity: 0.7;
   font-weight: var(--fw-bold);
 }
 
@@ -104,7 +110,6 @@
   margin-top: var(--sp-2);
   font-size: var(--fs-label);
   font-weight: var(--fw-semibold);
-  opacity: 0.85;
 }
 
 .stats {
@@ -113,14 +118,13 @@
   flex-wrap: wrap;
   margin-top: var(--sp-4);
   padding-top: var(--sp-4);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--c-type-line);
 }
 
 .statLabel {
   font-size: var(--fs-nano);
   text-transform: uppercase;
   letter-spacing: var(--ls-label);
-  opacity: 0.68;
   font-weight: var(--fw-bold);
 }
 
@@ -137,13 +141,14 @@
   line-height: 1.2;
 }
 
+/* The rank is the one number worth picking out, and on a light accent that
+   means going darker rather than lighter. */
 .statNumberAccent {
-  color: var(--c-blue-light);
+  color: var(--c-blue-deep);
 }
 
 .statSuffix {
   font-size: var(--fs-micro);
-  opacity: 0.7;
   font-weight: var(--fw-semibold);
 }
 
@@ -152,7 +157,8 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  background: rgba(169, 59, 78, 0.9);
+  background: var(--c-maroon);
+  color: #fff;
   border-radius: var(--r-pill);
   padding: 7px var(--sp-4);
   font-size: var(--fs-meta);
@@ -171,5 +177,4 @@
   margin-top: var(--sp-4);
   font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
-  opacity: 0.8;
 }

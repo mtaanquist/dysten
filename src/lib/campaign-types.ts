@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /**
  * Campaign type registry.
  *
@@ -13,6 +15,20 @@
  * No migration, because Entry.value1/value2 stay meaning-neutral.
  */
 
+/**
+ * What decides the standings.
+ *
+ * `total` — whoever logged the most wins. Right for steps: everyone's day is
+ * the same length, so the number is comparable.
+ *
+ * `activeDays` — whoever turned out on the most days wins, and the distance is
+ * only ever shown, never ranked. Right for cycling to work: how far you live
+ * from the office is not an achievement, and ranking on kilometres would hand
+ * the campaign to whoever has the longest commute. A day counts when something
+ * was actually ridden, so logging a zero does not buy a day.
+ */
+export type RankBy = "total" | "activeDays";
+
 export interface CampaignTypeDefinition {
   /** Stable key persisted in Campaign.type and used as the i18n lookup path. */
   key: string;
@@ -23,11 +39,20 @@ export interface CampaignTypeDefinition {
   decimals: 0 | 1;
   /** `step` attribute on the number inputs — nudges mobile keyboards sensibly. */
   inputStep: number;
+  /** Which figure the leaderboard sorts on. See RankBy. */
+  rankBy: RankBy;
+  /**
+   * The type's colour, as a reference to a token in styles/tokens.css rather
+   * than a literal — no hex belongs outside that file. Components set it as a
+   * custom property, so adding a type still touches only this registry and the
+   * language files, never a stylesheet.
+   */
+  accent: string;
 }
 
 export const CAMPAIGN_TYPES = {
-  step: { key: "step", decimals: 0, inputStep: 10 },
-  bike: { key: "bike", decimals: 1, inputStep: 0.1 },
+  step: { key: "step", decimals: 0, inputStep: 10, rankBy: "total", accent: "var(--c-type-step)" },
+  bike: { key: "bike", decimals: 1, inputStep: 0.1, rankBy: "activeDays", accent: "var(--c-type-bike)" },
 } as const satisfies Record<string, CampaignTypeDefinition>;
 
 export type CampaignTypeKey = keyof typeof CAMPAIGN_TYPES;
@@ -45,6 +70,24 @@ export function isCampaignTypeKey(value: unknown): value is CampaignTypeKey {
  */
 export function campaignType(key: string): CampaignTypeDefinition {
   return isCampaignTypeKey(key) ? CAMPAIGN_TYPES[key] : CAMPAIGN_TYPES.step;
+}
+
+/**
+ * Style props that paint a surface in a campaign type's colour.
+ *
+ * Spread onto the element; the stylesheet reads `var(--c-accent)` and
+ * `var(--c-accent-ink)` without knowing which type it is looking at.
+ */
+export function accentStyle(key: string): CSSProperties {
+  return {
+    "--c-accent": campaignType(key).accent,
+    "--c-accent-ink": "var(--c-type-ink)",
+  } as CSSProperties;
+}
+
+/** Whether this type's standings are decided by days out rather than distance. */
+export function ranksByActiveDays(key: string): boolean {
+  return campaignType(key).rankBy === "activeDays";
 }
 
 /** Rounds a raw input to the precision the type stores. */

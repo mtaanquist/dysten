@@ -37,6 +37,23 @@
   --c-grid-line: #f0f5f9;     /* chart gridlines */
   --c-grey-blob: #dce5ec;     /* decorative organic shape */
 
+  /* ---- Campaign type accents ----
+     One colour per campaign type, so a step campaign and a bike campaign are
+     told apart at a glance on a dashboard that shows both at once. Carried on
+     the type pill and the shared-goal panel.
+
+     Both are light enough that white text fails WCAG AA on them (2.7:1 and
+     1.6:1). Everything sitting on an accent uses --c-type-ink, which clears AA
+     on both (5.9:1 and 10.1:1). A new type's colour belongs here, and must hold
+     that same contrast. */
+  --c-type-step: #3fb24b;
+  --c-type-bike: #ffbbd0;
+  --c-type-ink: var(--c-ink);
+  /* Bars and rules drawn on an accent, where a flat tint reads better than
+     another named colour. */
+  --c-type-track: rgb(0 0 0 / 0.14);
+  --c-type-line: rgb(0 0 0 / 0.18);
+
   /* ---- Chart series (in order) ---- */
   --c-series-1: #1789ce;
   --c-series-2: #a93b4e;

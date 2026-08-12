@@ -5,7 +5,7 @@ import type { SessionUser } from "./auth/types";
 import type { IsoDate } from "./dates";
 
 /**
- * Every authorisation rule in one place, expressed against `effectiveRole`.
+ * Every authorisation rule in one place, expressed against the account's role.
  *
  * Server actions call these before touching the database; components call the
  * same functions to decide what to render. One source of truth means a hidden
@@ -13,11 +13,11 @@ import type { IsoDate } from "./dates";
  */
 
 export function canManageCampaigns(user: SessionUser): boolean {
-  return atLeast(user.effectiveRole, Role.CAPTAIN);
+  return atLeast(user.role, Role.CAPTAIN);
 }
 
 export function canAdminister(user: SessionUser): boolean {
-  return atLeast(user.effectiveRole, Role.ADMIN);
+  return atLeast(user.role, Role.ADMIN);
 }
 
 /** Deleting a campaign, and everything logged in it, is admin-only. */

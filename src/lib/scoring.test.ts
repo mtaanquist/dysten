@@ -37,7 +37,10 @@ function entry(userId: string, date: string, value1: number, value2 = 0): EntryL
   return { userId, date, value1, value2 };
 }
 
-/** A standing with only the fields ranking cares about. */
+/**
+ * A standing with only the fields ranking cares about. `score` is what the sort
+ * reads; for a step campaign that is the total, so the two match here.
+ */
 function standing(userId: string, displayName: string, total: number): Standing {
   return {
     userId,
@@ -46,6 +49,8 @@ function standing(userId: string, displayName: string, total: number): Standing 
     value2: 0,
     total,
     daysLogged: 1,
+    activeDays: 1,
+    score: total,
     average: total,
     rank: 0,
     editedByAdmin: false,
@@ -165,6 +170,126 @@ describe("computeStandings", () => {
   it("returns rows already ranked", () => {
     const rows = computeStandings(ROSTER, entries, "2026-08-02", "step");
     assert.deepEqual(rows.map((row) => row.rank), [1, 2, 3]);
+  });
+});
+
+describe("computeStandings on a days-ranked campaign", () => {
+  // The point of the rule: someone with a long commute must not out-rank
+  // someone who turned out more often.
+  const commuter = { id: "far", displayName: "Far Away" };
+  const local = { id: "near", displayName: "Near By" };
+
+  const entries: EntryLike[] = [
+    // 40 km each, but only two days out.
+    entry("far", "2026-08-01", 20),
+    entry("far", "2026-08-02", 20),
+    // 12 km across four days out.
+    entry("near", "2026-08-01", 3),
+    entry("near", "2026-08-02", 3),
+    entry("near", "2026-08-03", 3),
+    entry("near", "2026-08-04", 3),
+  ];
+
+  it("ranks on days out, not distance", () => {
+    const rows = computeStandings([commuter, local], entries, "2026-08-04", "bike");
+
+    assert.deepEqual(
+      rows.map((row) => [row.userId, row.rank]),
+      [
+        ["near", 1],
+        ["far", 2],
+      ],
+      "four short rides must beat two long ones",
+    );
+    assert.equal(rows[0].score, 4);
+    assert.equal(rows[1].score, 2);
+  });
+
+  it("still reports the distance, it just does not rank on it", () => {
+    const rows = computeStandings([commuter, local], entries, "2026-08-04", "bike");
+    assert.equal(rows.find((row) => row.userId === "far")?.total, 40);
+    assert.equal(rows.find((row) => row.userId === "near")?.total, 12);
+  });
+
+  it("does not count a day logged as zero", () => {
+    const rows = computeStandings(
+      [local],
+      [entry("near", "2026-08-01", 5), entry("near", "2026-08-02", 0, 0)],
+      "2026-08-02",
+      "bike",
+    );
+
+    assert.equal(rows[0].daysLogged, 2, "the zero day is still a logged day");
+    assert.equal(rows[0].activeDays, 1, "but it is not a day out");
+    assert.equal(rows[0].score, 1);
+  });
+
+  it("leaves equal days as a genuine tie rather than splitting on distance", () => {
+    const rows = computeStandings(
+      [commuter, local],
+      [
+        entry("far", "2026-08-01", 30),
+        entry("far", "2026-08-02", 30),
+        entry("near", "2026-08-01", 2),
+        entry("near", "2026-08-02", 2),
+      ],
+      "2026-08-02",
+      "bike",
+    );
+
+    assert.deepEqual(rows.map((row) => row.rank), [1, 1]);
+  });
+
+  it("scores a step campaign on the total instead", () => {
+    const rows = computeStandings(
+      [commuter, local],
+      entries,
+      "2026-08-04",
+      "step",
+    );
+
+    assert.deepEqual(rows.map((row) => row.userId), ["far", "near"]);
+    assert.equal(rows[0].score, 40);
+  });
+});
+
+describe("gapToNextRank on a days-ranked campaign", () => {
+  it("measures the gap in days, not kilometres", () => {
+    const rows = computeStandings(
+      [
+        { id: "a", displayName: "Ann" },
+        { id: "b", displayName: "Bo" },
+      ],
+      [
+        entry("a", "2026-08-01", 1),
+        entry("a", "2026-08-02", 1),
+        entry("a", "2026-08-03", 1),
+        entry("b", "2026-08-01", 500),
+      ],
+      "2026-08-03",
+      "bike",
+    );
+
+    assert.deepEqual(gapToNextRank(rows, "b", "bike"), { amount: 2, rank: 1 });
+  });
+});
+
+describe("cumulativeSeries on a days-ranked campaign", () => {
+  it("accumulates days out rather than distance", () => {
+    const entries = [
+      entry("a", "2026-08-01", 12),
+      entry("a", "2026-08-02", 0), // logged, but nothing ridden
+      entry("a", "2026-08-03", 8),
+    ];
+    const standings = computeStandings([{ id: "a", displayName: "Ann" }], entries, "2026-08-03", "bike");
+
+    const [series] = cumulativeSeries(standings, entries, "2026-08-01", "2026-08-03", "bike");
+
+    assert.deepEqual(series.points, [
+      { date: "2026-08-01", value: 1 },
+      { date: "2026-08-02", value: 1 },
+      { date: "2026-08-03", value: 2 },
+    ]);
   });
 });
 

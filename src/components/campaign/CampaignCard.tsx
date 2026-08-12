@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFormatters, useTranslator } from "@/i18n/provider";
+import { accentStyle, ranksByActiveDays } from "@/lib/campaign-types";
 import type { CampaignSummary } from "@/lib/queries";
 import { Pill, ProgressBar } from "@/components/ui";
 import styles from "./CampaignCard.module.css";
@@ -19,6 +20,7 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
   const format = useFormatters();
 
   const unit = t(`campaignTypes.${summary.type}.unit` as never);
+  const byDays = ranksByActiveDays(summary.type);
   const timeLabel =
     summary.status === "upcoming"
       ? t("campaign.startsIn", { count: summary.daysUntilStart })
@@ -30,7 +32,9 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
     <Link href={`/campaigns/${summary.id}`} className={styles.card}>
       <div className={styles.info}>
         <div className={styles.pills}>
-          <Pill>{t(`campaignTypes.${summary.type}.name` as never)}</Pill>
+          <Pill tone="type" style={accentStyle(summary.type)}>
+            {t(`campaignTypes.${summary.type}.name` as never)}
+          </Pill>
           {summary.myStreak >= 2 ? (
             <Pill tone="maroon">{t("campaign.streakBadge", { count: summary.myStreak })}</Pill>
           ) : null}
@@ -43,7 +47,7 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
         {summary.description ? <p className={styles.description}>{summary.description}</p> : null}
       </div>
 
-      <div className={styles.hero}>
+      <div className={styles.hero} style={accentStyle(summary.type)}>
         <span className={styles.heroBlob} aria-hidden="true" />
         <div className={styles.heroContent}>
           {summary.goalFraction !== null && summary.goalValue ? (
@@ -73,11 +77,22 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
               suffix={summary.totalParticipantsRanked ? `${t("common.of")} ${summary.totalParticipantsRanked}` : ""}
               accent
             />
-            <Stat
-              label={t("dashboard.dailyAverage")}
-              value={format.value(summary.type, summary.myAverage)}
-              suffix={unit}
-            />
+            {/* On a days-ranked campaign the third stat is what actually
+                decides the rank. An average distance per day would be the very
+                framing the ranking sets aside. */}
+            {byDays ? (
+              <Stat
+                label={t("campaign.daysOut")}
+                value={String(summary.myActiveDays)}
+                suffix={t("common.days")}
+              />
+            ) : (
+              <Stat
+                label={t("dashboard.dailyAverage")}
+                value={format.value(summary.type, summary.myAverage)}
+                suffix={unit}
+              />
+            )}
           </div>
 
           {summary.status === "upcoming" ? null : summary.myMissingDays > 0 ? (

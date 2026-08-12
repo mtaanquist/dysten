@@ -29,11 +29,18 @@ export function Avatar({
 export function Pill({
   children,
   tone = "light",
+  style,
 }: {
   children: ReactNode;
-  tone?: "light" | "soft" | "maroon" | "solid";
+  tone?: "light" | "soft" | "maroon" | "solid" | "type";
+  /** Carries a campaign type's accent in, via accentStyle(). */
+  style?: CSSProperties;
 }) {
-  return <span className={`${styles.pill} ${styles[`pill_${tone}`]}`}>{children}</span>;
+  return (
+    <span className={`${styles.pill} ${styles[`pill_${tone}`]}`} style={style}>
+      {children}
+    </span>
+  );
 }
 
 /** The uppercase micro-label that titles a section or a stat. */
@@ -77,11 +84,11 @@ export function Blobs() {
 /** A horizontal progress bar. `fraction` is clamped to 0–1 by the caller. */
 export function ProgressBar({
   fraction,
-  tone = "onDark",
+  tone = "onAccent",
   height = 9,
 }: {
   fraction: number;
-  tone?: "onDark" | "onLight";
+  tone?: "onAccent" | "onLight";
   height?: number;
 }) {
   const style = { "--progress-height": `${height}px` } as CSSProperties;

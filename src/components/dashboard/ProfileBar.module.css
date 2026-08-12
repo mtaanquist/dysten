@@ -67,32 +67,3 @@
   color: var(--c-ink-faint);
 }
 
-.viewAs {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--c-surface);
-  border: var(--bd-default);
-  border-radius: var(--r-pill);
-  padding: 7px var(--sp-2) 7px 16px;
-}
-
-.viewAsLabel {
-  font-size: var(--fs-label);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--c-ink-soft);
-  font-weight: var(--fw-semibold);
-  white-space: nowrap;
-}
-
-.viewAsSelect {
-  border: 0;
-  background: var(--c-blue-soft);
-  border-radius: var(--r-pill);
-  padding: 7px var(--sp-3);
-  font-size: var(--fs-meta);
-  font-weight: var(--fw-semibold);
-  color: var(--c-ink);
-  cursor: pointer;
-}

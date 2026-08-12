@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFormatters, useTranslator } from "@/i18n/provider";
+import { ranksByActiveDays } from "@/lib/campaign-types";
 import type { LeaderboardRow } from "@/lib/queries";
 import { Avatar } from "@/components/ui";
 import styles from "./Leaderboard.module.css";
@@ -12,6 +13,10 @@ import styles from "./Leaderboard.module.css";
  * Tapping a name opens that person's day-by-day view — the spec wants every
  * participant's daily figures visible to everyone in the campaign, not just a
  * summary. Movement arrows compare against yesterday's standings.
+ *
+ * The headline column is whatever the campaign ranks on: steps for a step
+ * campaign, days out for a bike one, with the distance kept underneath so it is
+ * still there to see.
  */
 export function Leaderboard({
   rows,
@@ -30,16 +35,19 @@ export function Leaderboard({
 }) {
   const t = useTranslator();
   const format = useFormatters();
+  const byDays = ranksByActiveDays(type);
   const unit = t(`campaignTypes.${type}.unit` as never);
 
   return (
     <div>
+      {byDays ? <p className={styles.rankNote}>{t("campaign.rankedByDaysOut")}</p> : null}
+
       <div className={styles.scroller}>
         <div className={styles.table}>
           <div className={styles.headRow}>
             <div>{t("campaign.rank")}</div>
             <div>{t("campaign.name")}</div>
-            <div className={styles.right}>{t("campaign.total")}</div>
+            <div className={styles.right}>{byDays ? t("campaign.daysOut") : t("campaign.total")}</div>
             <div className={styles.right}>{t("campaign.averagePerDay")}</div>
             <div className={styles.right}>{t("campaign.move")}</div>
           </div>
@@ -65,9 +73,13 @@ export function Leaderboard({
               </div>
 
               <div className={styles.right}>
-                <div className={styles.total}>{format.value(type, row.total)}</div>
+                <div className={styles.total}>
+                  {byDays ? row.activeDays : format.value(type, row.total)}
+                </div>
                 <div className={styles.split}>
-                  {format.value(type, row.value1)} + {format.value(type, row.value2)}
+                  {byDays
+                    ? `${format.value(type, row.total)} ${unit}`
+                    : `${format.value(type, row.value1)} + ${format.value(type, row.value2)}`}
                 </div>
               </div>
 
@@ -95,11 +107,14 @@ export function Leaderboard({
 
       {gap ? (
         <div className={styles.gap}>
-          {t("campaign.gapBehind", {
-            amount: format.value(type, gap.amount),
-            unit,
-            rank: gap.rank,
-          })}
+          {/* Days carry their own plural form; a distance never needs one. */}
+          {byDays
+            ? t("campaign.gapBehindDays", { count: gap.amount, rank: gap.rank })
+            : t("campaign.gapBehind", {
+                amount: format.value(type, gap.amount),
+                unit,
+                rank: gap.rank,
+              })}
         </div>
       ) : null}
     </div>

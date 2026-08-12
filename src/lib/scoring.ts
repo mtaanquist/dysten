@@ -1,4 +1,4 @@
-import { campaignType, roundToType } from "./campaign-types";
+import { campaignType, ranksByActiveDays, roundToType } from "./campaign-types";
 import { addDays, dayRange, type IsoDate } from "./dates";
 
 /**
@@ -32,6 +32,14 @@ export interface Standing {
   total: number;
   /** Days with an entry — the divisor for a fair daily average. */
   daysLogged: number;
+  /** Days with something actually logged on them; a zero day does not count. */
+  activeDays: number;
+  /**
+   * The figure this campaign type ranks on — `total` or `activeDays`. Anything
+   * that compares participants (the sort, the gap, the chart) reads this, so
+   * the rules only have to be stated once, in the type registry.
+   */
+  score: number;
   /** Total ÷ days logged, so a late joiner compares on effort per day. */
   average: number;
   /** Shared on ties: 1, 2, 2, 4. */
@@ -67,15 +75,20 @@ export function computeStandings(
 ): Standing[] {
   const buckets = entriesByUser(entries, horizon);
 
+  const byActiveDays = ranksByActiveDays(typeKey);
+
   const rows = roster.map((participant) => {
     const own = buckets.get(participant.id) ?? [];
     let value1 = 0;
     let value2 = 0;
+    let activeDays = 0;
     let editedByAdmin = false;
 
     for (const entry of own) {
+      const dayTotal = (entry.value1 || 0) + (entry.value2 || 0);
       value1 += entry.value1 || 0;
       value2 += entry.value2 || 0;
+      if (dayTotal > 0) activeDays += 1;
       if (entry.editedByAdmin) editedByAdmin = true;
     }
 
@@ -93,6 +106,8 @@ export function computeStandings(
       value2,
       total,
       daysLogged,
+      activeDays,
+      score: byActiveDays ? activeDays : total,
       average: daysLogged > 0 ? roundToType(typeKey, total / daysLogged) : 0,
       editedByAdmin,
       rank: 0,
@@ -103,21 +118,26 @@ export function computeStandings(
 }
 
 /**
- * Sorts by total descending and assigns competition ranks, so tied
+ * Sorts by score descending and assigns competition ranks, so tied
  * participants share a rank and the next one down skips accordingly.
  * Name is the tie-breaker for *ordering* only — it never changes the rank.
+ *
+ * Note that ties are left as ties rather than broken by distance. On a
+ * bike campaign two people who both rode twenty days have done the same thing,
+ * and separating them by kilometres would smuggle back the commute length the
+ * ranking deliberately ignores.
  */
 export function assignRanks(rows: Standing[]): Standing[] {
   const sorted = [...rows].sort(
-    (a, b) => b.total - a.total || a.displayName.localeCompare(b.displayName),
+    (a, b) => b.score - a.score || a.displayName.localeCompare(b.displayName),
   );
 
   let rank = 0;
-  let previousTotal: number | null = null;
+  let previousScore: number | null = null;
 
   return sorted.map((row, index) => {
-    if (previousTotal === null || row.total !== previousTotal) rank = index + 1;
-    previousTotal = row.total;
+    if (previousScore === null || row.score !== previousScore) rank = index + 1;
+    previousScore = row.score;
     return { ...row, rank };
   });
 }
@@ -206,7 +226,12 @@ export function rankMovements(
   return movements;
 }
 
-/** How far the user is from the rank immediately above them, if any. */
+/**
+ * How far the user is from the rank immediately above them, if any.
+ *
+ * Measured in whatever the campaign ranks on, so a bike campaign says "3 days
+ * behind #2" rather than quoting a kilometre gap that would not move anyone up.
+ */
 export function gapToNextRank(
   standings: Standing[],
   userId: string,
@@ -219,7 +244,9 @@ export function gapToNextRank(
   const above = standings.filter((row) => row.rank < mine.rank).pop();
   if (!above) return null;
 
-  return { amount: roundToType(typeKey, above.total - mine.total), rank: above.rank };
+  const difference = above.score - mine.score;
+  const amount = ranksByActiveDays(typeKey) ? difference : roundToType(typeKey, difference);
+  return { amount, rank: above.rank };
 }
 
 export interface BestDay {
@@ -266,7 +293,13 @@ export interface CumulativeSeries {
   total: number;
 }
 
-/** Running totals per day for the leading participants — the progress chart. */
+/**
+ * Running totals per day for the leading participants — the progress chart.
+ *
+ * Plots whatever the campaign ranks on, so the lines and the leaderboard tell
+ * the same story: cumulative steps for a step campaign, cumulative days out for
+ * a bike one.
+ */
 export function cumulativeSeries(
   standings: Standing[],
   entries: EntryLike[],
@@ -278,25 +311,34 @@ export function cumulativeSeries(
   if (horizon < start) return [];
   const days = dayRange(start, horizon);
   const leaders = standings.slice(0, limit);
+  const byActiveDays = ranksByActiveDays(typeKey);
 
   return leaders.map((leader) => {
     const own = new Map<IsoDate, number>();
     for (const entry of entries) {
       if (entry.userId !== leader.userId || entry.date > horizon) continue;
-      own.set(entry.date, (own.get(entry.date) ?? 0) + (entry.value1 || 0) + (entry.value2 || 0));
+      const dayTotal = (entry.value1 || 0) + (entry.value2 || 0);
+      const contribution = byActiveDays ? (dayTotal > 0 ? 1 : 0) : dayTotal;
+      own.set(entry.date, (own.get(entry.date) ?? 0) + contribution);
     }
 
     let running = 0;
     const points = days.map((date) => {
       running += own.get(date) ?? 0;
-      return { date, value: roundToType(typeKey, running) };
+      return { date, value: byActiveDays ? running : roundToType(typeKey, running) };
     });
 
-    return { userId: leader.userId, displayName: leader.displayName, points, total: leader.total };
+    return { userId: leader.userId, displayName: leader.displayName, points, total: leader.score };
   });
 }
 
-/** Combined total across the roster — the shared-goal progress bar. */
+/**
+ * Combined total across the roster — the shared-goal progress bar.
+ *
+ * Always the raw amount, never the ranking score: "together we ride around
+ * Denmark" is a distance the group covers, and stays one even on a campaign
+ * whose winner is decided by days out.
+ */
 export function combinedTotal(standings: Standing[], typeKey: string): number {
   return roundToType(
     typeKey,

@@ -6,6 +6,7 @@ import { useFormatters, useTranslator } from "@/i18n/provider";
 import { joinCampaign } from "@/app/actions/campaigns";
 import { useToast } from "@/components/ui/Toast";
 import { Pill } from "@/components/ui";
+import { accentStyle } from "@/lib/campaign-types";
 import type { CampaignSummary } from "@/lib/queries";
 import styles from "./OpenCampaignCard.module.css";
 
@@ -29,7 +30,9 @@ export function OpenCampaignCard({ summary }: { summary: CampaignSummary }) {
   return (
     <article className={styles.card}>
       <div className={styles.pills}>
-        <Pill tone="soft">{t(`campaignTypes.${summary.type}.name` as never)}</Pill>
+        <Pill tone="type" style={accentStyle(summary.type)}>
+          {t(`campaignTypes.${summary.type}.name` as never)}
+        </Pill>
       </div>
       <h3 className={styles.name}>{summary.name}</h3>
       <div className={styles.meta}>

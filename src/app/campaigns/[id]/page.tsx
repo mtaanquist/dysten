@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { canAdminister } from "@/lib/permissions";
+import { accentStyle } from "@/lib/campaign-types";
 import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
@@ -11,7 +12,7 @@ import { Panel, PanelTitle, Pill } from "@/components/ui";
 import { EntryCalendar } from "@/components/campaign/EntryCalendar";
 import { Leaderboard } from "@/components/campaign/Leaderboard";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
-import { GoalPanel, Highlights, ParticipantList, ProgressChart } from "@/components/campaign/panels";
+import { GoalPanel, Highlights, ProgressChart } from "@/components/campaign/panels";
 import styles from "../campaign.module.css";
 
 export default async function CampaignPage({
@@ -59,7 +60,9 @@ export default async function CampaignPage({
 
         <header className={styles.header}>
           <div>
-            <Pill>{t(`campaignTypes.${summary.type}.name` as never)}</Pill>
+            <Pill tone="type" style={accentStyle(summary.type)}>
+              {t(`campaignTypes.${summary.type}.name` as never)}
+            </Pill>
             <h1 className={styles.title}>{summary.name}</h1>
             <div className={styles.range}>{format.dateRange(summary.startDate, summary.endDate)}</div>
           </div>
@@ -130,9 +133,11 @@ export default async function CampaignPage({
             />
           </Panel>
 
+          {/* No separate roster panel: the leaderboard already lists everyone
+              on the campaign, people who have logged nothing included, so a
+              participant list beside it was the same names twice. */}
           <div className={styles.sideStack}>
             <ProgressChart series={detail.series} type={summary.type} />
-            <ParticipantList participants={detail.roster} basePath={`/campaigns/${id}`} />
           </div>
         </div>
       </div>

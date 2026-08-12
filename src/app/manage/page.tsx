@@ -20,8 +20,6 @@ export default async function ManagePage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  // Captains and admins only — and this reads effectiveRole, so an admin
-  // previewing as a member is bounced too, exactly as a member would be.
   if (!canManageCampaigns(user)) redirect("/");
 
   const { edit, roster } = await searchParams;

@@ -13,13 +13,8 @@ export interface SessionUser {
   id: string;
   email: string;
   displayName: string;
-  /** The role stored against the account. */
+  /** The role stored against the account; what every permission check reads. */
   role: Role;
-  /**
-   * The role the UI and permission checks should use. Captains and admins can
-   * preview the app as a lesser role; this is never higher than `role`.
-   */
-  effectiveRole: Role;
   locale: Locale;
   remindersEnabled: boolean;
 }

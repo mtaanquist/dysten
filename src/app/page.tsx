@@ -29,7 +29,6 @@ export default async function DashboardPage({
           displayName={user.displayName}
           email={user.email}
           role={user.role}
-          effectiveRole={user.effectiveRole}
           remindersEnabled={user.remindersEnabled}
         />
 
@@ -48,19 +47,27 @@ export default async function DashboardPage({
           )}
         </section>
 
-        {data.openToJoin.length > 0 ? (
-          <section className={styles.section}>
-            <h2 className={styles.sectionLabel}>{t("dashboard.otherCampaigns")}</h2>
-            <div className={styles.openGrid}>
-              {data.openToJoin.map((summary) => (
-                <OpenCampaignCard key={summary.id} summary={summary} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        {data.openToJoin.length > 0 || data.past.length > 0 ? (
+          <div className={styles.lowerGrid}>
+            {data.openToJoin.length > 0 ? (
+              <section className={styles.column}>
+                <h2 className={styles.sectionLabel}>{t("dashboard.otherCampaigns")}</h2>
+                <div className={styles.openStack}>
+                  {data.openToJoin.map((summary) => (
+                    <OpenCampaignCard key={summary.id} summary={summary} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-        {data.past.length > 0 ? (
-          <PreviousCampaigns rows={data.past} page={data.pastPage} pageCount={data.pastPageCount} />
+            {data.past.length > 0 ? (
+              <PreviousCampaigns
+                rows={data.past}
+                page={data.pastPage}
+                pageCount={data.pastPageCount}
+              />
+            ) : null}
+          </div>
         ) : null}
       </div>
     </AppShell>

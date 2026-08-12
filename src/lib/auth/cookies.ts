@@ -10,7 +10,6 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  */
 
 export const SESSION_COOKIE = "atk_session";
-export const VIEW_ROLE_COOKIE = "atk_view_role";
 export const LOCALE_COOKIE = "atk_locale";
 
 function secret(): string {

@@ -20,9 +20,23 @@
   gap: var(--gap-card);
 }
 
-.openGrid {
+/* Open-to-join and finished campaigns are both short lists, and side by side
+   they fill the space one above the other left empty. Below ~760px the columns
+   collapse and the order is preserved. */
+.lowerGrid {
+  margin-top: var(--sp-7);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--sp-7) var(--gap-card);
+  align-items: start;
+}
+
+.column {
+  min-width: 0;
+}
+
+.openStack {
+  display: grid;
   gap: var(--gap-card);
 }
 
