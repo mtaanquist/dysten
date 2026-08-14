@@ -138,6 +138,19 @@ describe("assertTenantAllowed", () => {
     assert.doesNotThrow(() => assertTenantAllowed(claims(ACME, { acct: 0 })));
   });
 
+  it("refuses rather than guesses when guests are off but acct is missing", () => {
+    // `acct` is an optional claim. Reading its absence as "not a guest" would
+    // let an unconfigured app registration admit every guest in the directory
+    // while the setting claims to exclude them.
+    configure({ tenants: ACME, allowGuests: "false" });
+    assert.throws(() => assertTenantAllowed(claims(ACME)), /no `acct` claim/);
+  });
+
+  it("does not care about a missing acct while guests are allowed", () => {
+    configure({ tenants: ACME, allowGuests: undefined });
+    assert.doesNotThrow(() => assertTenantAllowed(claims(ACME)));
+  });
+
   it("marks policy refusals so the callback can say why", () => {
     configure({ tenants: ACME });
     try {

@@ -267,24 +267,120 @@ the v2.0 endpoints. The app never calls Graph — the object id, e-mail and disp
 name it needs are all in the ID token — so there is no access token to keep and
 nothing to refresh.
 
-1. **Register an application** in Entra ID. Set "Supported account types" to
-   **"Accounts in this organizational directory only"**. Add a *web* redirect URI
-   of `{your-url}/api/auth/callback`. The delegated `User.Read` scope is enough;
-   `openid profile email` is what the app actually asks for.
-2. **Add a client secret** and note it — Entra shows it once.
-3. **Set the environment**: `AUTH_PROVIDER=entra`, `ENTRA_TENANT_IDS` (your
-   tenant id), `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET`, and `APP_URL` set to the
-   public origin.
+Account creation, the first-user-becomes-admin rule and role assignment need no
+changes: the callback provisions the user and writes the same signed session
+cookie the dev provider uses, and every request after that just reads the cookie.
 
-`APP_URL` matters more than it looks. The redirect URI has to match the app
+#### Registering the app
+
+You need someone who can create app registrations in your tenant — often
+Application Administrator or Cloud Application Administrator rather than a full
+Global Administrator. Getting that person's time is usually the long pole here,
+so start it before you need it.
+
+Throughout, `{your-url}` is the public origin of the deployment, e.g.
+`https://dysten.example.com`.
+
+**1. Create the registration.**
+
+In the [Microsoft Entra admin center](https://entra.microsoft.com):
+**Identity → Applications → App registrations → New registration**.
+
+| Field | Value |
+| --- | --- |
+| Name | Anything; users see it on the consent screen. "Dysten" is fine |
+| Supported account types | **Accounts in this organizational directory only (Single tenant)** |
+| Redirect URI | Platform **Web**, value `{your-url}/api/auth/callback` |
+
+The account-types choice is the strongest of the three tenant controls, because
+it makes Microsoft itself refuse to issue a token to anyone else — it does not
+depend on this app's code being correct. Only pick a multi-tenant option if you
+genuinely need several tenants; see [Restricting who may sign in](#restricting-who-may-sign-in)
+for what that costs.
+
+The redirect URI must be **Web**, not "Single-page application". A SPA
+registration refuses to accept a client secret, and this is a confidential
+client. HTTPS is required except for `http://localhost`, which Entra allows so
+you can test against a real tenant from your own machine.
+
+**2. Copy the two ids.** The registration's **Overview** page has both:
+
+- **Application (client) ID** → `ENTRA_CLIENT_ID`
+- **Directory (tenant) ID** → `ENTRA_TENANT_IDS`
+
+**3. Create a client secret.**
+
+**Certificates & secrets → Client secrets → New client secret.** Give it a
+description and an expiry.
+
+Copy the **Value** column, not the Secret ID — they sit next to each other and
+the Value is the one you need. It is shown once and is unrecoverable afterwards;
+if you miss it, delete the secret and make another. That goes in
+`ENTRA_CLIENT_SECRET`.
+
+Entra caps secret lifetime at 24 months. **Put the expiry date in a calendar
+now** — an expired secret takes sign-in down for everyone at once, and the
+symptom (`AADSTS7000215`) does not obviously say "your secret expired".
+
+**4. Check the permissions.**
+
+**API permissions** should already list Microsoft Graph → `User.Read`
+(delegated), added by default. That is enough. The app requests
+`openid profile email`, all of which are delegated Graph permissions that a user
+consents to themselves — no admin consent, no application permissions, nothing
+that reads anyone else's data.
+
+**5. Only if you are setting `ENTRA_ALLOW_GUESTS=false`:** add the `acct` claim.
+
+**Token configuration → Add optional claim → ID → `acct`.**
+
+`acct` is what distinguishes a member of your tenant (`0`) from a B2B guest
+(`1`), and Entra omits it unless the registration asks for it. The app refuses
+every sign-in if you have switched guests off and the claim is missing, rather
+than guessing — an absent claim read as "not a guest" would quietly admit every
+guest in the directory while the setting says the opposite. If you see that
+refusal, this step is what you skipped.
+
+**6. Optional but worth knowing: restrict who can use it at all.**
+
+**Enterprise applications → (your app) → Properties → Assignment required: Yes**,
+then assign the users or groups under **Users and groups**. Anyone else is
+refused by Entra before they ever reach the app.
+
+This is the cleanest way to run a beta: put the pilot group on the assignment
+list and open it up later, without touching configuration or code.
+
+**7. Set the environment.**
+
+```dotenv
+AUTH_PROVIDER=entra
+APP_URL=https://dysten.example.com
+ENTRA_TENANT_IDS=<Directory (tenant) ID>
+ENTRA_CLIENT_ID=<Application (client) ID>
+ENTRA_CLIENT_SECRET=<the secret Value>
+```
+
+Then drop `ALLOW_DEV_AUTH` entirely, so the account picker cannot come back.
+
+`APP_URL` matters more than it looks. The redirect URI has to match the
 registration byte for byte, and behind a reverse proxy the request's own idea of
-its origin is whatever the proxy forwarded. Setting it explicitly is the
-difference between working and `AADSTS50011`.
+its origin is whatever the proxy forwarded — which is the difference between
+working and `AADSTS50011`.
 
-Account creation, the first-user-becomes-admin rule and role assignment already
-work and need no changes: the callback provisions the user and writes the same
-signed session cookie the dev provider uses, and every request after that just
-reads the cookie.
+#### When it does not work
+
+Nearly every first-run failure is one of these. The `AADSTS` code is in the
+Microsoft error page, and the app logs its own refusals with an `[auth]` prefix.
+
+| What you see | Usually means |
+| --- | --- |
+| `AADSTS50011` redirect URI mismatch | `APP_URL` and the registered redirect URI disagree — check the scheme, a trailing slash, and that the path is exactly `/api/auth/callback` |
+| `AADSTS7000215` invalid client secret | The secret expired, or the Secret **ID** was copied instead of the **Value** |
+| `AADSTS700016` application not found | `ENTRA_CLIENT_ID` is wrong, or the registration is in a different tenant from `ENTRA_TENANT_IDS` |
+| `AADSTS50020` user account does not exist in tenant | A personal Microsoft account, or someone from another tenant, against a single-tenant registration. Working as intended |
+| "Your account is not from an organisation allowed to use Dysten" | The app's own check: the token's `tid` is not in `ENTRA_TENANT_IDS`. The log line names the tenant it saw |
+| That message for *everyone*, with `no acct claim` in the log | `ENTRA_ALLOW_GUESTS=false` without step 5 |
+| "Sign-in failed", `state mismatch` in the log | The one-time cookies did not survive the round trip. Almost always a missing `secure`/HTTPS mismatch or a proxy dropping cookies |
 
 #### Restricting who may sign in
 

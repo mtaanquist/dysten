@@ -138,7 +138,22 @@ export function assertTenantAllowed(claims: EntraClaims): void {
   }
 
   const allowGuests = process.env.ENTRA_ALLOW_GUESTS !== "false";
-  if (!allowGuests && claims.acct === 1) {
-    throw new TenantNotAllowedError("Sign-in rejected: guest accounts are not permitted.");
+  if (!allowGuests) {
+    // `acct` is an *optional* claim: Entra omits it unless the app registration
+    // asks for it. Treating "absent" as "not a guest" would mean an
+    // unconfigured registration silently admits every guest in the directory
+    // while the setting says they are excluded — the failure would be invisible
+    // and on the permissive side. So an unanswerable question is refused rather
+    // than guessed, and the message says exactly which box to tick.
+    if (claims.acct === undefined) {
+      throw new TenantNotAllowedError(
+        "Sign-in rejected: ENTRA_ALLOW_GUESTS is false, but the token carries no `acct` claim " +
+          "to tell members from guests. Add it on the app registration under Token configuration " +
+          "→ Add optional claim → ID → acct, or set ENTRA_ALLOW_GUESTS=true.",
+      );
+    }
+    if (claims.acct === 1) {
+      throw new TenantNotAllowedError("Sign-in rejected: guest accounts are not permitted.");
+    }
   }
 }
