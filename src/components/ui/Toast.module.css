@@ -18,3 +18,24 @@
   animation: fadeUp var(--dur-drawer) var(--ease-out) both;
   white-space: nowrap;
 }
+
+@media (max-width: 640px) {
+  /* Clears the fixed tab bar rather than landing on top of it. */
+  .viewport {
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    left: var(--sp-3);
+    right: var(--sp-3);
+    transform: none;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* A message that fits on one line at 1180px does not fit at 390px, so it
+     wraps here instead of running off the side. */
+  .toast {
+    white-space: normal;
+    text-wrap: pretty;
+    border-radius: var(--r-inner);
+    padding: var(--sp-3) var(--sp-5);
+  }
+}

@@ -62,7 +62,9 @@ export function Leaderboard({
               <div className={styles.rank}>{row.rank}</div>
 
               <div className={styles.person}>
-                <Avatar name={row.displayName} />
+                <span className={styles.avatarSlot}>
+                  <Avatar name={row.displayName} />
+                </span>
                 <div className={styles.personText}>
                   <div className={styles.name}>{row.displayName}</div>
                   <div className={styles.barTrack}>
@@ -72,10 +74,14 @@ export function Leaderboard({
                 {row.streak >= 3 ? <span className={styles.streak}>{row.streak}d</span> : null}
               </div>
 
-              <div className={styles.right}>
+              <div className={`${styles.right} ${styles.headline}`}>
                 <div className={styles.total}>
                   {byDays ? row.activeDays : format.value(type, row.total)}
                 </div>
+                {/* The column header carries the unit at desk widths; on a
+                    phone there is no header row, so each figure says what it
+                    is — and a bike campaign's headline is days, not distance. */}
+                <div className={styles.headlineUnit}>{byDays ? t("common.days") : unit}</div>
                 <div className={styles.split}>
                   {byDays
                     ? `${format.value(type, row.total)} ${unit}`
@@ -83,7 +89,10 @@ export function Leaderboard({
                 </div>
               </div>
 
-              <div className={`${styles.right} ${styles.average}`}>{format.value(type, row.average)}</div>
+              <div className={`${styles.right} ${styles.average}`}>
+                <span className={styles.metaLabel}>{t("campaign.averagePerDay")}</span>
+                {format.value(type, row.average)}
+              </div>
 
               <div
                 className={`${styles.right} ${styles.move} ${

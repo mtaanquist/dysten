@@ -63,9 +63,12 @@
   outline-color: var(--c-blue);
 }
 
+/* Below this width the picker only ever appears inside the account menu, where
+   it is a settings row rather than a header ornament — so the targets grow
+   instead of shrinking to fit a crowded top bar. */
 @media (max-width: 640px) {
   .option {
-    width: 30px;
-    height: 30px;
+    width: 38px;
+    height: 38px;
   }
 }

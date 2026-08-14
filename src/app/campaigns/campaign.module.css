@@ -98,20 +98,6 @@
   margin-top: var(--sp-5);
 }
 
-.entriesHead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-}
-
-.entriesMeta {
-  font-size: var(--fs-meta);
-  color: var(--c-ink-soft);
-  font-weight: var(--fw-semibold);
-}
-
 .notMember {
   margin: var(--sp-4) 0 0;
   font-size: var(--fs-body-sm);
@@ -147,4 +133,57 @@
   color: var(--c-ink-faint);
   font-weight: var(--fw-semibold);
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  /* Four campaigns wrapping to four rows pushes the page down before it has
+     said anything. One row that scrolls sideways costs the same tap and none
+     of the height; the pill clipped at the edge is the affordance. */
+  .switcher {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    /* The active pill's outline is not clipped by the scroll box. */
+    padding: 2px 0;
+    margin-inline: calc(var(--sp-4) * -1);
+    padding-inline: var(--sp-4);
+  }
+
+  .switcher::-webkit-scrollbar {
+    display: none;
+  }
+
+  .switch {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: var(--touch-min);
+    display: flex;
+    align-items: center;
+  }
+
+  .header {
+    padding: var(--sp-5);
+    gap: var(--sp-3);
+    align-items: flex-start;
+  }
+
+  /* Two lines at 32px is most of the card before anything has been said. */
+  .title {
+    font-size: 26px;
+  }
+
+  /* Once the header stops being two columns the counter has no right-hand edge
+     to hang from, and a right-aligned number over its own label reads as a
+     mistake. On one line it is a sentence again: 19 dage tilbage. */
+  .countdown {
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+  }
+
+  .countdownNumber {
+    font-size: 30px;
+  }
 }

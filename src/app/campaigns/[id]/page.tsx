@@ -10,6 +10,7 @@ import { createFormatters } from "@/lib/format";
 import { AppShell } from "@/components/layout/AppShell";
 import { Panel, PanelTitle, Pill } from "@/components/ui";
 import { EntryCalendar } from "@/components/campaign/EntryCalendar";
+import { DayEntry } from "@/components/campaign/DayEntry";
 import { Leaderboard } from "@/components/campaign/Leaderboard";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
 import { GoalPanel, Highlights, ProgressChart } from "@/components/campaign/panels";
@@ -89,27 +90,34 @@ export default async function CampaignPage({
         </div>
 
         <Panel className={styles.entries}>
-          <div className={styles.entriesHead}>
-            <PanelTitle>
-              {t("campaign.myEntries")} — {summary.name}
-            </PanelTitle>
-            <div className={styles.entriesMeta}>
-              {t(`campaignTypes.${summary.type}.field1` as never)} ·{" "}
-              {t(`campaignTypes.${summary.type}.field2` as never)} —{" "}
-              {t(`campaignTypes.${summary.type}.unit` as never)}
-            </div>
-          </div>
+          {/* Just the title. The campaign name is in the header a screen-length
+              above, and the two field names are on the fields themselves — the
+              subtitle said both again on the way past. */}
+          <PanelTitle>{t("campaign.myEntries")}</PanelTitle>
 
           {summary.isParticipant ? (
-            <EntryCalendar
-              campaignId={summary.id}
-              type={summary.type}
-              startDate={summary.startDate}
-              endDate={summary.endDate}
-              today={today()}
-              editable={summary.editable}
-              entries={detail.myEntries}
-            />
+            /* Two controls over the same data, one visible per viewport: the
+               month grid at desk widths, the day-at-a-time form on a phone. */
+            <>
+              <EntryCalendar
+                campaignId={summary.id}
+                type={summary.type}
+                startDate={summary.startDate}
+                endDate={summary.endDate}
+                today={today()}
+                editable={summary.editable}
+                entries={detail.myEntries}
+              />
+              <DayEntry
+                campaignId={summary.id}
+                type={summary.type}
+                startDate={summary.startDate}
+                endDate={summary.endDate}
+                today={today()}
+                editable={summary.editable}
+                entries={detail.myEntries}
+              />
+            </>
           ) : (
             <p className={styles.notMember}>{t("campaign.notParticipating")}</p>
           )}

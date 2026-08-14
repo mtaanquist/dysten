@@ -206,6 +206,18 @@
   min-width: 0;
 }
 
+/* Wraps the avatar so the phone layout has something to switch off. */
+.avatarSlot {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+/* Both are phone-only: the header row names the columns at desk widths. */
+.metaLabel,
+.headlineUnit {
+  display: none;
+}
+
 .personName {
   font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
@@ -250,4 +262,105 @@
 .rosterName {
   font-size: var(--fs-meta);
   font-weight: var(--fw-semibold);
+}
+
+/* Final standings become cards on a phone, the same way the live leaderboard
+   does — one pattern for both, since they are the same row frozen. */
+@media (max-width: 640px) {
+  .scroller {
+    overflow-x: visible;
+  }
+
+  .standings {
+    min-width: 0;
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-3);
+  }
+
+  .standingsHead {
+    display: none;
+  }
+
+  .standingsRow {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank person headline"
+      "avg  avg    avg";
+    align-items: start;
+    gap: var(--sp-2) 10px;
+    padding: var(--sp-3);
+    border: var(--bd-default);
+    border-radius: var(--r-inner);
+    background: var(--c-surface);
+  }
+
+  .winnerRow {
+    border: 2px solid var(--c-maroon-line);
+  }
+
+  .rank {
+    grid-area: rank;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-cell);
+    background: var(--c-blue-soft);
+    color: var(--c-heading);
+  }
+
+  .winnerRow .rank {
+    background: var(--c-chip-bg);
+  }
+
+  .person {
+    grid-area: person;
+    align-items: flex-start;
+  }
+
+  .avatarSlot {
+    display: none;
+  }
+
+  .personName {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .headline {
+    grid-area: headline;
+  }
+
+  .headlineUnit {
+    display: block;
+    font-size: var(--fs-micro);
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+  }
+
+  .split {
+    white-space: nowrap;
+  }
+
+  .average {
+    grid-area: avg;
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-top: var(--sp-1);
+  }
+
+  .metaLabel {
+    display: inline;
+    font-size: var(--fs-micro);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-bold);
+  }
 }

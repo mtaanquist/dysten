@@ -116,7 +116,15 @@
     "entriesLocked": "Kampagnen er afsluttet — registreringer kan ikke ændres.",
     "correctEntries": "Ret registreringer",
     "correctEntriesHint": "Alt du ændrer her gemmes på denne person og markeres som rettet af administrator.",
-    "deleteEntry": "Slet registrering"
+    "deleteEntry": "Slet registrering",
+    "prevDay": "Forrige dag",
+    "nextDay": "Næste dag",
+    "week": "Uge",
+    "swipeHint": "Stryg til siden for at skifte uge.",
+    "savedOnBlur": "Gemmes når feltet forlades",
+    "missingTitle": "Dage du mangler",
+    "logIt": "Registrér",
+    "missingHint": "En dag forsvinder herfra i samme øjeblik den får et tal."
   },
   "history": {
     "title": "Tidligere kampagner",

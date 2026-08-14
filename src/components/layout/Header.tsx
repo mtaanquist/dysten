@@ -9,6 +9,7 @@ import { setLocale, signOut } from "@/app/actions/session";
 import { Avatar } from "@/components/ui";
 import type { Theme } from "@/lib/theme";
 import { ThemePicker } from "./ThemePicker";
+import { isNavActive, visibleNavItems } from "./nav-items";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -28,16 +29,39 @@ interface HeaderProps {
 }
 
 /**
- * `match` is the path prefix that marks the item current, separate from `href`
- * because the campaign link points at one specific campaign while every
- * campaign page should light it up.
+ * The language control, rendered twice: once in the header's tool row for wide
+ * viewports and once inside the account menu for phones. Only one of the two is
+ * ever visible. The theme picker is doubled the same way — on a 390px header
+ * both are settings you touch once, and giving them permanent space there is
+ * more prominence than they have earned.
  */
-const NAV = [
-  { href: "/", match: "/", key: "nav.dashboard" },
-  { href: null, match: "/campaigns", key: "nav.campaign" },
-  { href: "/history", match: "/history", key: "nav.history" },
-  { href: "/manage", match: "/manage", key: "nav.management", manageOnly: true },
-] as const;
+function LanguageSelect({ className }: { className: string }) {
+  const t = useTranslator();
+  const locale = useLocale();
+  const [, startTransition] = useTransition();
+
+  return (
+    <label className={className}>
+      <span className="srOnly">{t("profile.language")}</span>
+      <select
+        className={styles.language}
+        value={locale}
+        onChange={(event) => {
+          const next = event.target.value;
+          startTransition(() => {
+            void setLocale(next);
+          });
+        }}
+      >
+        {LOCALES.map((option) => (
+          <option key={option} value={option} className={styles.languageOption}>
+            {LOCALE_LABELS[option]}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 export function Header({
   orgName,
@@ -49,13 +73,8 @@ export function Header({
   campaignHref,
 }: HeaderProps) {
   const t = useTranslator();
-  const locale = useLocale();
   const pathname = usePathname();
-  const [, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const isActive = (match: string) =>
-    match === "/" ? pathname === "/" : pathname.startsWith(match);
 
   return (
     <header className={styles.header}>
@@ -71,13 +90,14 @@ export function Header({
           <span className={styles.tagline}>{brandName ? orgName : t("app.tagline")}</span>
         </Link>
 
+        {/* Hidden on phones, where BottomNav carries the same four links. */}
         <nav className={styles.nav} aria-label={t("nav.dashboard")}>
-          {NAV.filter((item) => !("manageOnly" in item && item.manageOnly) || canManage).map((item) => (
+          {visibleNavItems(canManage).map((item) => (
             <Link
               key={item.match}
               href={item.href ?? campaignHref}
-              className={`${styles.navLink} ${isActive(item.match) ? styles.navLinkActive : ""}`}
-              aria-current={isActive(item.match) ? "page" : undefined}
+              className={`${styles.navLink} ${isNavActive(pathname, item.match) ? styles.navLinkActive : ""}`}
+              aria-current={isNavActive(pathname, item.match) ? "page" : undefined}
             >
               {t(item.key)}
             </Link>
@@ -85,27 +105,11 @@ export function Header({
         </nav>
 
         <div className={styles.tools}>
-          <ThemePicker theme={theme} />
+          <span className={styles.themeSlot}>
+            <ThemePicker theme={theme} />
+          </span>
 
-          <label className={styles.languageLabel}>
-            <span className="srOnly">{t("profile.language")}</span>
-            <select
-              className={styles.language}
-              value={locale}
-              onChange={(event) => {
-                const next = event.target.value;
-                startTransition(() => {
-                  void setLocale(next);
-                });
-              }}
-            >
-              {LOCALES.map((option) => (
-                <option key={option} value={option} className={styles.languageOption}>
-                  {LOCALE_LABELS[option]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <LanguageSelect className={styles.languageLabel} />
 
           <div className={styles.account}>
             <button
@@ -132,6 +136,26 @@ export function Header({
                 <div className={styles.menu} role="menu">
                   <div className={styles.menuName}>{displayName}</div>
                   <div className={styles.menuEmail}>{email}</div>
+
+                  {/* Phones only: the header hands these two over rather than
+                      keeping them on screen at all times. The visible labels
+                      are hidden from assistive tech because both controls
+                      already name themselves. */}
+                  <div className={styles.menuControls}>
+                    <div className={styles.menuRow}>
+                      <span className={styles.menuRowLabel} aria-hidden="true">
+                        {t("profile.theme")}
+                      </span>
+                      <ThemePicker theme={theme} variant="light" />
+                    </div>
+                    <div className={styles.menuRow}>
+                      <span className={styles.menuRowLabel} aria-hidden="true">
+                        {t("profile.language")}
+                      </span>
+                      <LanguageSelect className={styles.menuLanguage} />
+                    </div>
+                  </div>
+
                   <form action={signOut}>
                     <button type="submit" className={styles.signOut} role="menuitem">
                       {t("profile.signOut")}

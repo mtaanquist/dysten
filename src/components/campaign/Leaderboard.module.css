@@ -69,6 +69,13 @@
   min-width: 0;
 }
 
+/* Wraps the avatar so the phone layout has something to switch off without
+   reaching into another component's class names. */
+.avatarSlot {
+  flex: 0 0 auto;
+  display: flex;
+}
+
 .personText {
   min-width: 0;
   flex: 1;
@@ -148,4 +155,127 @@
   padding: 11px var(--sp-4);
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-semibold);
+}
+
+/* Both are phone-only affordances: at desk widths the header row names the
+   columns, so a per-figure label would only repeat it. */
+.metaLabel,
+.headlineUnit {
+  display: none;
+}
+
+/* On a phone the five columns become a card. It is the same DOM re-laid out,
+   not a second component: every figure the table shows is still on screen,
+   and nothing has moved behind a tap. */
+@media (max-width: 640px) {
+  .scroller {
+    overflow-x: visible;
+  }
+
+  .table {
+    min-width: 0;
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-3);
+  }
+
+  /* Column headers have nowhere to sit once the rows stop being rows. */
+  .headRow {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank person headline"
+      "avg  avg    move";
+    align-items: start;
+    gap: var(--sp-2) 10px;
+    padding: var(--sp-3);
+    border: var(--bd-default);
+    border-radius: var(--r-inner);
+    background: var(--c-surface);
+  }
+
+  .rowMe {
+    border: var(--bd-selected);
+    background: var(--c-blue-tint);
+  }
+
+  /* The rank leads the card, as a chip rather than a bare figure — it is the
+     one number that has to survive being read at arm's length. */
+  .rank {
+    grid-area: rank;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-cell);
+    background: var(--c-blue-soft);
+    color: var(--c-heading);
+  }
+
+  .rowMe .rank {
+    background: var(--c-chip-bg);
+  }
+
+  .person {
+    grid-area: person;
+    align-items: flex-start;
+  }
+
+  /* At 390px the avatar costs more width than it earns; the rank chip on the
+     left is already carrying the row's identity. */
+  .avatarSlot {
+    display: none;
+  }
+
+  .name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .headline {
+    grid-area: headline;
+  }
+
+  .headlineUnit {
+    display: block;
+    font-size: var(--fs-micro);
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+  }
+
+  .split {
+    white-space: nowrap;
+  }
+
+  /* No rule under the headline block: a border on each of the two areas
+     leaves a gap where the column gap falls, which reads as a mistake. The
+     label carries the separation instead. */
+  .average {
+    grid-area: avg;
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-top: var(--sp-1);
+  }
+
+  .metaLabel {
+    display: inline;
+    font-size: var(--fs-micro);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-bold);
+  }
+
+  .move {
+    grid-area: move;
+    margin-top: var(--sp-1);
+  }
 }

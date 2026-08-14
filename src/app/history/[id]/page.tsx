@@ -90,12 +90,18 @@ export default async function HistoryDetailPage({
                   >
                     <div className={styles.rank}>{row.rank}</div>
                     <div className={styles.person}>
-                      <Avatar name={row.displayName} />
+                      <span className={styles.avatarSlot}>
+                        <Avatar name={row.displayName} />
+                      </span>
                       <span className={styles.personName}>{row.displayName}</span>
                     </div>
-                    <div className={styles.right}>
+                    <div className={`${styles.right} ${styles.headline}`}>
                       <div className={styles.total}>
                         {byDays ? row.activeDays : format.value(detail.type, row.total)}
+                      </div>
+                      {/* No header row on a phone, so the figure names itself. */}
+                      <div className={styles.headlineUnit}>
+                        {byDays ? t("common.days") : unit}
                       </div>
                       <div className={styles.split}>
                         {byDays
@@ -104,6 +110,7 @@ export default async function HistoryDetailPage({
                       </div>
                     </div>
                     <div className={`${styles.right} ${styles.average}`}>
+                      <span className={styles.metaLabel}>{t("campaign.averagePerDay")}</span>
                       {format.value(detail.type, row.average)}
                     </div>
                   </Link>

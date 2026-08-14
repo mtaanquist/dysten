@@ -116,7 +116,15 @@
     "entriesLocked": "This campaign has ended — entries are read-only.",
     "correctEntries": "Correct entries",
     "correctEntriesHint": "Anything you change here is saved against this person and marked as an admin correction.",
-    "deleteEntry": "Delete entry"
+    "deleteEntry": "Delete entry",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "week": "Week",
+    "swipeHint": "Swipe sideways to change week.",
+    "savedOnBlur": "Saved when the field loses focus",
+    "missingTitle": "Days you are missing",
+    "logIt": "Log it",
+    "missingHint": "A day leaves this list the moment it gets a number."
   },
   "history": {
     "title": "Past campaigns",

@@ -6,6 +6,7 @@ import { Blobs } from "@/components/ui";
 import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
 import { getDefaultCampaignId } from "@/lib/queries";
 import { Header } from "./Header";
+import { BottomNav } from "./BottomNav";
 import styles from "./AppShell.module.css";
 
 /**
@@ -18,6 +19,8 @@ export async function AppShell({ user, children }: { user: SessionUser; children
   // Left as /campaigns only when there is none to point at, in which case that
   // route's redirect sends you back to the dashboard.
   const defaultCampaignId = await getDefaultCampaignId(user.id);
+  const campaignHref = defaultCampaignId ? `/campaigns/${defaultCampaignId}` : "/campaigns";
+  const canManage = atLeast(user.role, Role.CAPTAIN);
 
   return (
     <div className={styles.root}>
@@ -28,11 +31,13 @@ export async function AppShell({ user, children }: { user: SessionUser; children
           brandName={BRAND_NAME}
           displayName={user.displayName}
           email={user.email}
-          canManage={atLeast(user.role, Role.CAPTAIN)}
+          canManage={canManage}
           theme={user.theme}
-          campaignHref={defaultCampaignId ? `/campaigns/${defaultCampaignId}` : "/campaigns"}
+          campaignHref={campaignHref}
         />
         <main className={styles.container}>{children}</main>
+        {/* Phones only — hidden in CSS above 640px. */}
+        <BottomNav canManage={canManage} campaignHref={campaignHref} />
       </div>
     </div>
   );

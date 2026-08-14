@@ -218,9 +218,149 @@
   background: var(--c-maroon-soft);
 }
 
+/* The grab handle only exists in the phone's bottom-sheet form. */
+.grabber {
+  display: none;
+}
+
+/* Wrappers that are invisible to the desk-width grid: their labels are off, so
+   the inputs and values remain the direct grid children the table expects. */
+.cell {
+  display: contents;
+}
+
+.cellLabel {
+  display: none;
+}
+
+/* A side drawer at 460px is a desktop pattern on a handset. At phone widths it
+   becomes a bottom sheet: it arrives from the edge nearest the thumb, and the
+   four-column table inside it becomes a card per day rather than something to
+   be scrolled sideways. */
 @media (max-width: 640px) {
+  .overlay {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .drawer {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+    padding: var(--sp-3) var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom));
+    box-shadow: 0 -14px 44px var(--c-shadow-m);
+  }
+
+  .grabber {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: var(--r-pill);
+    background: var(--c-border);
+    margin: 0 auto var(--sp-3);
+  }
+
+  .close {
+    /* The one control in the sheet a thumb has to find first time. */
+    width: var(--touch-min);
+    height: var(--touch-min);
+    font-size: 18px;
+  }
+
+  .scroller {
+    overflow-x: visible;
+  }
+
+  .table,
+  .tableEditing {
+    min-width: 0;
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  /* The header row named the columns; each value now names itself instead. */
+  .headRow {
+    display: none;
+  }
+
+  .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "date total"
+      "v1   v2";
+    align-items: baseline;
+    gap: var(--sp-1) var(--sp-3);
+    padding: 10px var(--sp-3);
+    border: var(--bd-default);
+    border-radius: var(--r-field);
+    background: var(--c-surface);
+  }
+
+  .rowEditing {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--touch-min);
+    grid-template-areas:
+      "date date total"
+      "v1   v2   del";
+    align-items: end;
+    gap: var(--sp-2) var(--sp-2);
+  }
+
+  .cellDate {
+    grid-area: date;
+  }
+
+  .rowTotal {
+    grid-area: total;
+  }
+
+  .cell {
+    display: block;
+  }
+
+  .cellV1 {
+    grid-area: v1;
+  }
+
+  .cellV2 {
+    grid-area: v2;
+  }
+
+  .cellDelete {
+    grid-area: del;
+  }
+
+  /* Both values stay on the face of the row, never behind a tap — the read-only
+     pair reads as "Skridt 12.000 · Beregnet 500" on one line. */
+  .cellLabel {
+    display: block;
+    font-size: var(--fs-nano);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-bold);
+    margin-bottom: 2px;
+  }
+
+  .cellV1,
+  .cellV2 {
+    text-align: left;
+  }
+
+  /* Corrections are typed with a thumb, so the field clears the 44px floor
+     rather than shrinking under it as the old breakpoint had it do. */
   .input {
-    min-height: 38px;
-    font-size: var(--fs-body-sm);
+    min-height: var(--touch-min);
+    font-size: var(--fs-body);
+    text-align: left;
+    padding: var(--sp-2) 10px;
+  }
+
+  .delete {
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    border: var(--bd-default);
+    border-radius: var(--r-field-sm);
   }
 }

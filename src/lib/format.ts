@@ -52,6 +52,12 @@ export interface Formatters {
   dateRange(start: IsoDate, end: IsoDate): string;
   /** Abbreviated weekday, for calendar column headers and drawer rows. */
   weekday(date: IsoDate): string;
+  /** Full weekday: "onsdag" · "Wednesday". */
+  weekdayLong(date: IsoDate): string;
+  /** Day and month without the year: "12. august" · "12 August". */
+  dayMonth(date: IsoDate): string;
+  /** The phone entry screen's heading: "onsdag 12. august" · "Wednesday 12 August". */
+  dayLong(date: IsoDate): string;
   /** "August 2026" — the calendar's month heading. */
   monthYear(date: IsoDate): string;
   /** Whole-number percentage, e.g. "69%". */
@@ -75,6 +81,14 @@ export function createFormatters(locale: Locale): Formatters {
       return `${this.dateMedium(start)} – ${this.dateMedium(end)}`;
     },
     weekday: (date) => dateFormat(locale, { weekday: "short" }, "weekday").format(parseIsoDate(date)),
+    weekdayLong: (date) =>
+      dateFormat(locale, { weekday: "long" }, "weekdayLong").format(parseIsoDate(date)),
+    dayMonth: (date) =>
+      dateFormat(locale, { day: "numeric", month: "long" }, "dayMonth").format(parseIsoDate(date)),
+    dayLong: (date) =>
+      dateFormat(locale, { weekday: "long", day: "numeric", month: "long" }, "dayLong").format(
+        parseIsoDate(date),
+      ),
     monthYear: (date) =>
       dateFormat(locale, { month: "long", year: "numeric" }, "monthYear").format(parseIsoDate(date)),
     percent: (fraction) =>

@@ -47,6 +47,9 @@ interface MonthBlock {
  *
  * Values save on blur rather than on each keystroke: one request per finished
  * number, and no half-typed "1" landing in the database before "12,500".
+ *
+ * On phones this is hidden and DayEntry takes over — see the note there on why
+ * the choice is made in CSS rather than in JavaScript.
  */
 export function EntryCalendar({
   campaignId,
@@ -137,7 +140,7 @@ export function EntryCalendar({
   }
 
   return (
-    <div>
+    <div className={styles.root}>
       <div className={styles.legend}>
         <LegendSwatch className={styles.swatchLogged} label={t("campaign.legendLogged")} />
         <LegendSwatch className={styles.swatchMissing} label={t("campaign.legendMissing")} />
@@ -150,7 +153,8 @@ export function EntryCalendar({
         <div key={month.key} className={styles.month}>
           <div className={styles.monthName}>{format.monthYear(month.anchor)}</div>
 
-          {/* Below ~660px the grid scrolls rather than crushing the inputs. */}
+          {/* Between 640px and the grid's own 660px it scrolls rather than
+              crushing the inputs; below that DayEntry has replaced it. */}
           <div className={styles.scroller}>
             <div className={styles.grid}>
               {headers.map((header, index) => (

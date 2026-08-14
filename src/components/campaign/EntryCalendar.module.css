@@ -183,11 +183,11 @@
   cursor: not-allowed;
 }
 
-/* On a phone the fields become the tap target the spec asks for. */
+/* Phones get DayEntry instead. The month grid used to survive here by shrinking
+   its inputs to 38px, which is under the app's own 44px floor — the grid was
+   never the right control at this width, and squeezing it was the symptom. */
 @media (max-width: 640px) {
-  .inputPrimary,
-  .inputSecondary {
-    min-height: 38px;
-    font-size: var(--fs-body-sm);
+  .root {
+    display: none;
   }
 }

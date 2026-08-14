@@ -110,6 +110,43 @@
   display: inline-flex;
 }
 
+.themeSlot {
+  display: inline-flex;
+}
+
+/* The theme and language controls repeated inside the account menu, for
+   phones. Off here, on in the breakpoint at the foot of this file — a control
+   is never visible in both places at once. */
+.menuControls {
+  display: none;
+}
+
+.menuRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: var(--touch-min);
+}
+
+.menuRowLabel {
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-muted);
+}
+
+.menuLanguage {
+  display: inline-flex;
+}
+
+/* In the menu it sits on a pale surface rather than the blue header, so the
+   on-brand wash and white ink both have to go. */
+.menuLanguage .language {
+  background: var(--c-blue-soft);
+  color: var(--c-heading);
+  padding: 9px 10px;
+}
+
 .language {
   background: var(--c-on-brand-wash);
   color: var(--c-on-dark);
@@ -196,13 +233,62 @@
 }
 
 @media (max-width: 640px) {
-  .inner {
-    padding: 10px var(--sp-4);
+  /* The header stays put while the page scrolls, so the brand and the account
+     are reachable without scrolling back up — the tab bar at the other end of
+     the screen is fixed for the same reason. */
+  .header {
+    position: sticky;
+    top: 0;
   }
 
+  .inner {
+    padding: var(--sp-2) var(--sp-4);
+    gap: var(--sp-2);
+    min-height: 56px;
+    flex-wrap: nowrap;
+  }
+
+  /* The four links move to BottomNav. Removing them here is what frees the
+     header's width for the brand lockup, which may be two lines deep. */
   .nav {
-    order: 3;
-    flex-basis: 100%;
-    justify-content: flex-start;
+    display: none;
+  }
+
+  .brand {
+    /* Allowed to shrink and wrap: a sub-brand is a real word in someone's
+       language, not a fixed-width asset. */
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .wordmark {
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+  }
+
+  .tagline {
+    font-size: var(--fs-micro);
+  }
+
+  /* Brand and avatar are all the header keeps: one is identity, the other is
+     the way in to everything else. */
+  .themeSlot,
+  .languageLabel {
+    display: none;
+  }
+
+  /* Wide enough for the theme row, which is now the menu's widest line. */
+  .menu {
+    min-width: 240px;
+  }
+
+  .menuControls {
+    display: grid;
+    gap: var(--sp-1);
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-2);
+    border-top: var(--bd-quiet);
   }
 }

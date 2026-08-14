@@ -1,7 +1,10 @@
 .root {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  /* `clip` rather than `hidden`: both stop the decorative blobs widening the
+     page, but `hidden` makes this a scroll container, and a scroll container
+     that never scrolls silently kills the sticky header on phones. */
+  overflow-x: clip;
 }
 
 .stack {
@@ -16,12 +19,16 @@
   /* The side padding the design settled on — History and Management get it
      from here rather than each page re-declaring its own. */
   padding: var(--sp-7) var(--page-pad-x) 70px;
+  /* Deliberately no z-index: `.stack` already lifts everything clear of the
+     decorative blobs, and a stacking context here would trap the person
+     drawer's overlay below the fixed tab bar. */
   position: relative;
-  z-index: 2;
 }
 
 @media (max-width: 640px) {
   .container {
-    padding: var(--sp-5) var(--sp-4) 56px;
+    /* The tail clears the fixed tab bar (56px plus its own padding) and the
+       home indicator below it, so the last card is never parked underneath. */
+    padding: var(--sp-5) var(--sp-4) calc(84px + env(safe-area-inset-bottom));
   }
 }

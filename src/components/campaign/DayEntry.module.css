@@ -1,0 +1,496 @@
+/* Off everywhere but a phone: above the breakpoint EntryCalendar's month grid
+   is the better control and this one is not rendered to the screen at all. */
+.root {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .root {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+
+  .card {
+    background: var(--c-surface);
+    border: var(--bd-default);
+    border-radius: var(--r-card);
+    padding: var(--sp-4);
+  }
+
+  /* ---- The open day ---- */
+
+  .dayHead {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .step {
+    flex: 0 0 auto;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    border: var(--bd-default);
+    background: var(--c-surface);
+    color: var(--c-heading);
+    border-radius: var(--r-pill);
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .step:disabled {
+    border: 1px dashed var(--c-border-dashed);
+    background: var(--c-cell-future);
+    color: var(--c-ink-disabled);
+    cursor: default;
+  }
+
+  .dayTitleWrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .dayTitle {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+    line-height: 1.2;
+    text-wrap: pretty;
+  }
+
+  .dayState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 3px;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-bold);
+  }
+
+  .stateToday {
+    color: var(--c-blue);
+  }
+
+  .stateLogged {
+    color: var(--c-ink-soft);
+  }
+
+  .stateMissing {
+    color: var(--c-maroon-fg);
+  }
+
+  .adminMark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--c-maroon-fg);
+  }
+
+  .adminDot {
+    width: 5px;
+    height: 5px;
+    border-radius: var(--r-pill);
+    background: var(--c-maroon-fg);
+  }
+
+  /* ---- The week strip ---- */
+
+  .stripBlock {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: var(--bd-quiet);
+  }
+
+  .stripHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+  }
+
+  .weekLabel {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+  }
+
+  .dots {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+    flex: 0 0 auto;
+  }
+
+  .dot,
+  .dotActive {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--r-pill);
+    background: var(--c-border);
+  }
+
+  .dotActive {
+    background: var(--c-blue);
+  }
+
+  .strip {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-top: var(--sp-2);
+    /* Horizontal swipes drive the strip; vertical ones still scroll the page. */
+    touch-action: pan-x pan-y;
+  }
+
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .week {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
+  }
+
+  .day {
+    min-width: 0;
+    min-height: 56px;
+    padding: 4px 0 3px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--r-field-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sp-1);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .daySelected {
+    background: var(--c-blue-tint);
+    border: var(--bd-selected);
+  }
+
+  .day:disabled {
+    cursor: default;
+  }
+
+  .dayBlank {
+    display: block;
+  }
+
+  /* The bar is the day's total against this person's own best day. There is no
+     per-day target in the data model, so nothing here pretends there is one:
+     the height says "a big day" or "a small one", relative to themselves. */
+  .bar {
+    width: 60%;
+    border-radius: var(--r-swatch);
+    background: var(--c-progress);
+  }
+
+  .barMissing {
+    width: 60%;
+    height: 4px;
+    border-radius: var(--r-swatch);
+    background: var(--c-maroon-line);
+  }
+
+  .barNone {
+    width: 60%;
+    height: 4px;
+    border-radius: var(--r-swatch);
+    background: var(--c-border-quiet);
+  }
+
+  .dayNumber {
+    font-size: var(--fs-nano);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+  }
+
+  .dayNumberFuture {
+    color: var(--c-ink-disabled);
+  }
+
+  .dayNumberToday {
+    color: var(--c-blue);
+  }
+
+  .dayNumberMissing {
+    color: var(--c-ink-soft);
+  }
+
+  .dayAdminDot {
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: var(--r-pill);
+    background: var(--c-maroon-fg);
+  }
+
+  .stripHint {
+    margin: var(--sp-2) 0 0;
+    font-size: var(--fs-micro);
+    color: var(--c-ink-faint);
+    text-wrap: pretty;
+  }
+
+  /* ---- The two fields ---- */
+
+  .locked {
+    margin: var(--sp-4) 0 0;
+    background: var(--c-maroon-soft);
+    color: var(--c-maroon-dark);
+    border-radius: var(--r-field);
+    padding: 11px var(--sp-4);
+    font-size: var(--fs-body-sm);
+    font-weight: var(--fw-semibold);
+  }
+
+  .fields {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+
+  .field {
+    display: block;
+  }
+
+  .fieldLabel,
+  .fieldLabelQuiet {
+    display: block;
+    font-size: var(--fs-meta);
+    font-weight: var(--fw-semibold);
+    margin-bottom: 5px;
+    text-wrap: pretty;
+  }
+
+  /* The second field is genuinely secondary, so it is quieter in weight and in
+     the height of its input — but it is never hidden behind a disclosure. */
+  .fieldLabelQuiet {
+    color: var(--c-ink-muted);
+  }
+
+  .inputPrimary,
+  .inputSecondary {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--c-border-field);
+    border-radius: var(--r-field);
+    background: var(--c-field);
+    color: var(--c-ink);
+    font-weight: var(--fw-semibold);
+  }
+
+  /* Well clear of --touch-min, and at a size a thumb can correct in one go.
+     The 38px the old breakpoint shrank these to was below the app's own
+     floor — that was a bug, and this is the correction. */
+  .inputPrimary {
+    min-height: 56px;
+    padding: var(--sp-3) var(--sp-4);
+    font-size: 24px;
+  }
+
+  .inputSecondary {
+    min-height: 48px;
+    padding: 10px var(--sp-4);
+    font-size: 17px;
+  }
+
+  .inputPrimary:focus,
+  .inputSecondary:focus {
+    outline: none;
+    border-color: var(--c-blue);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 3px var(--c-blue-tint);
+  }
+
+  .inputPrimary:disabled,
+  .inputSecondary:disabled {
+    color: var(--c-ink-disabled);
+    background: var(--c-cell-future);
+    cursor: not-allowed;
+  }
+
+  .fieldHelp {
+    display: block;
+    font-size: var(--fs-micro);
+    color: var(--c-ink-faint);
+    margin-top: 5px;
+    text-wrap: pretty;
+  }
+
+  .dayFoot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: var(--bd-quiet);
+  }
+
+  .saveNote {
+    font-size: var(--fs-meta);
+    font-weight: var(--fw-semibold);
+    color: var(--c-ink-soft);
+    text-wrap: pretty;
+  }
+
+  .dayTotal {
+    white-space: nowrap;
+  }
+
+  .dayTotalNumber {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+  }
+
+  .dayTotalUnit {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--c-ink-soft);
+  }
+
+  /* ---- Days you are missing ---- */
+
+  .missingHead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+  }
+
+  .missingTitle {
+    margin: 0;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+  }
+
+  .missingCount {
+    font-size: var(--fs-meta);
+    font-weight: var(--fw-semibold);
+    color: var(--c-ink-soft);
+  }
+
+  .missingCountAlert {
+    font-size: var(--fs-meta);
+    font-weight: var(--fw-semibold);
+    color: var(--c-maroon-fg);
+  }
+
+  .missingList {
+    list-style: none;
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .missingRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    border: var(--bd-missing);
+    background: var(--c-cell-missing);
+    border-radius: var(--r-field);
+    padding: var(--sp-2) 10px var(--sp-2) var(--sp-3);
+    min-height: var(--touch-min);
+    cursor: pointer;
+  }
+
+  .missingRowSelected {
+    border: var(--bd-selected);
+    background: var(--c-blue-tint);
+  }
+
+  .missingDate {
+    flex: 1 1 120px;
+    min-width: 0;
+  }
+
+  .missingDateMain {
+    display: block;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+    color: var(--c-heading);
+  }
+
+  .missingDow {
+    display: block;
+    font-size: var(--fs-micro);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-ink-faint);
+    font-weight: var(--fw-bold);
+  }
+
+  .missingCta {
+    flex: 0 0 auto;
+    background: var(--c-maroon);
+    color: var(--c-on-dark);
+    border-radius: var(--r-pill);
+    padding: 0 var(--sp-4);
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-button);
+  }
+
+  .missingHint {
+    margin: var(--sp-3) 0 0;
+    font-size: var(--fs-label);
+    color: var(--c-ink-soft);
+    text-wrap: pretty;
+  }
+
+  .allDone {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--sp-3);
+    background: var(--c-blue-soft);
+    border-radius: var(--r-field);
+    padding: var(--sp-4);
+    font-size: var(--fs-body-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--c-heading);
+    text-wrap: pretty;
+  }
+
+  .allDoneTick {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    border-radius: var(--r-pill);
+    background: var(--c-progress);
+    color: var(--c-panel-deep);
+    display: grid;
+    place-items: center;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+  }
+}

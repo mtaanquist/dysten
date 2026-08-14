@@ -127,6 +127,10 @@ export function PersonDrawer({
       <Link href={closeHref} scroll={false} className={styles.scrim} aria-label={t("common.close")} />
 
       <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label={detail.displayName}>
+        {/* On a phone this is a bottom sheet rather than a side drawer, so it
+            gets the grab handle that says which way it came from. */}
+        <span className={styles.grabber} aria-hidden="true" />
+
         <div className={styles.head}>
           <Avatar name={detail.displayName} size="lg" />
           <div className={styles.headText}>
@@ -174,7 +178,7 @@ export function PersonDrawer({
 
                 return (
                   <div key={date} className={`${styles.row} ${editing ? styles.rowEditing : ""}`}>
-                    <div>
+                    <div className={styles.cellDate}>
                       <div className={styles.date}>{format.date(date)}</div>
                       <div className={styles.dow}>
                         {format.weekday(date)}
@@ -184,41 +188,62 @@ export function PersonDrawer({
                       </div>
                     </div>
 
+                    {/* The cell wrappers are `display: contents` at desk
+                        widths, so the inputs stay direct grid children and the
+                        four-column table is unchanged. On a phone they become
+                        blocks and their labels appear, because the header row
+                        that named the columns is no longer on screen. */}
                     {editing ? (
                       <>
-                        <ValueInput
-                          date={date}
-                          field="value1"
-                          value={fieldValue(date, "value1")}
-                          label={`${format.date(date)} — ${t(`campaignTypes.${detail.campaignType}.field1` as never)}`}
-                          step={inputStep}
-                          decimals={decimals}
-                          disabled={future}
-                          onChange={(next) =>
-                            setDraft((previous) => ({ ...previous, [`${date}:value1`]: next }))
-                          }
-                          onCommit={(next) => commit(date, "value1", next)}
-                        />
-                        <ValueInput
-                          date={date}
-                          field="value2"
-                          value={fieldValue(date, "value2")}
-                          label={`${format.date(date)} — ${t(`campaignTypes.${detail.campaignType}.field2` as never)}`}
-                          step={inputStep}
-                          decimals={decimals}
-                          disabled={future}
-                          onChange={(next) =>
-                            setDraft((previous) => ({ ...previous, [`${date}:value2`]: next }))
-                          }
-                          onCommit={(next) => commit(date, "value2", next)}
-                        />
+                        <span className={`${styles.cell} ${styles.cellV1}`}>
+                          <span className={styles.cellLabel}>
+                            {t(`campaignTypes.${detail.campaignType}.field1` as never)}
+                          </span>
+                          <ValueInput
+                            date={date}
+                            field="value1"
+                            value={fieldValue(date, "value1")}
+                            label={`${format.date(date)} — ${t(`campaignTypes.${detail.campaignType}.field1` as never)}`}
+                            step={inputStep}
+                            decimals={decimals}
+                            disabled={future}
+                            onChange={(next) =>
+                              setDraft((previous) => ({ ...previous, [`${date}:value1`]: next }))
+                            }
+                            onCommit={(next) => commit(date, "value1", next)}
+                          />
+                        </span>
+                        <span className={`${styles.cell} ${styles.cellV2}`}>
+                          <span className={styles.cellLabel}>
+                            {t(`campaignTypes.${detail.campaignType}.field2` as never)}
+                          </span>
+                          <ValueInput
+                            date={date}
+                            field="value2"
+                            value={fieldValue(date, "value2")}
+                            label={`${format.date(date)} — ${t(`campaignTypes.${detail.campaignType}.field2` as never)}`}
+                            step={inputStep}
+                            decimals={decimals}
+                            disabled={future}
+                            onChange={(next) =>
+                              setDraft((previous) => ({ ...previous, [`${date}:value2`]: next }))
+                            }
+                            onCommit={(next) => commit(date, "value2", next)}
+                          />
+                        </span>
                       </>
                     ) : (
                       <>
-                        <div className={styles.right}>
+                        <div className={`${styles.right} ${styles.cellV1}`}>
+                          <span className={styles.cellLabel}>
+                            {t(`campaignTypes.${detail.campaignType}.field1` as never)}
+                          </span>
                           {format.value(detail.campaignType, row?.value1 ?? 0)}
                         </div>
-                        <div className={styles.right}>
+                        <div className={`${styles.right} ${styles.cellV2}`}>
+                          <span className={styles.cellLabel}>
+                            {t(`campaignTypes.${detail.campaignType}.field2` as never)}
+                          </span>
                           {format.value(detail.campaignType, row?.value2 ?? 0)}
                         </div>
                       </>
@@ -229,7 +254,7 @@ export function PersonDrawer({
                     </div>
 
                     {editing ? (
-                      <div className={styles.right}>
+                      <div className={`${styles.right} ${styles.cellDelete}`}>
                         {row ? (
                           <button
                             type="button"

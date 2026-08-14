@@ -1,0 +1,72 @@
+/* Off above the phone breakpoint: the header carries the same four links
+   there, and only one of the two is ever on screen. */
+.bar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Above the page, below the drawer (20) and the toast (40). */
+    z-index: 15;
+    display: flex;
+    background: var(--c-surface);
+    border-top: var(--bd-default);
+    box-shadow: 0 -8px 24px var(--c-shadow-s);
+    /* The home indicator on a modern handset sits inside the bar's footprint,
+       so the safe-area inset goes on the padding rather than the position. */
+    padding: var(--sp-1) max(var(--sp-1), env(safe-area-inset-left))
+      max(var(--sp-1), env(safe-area-inset-bottom))
+      max(var(--sp-1), env(safe-area-inset-right));
+  }
+
+  .tab {
+    flex: 1 1 0;
+    min-width: 0;
+    /* Comfortably over --touch-min: a tab bar is hit without looking. */
+    min-height: 56px;
+    padding: 6px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--c-ink-muted);
+    border-radius: var(--r-field-sm);
+  }
+
+  .tab:hover {
+    color: var(--c-ink-muted);
+  }
+
+  .icon {
+    color: var(--c-ink-soft);
+  }
+
+  .label {
+    font-size: var(--fs-nano);
+    font-weight: var(--fw-bold);
+    line-height: 1.15;
+    text-align: center;
+    /* "Administration" is the longest label in either language and is allowed
+       a second line rather than being truncated. */
+    overflow-wrap: anywhere;
+  }
+
+  .tabActive {
+    color: var(--c-heading);
+  }
+
+  .tabActive .icon {
+    color: var(--c-blue);
+  }
+
+  .tab:focus-visible {
+    outline: 2px solid var(--c-blue);
+    outline-offset: -2px;
+  }
+}
