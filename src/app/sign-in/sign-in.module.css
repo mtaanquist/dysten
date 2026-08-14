@@ -170,3 +170,18 @@
   gap: var(--sp-2);
   margin-top: var(--sp-7);
 }
+
+/* Sign-in refusals come back as a query parameter on a fresh page load, so the
+   message has to survive the redirect rather than live in component state. */
+.error {
+  margin: 0 0 var(--sp-5);
+  background: var(--c-maroon-soft);
+  color: var(--c-maroon-dark);
+  border: 1px solid var(--c-maroon-line);
+  border-radius: var(--r-field);
+  padding: 11px var(--sp-4);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}

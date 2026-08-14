@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { authProvider, getCurrentUser } from "@/lib/auth";
 import {
   COOKIE_OPTIONS,
   LOCALE_COOKIE,
@@ -40,7 +40,11 @@ export async function signInAsUser(userId: string) {
 export async function signOut() {
   const store = await cookies();
   store.delete(SESSION_COOKIE);
-  redirect("/sign-in");
+  // Handed to the provider rather than sent straight to /sign-in: with Entra
+  // this goes via /api/auth/signout, which also ends the Microsoft session.
+  // Dropping only our own cookie would leave the browser signed in to the
+  // tenant, so the next sign-in would sail through without a prompt.
+  redirect(authProvider().signOutUrl());
 }
 
 /**

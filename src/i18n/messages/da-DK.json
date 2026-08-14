@@ -32,7 +32,13 @@
     "hint": "Single sign-on · Entra ID",
     "devTitle": "Udviklingslogin",
     "devSubtitle": "Entra ID er ikke konfigureret. Vælg en konto for at fortsætte — genvejen slås fra, når rigtig godkendelse er sat op.",
-    "devContinue": "Fortsæt"
+    "devContinue": "Fortsæt",
+    "error": {
+      "tenant": "Din konto hører ikke til en organisation, der må bruge Dysten. Log ind med din arbejdskonto.",
+      "denied": "Du afbrød login. Prøv igen, når du er klar.",
+      "config": "Login er ikke sat rigtigt op endnu. Sig til en administrator.",
+      "failed": "Login mislykkedes. Prøv igen — sker det igen, så sig til en administrator."
+    }
   },
   "roles": {
     "member": "Deltager",

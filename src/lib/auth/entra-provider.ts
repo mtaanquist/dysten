@@ -1,103 +1,183 @@
+import { cookies } from "next/headers";
+import { createRemoteJWKSet, jwtVerify } from "jose";
+import { prisma } from "@/lib/db";
+import { SESSION_COOKIE, unsignValue } from "./cookies";
 import type { AuthProvider, ExternalIdentity } from "./types";
+import {
+  LOGIN_HOST,
+  allowedTenantIds,
+  assertTenantAllowed,
+  authorityTenant,
+  type EntraClaims,
+} from "./entra-tenant";
+
+// Re-exported so callers have one import for "the Entra provider" and do not
+// have to know that the tenant rules live in their own, dependency-free module.
+export {
+  TenantNotAllowedError,
+  allowedTenantIds,
+  assertTenantAllowed,
+  authorityTenant,
+} from "./entra-tenant";
+export type { EntraClaims } from "./entra-tenant";
 
 /**
- * Microsoft 365 / Entra ID provider — the intended production auth.
+ * Microsoft 365 / Entra ID — the production sign-in.
  *
- * Deliberately left unimplemented rather than guessed at: wiring it needs a
- * tenant id, an app registration's client id and secret, and redirect URIs
- * that only whoever owns the tenant can supply.
+ * The authorization-code flow with PKCE, done directly against the v2.0
+ * endpoints rather than through @azure/msal-node. The app never calls Graph and
+ * never needs an access token: every claim it wants — object id, email, display
+ * name — is in the ID token. What is left once the token cache and the
+ * silent-refresh machinery are dropped is one redirect, one POST and one
+ * signature check, and `jose` is the only dependency that adds against four in
+ * the whole project.
  *
- * To finish it:
+ * Once someone has signed in, this provider behaves exactly like the dev one:
+ * the callback route provisions the User row and writes the same signed session
+ * cookie, and every request after that just reads it. The OAuth round trip
+ * happens once, not per request.
  *
- *   1. Register an app in Entra ID. Set "Supported account types" to
- *      **"Accounts in this organizational directory only"** — see the tenant
- *      lock-down notes below. Add a web redirect URI of
- *      {APP_URL}/api/auth/callback and grant the delegated `User.Read` scope.
- *   2. Set AUTH_PROVIDER=entra plus ENTRA_TENANT_ID, ENTRA_CLIENT_ID and
- *      ENTRA_CLIENT_SECRET (see .env.example).
- *   3. Implement the authorization-code exchange below — @azure/msal-node's
- *      ConfidentialClientApplication covers it in a few dozen lines — and map
- *      the validated claims onto ExternalIdentity: `oid` to externalId,
- *      `preferred_username`/`mail` to email, `name` to displayName.
- *   4. Pass the validated claims through `assertTenantAllowed` before trusting
- *      them.
- *
- * User provisioning, role assignment and the first-user-becomes-admin rule are
- * already handled in ./index.ts and need no changes.
- *
- * ---------------------------------------------------------------------------
- * Restricting sign-in to a single tenant
- * ---------------------------------------------------------------------------
- * Three independent layers. Use all three — the first two are configuration
- * that is easy to get subtly wrong, and the third is the check that catches it.
- *
- *   1. **Register the app as single-tenant.** "Accounts in this organizational
- *      directory only" makes Microsoft itself refuse to issue tokens for other
- *      tenants. This is the primary control.
- *
- *   2. **Use the tenant-scoped authority**, never the multi-tenant ones:
- *
- *          https://login.microsoftonline.com/${ENTRA_TENANT_ID}/v2.0   ✅
- *          https://login.microsoftonline.com/common/v2.0               ❌
- *          https://login.microsoftonline.com/organizations/v2.0        ❌
- *
- *      `/common` is the single most common way an app meant for one company
- *      quietly accepts sign-ins from every Microsoft tenant on earth.
- *
- *   3. **Verify the `tid` claim** on the validated token equals your tenant id,
- *      and reject if not — `assertTenantAllowed` below. Configuration drifts;
- *      an assertion in code does not.
- *
- * A note on guests: B2B guest accounts invited into your directory legitimately
- * carry your `tid` while belonging to another organisation. If contractors and
- * partners should not appear on the leaderboard, set ENTRA_ALLOW_GUESTS=false —
- * the check uses the `acct` claim, which is 0 for members and 1 for guests.
+ * Who is allowed in is decided in ./entra-tenant.ts, which is deliberately free
+ * of Next and Prisma imports so those rules can be tested as plain functions.
  */
 
-export interface EntraClaims {
-  /** Tenant id the token was issued for. */
-  tid?: string;
-  /** Immutable object id of the user. */
-  oid?: string;
-  /** Issuer; should also carry the tenant id. */
-  iss?: string;
-  /** Account type: 0 = member of this tenant, 1 = guest. */
-  acct?: number;
-  [claim: string]: unknown;
+const SCOPES = "openid profile email";
+
+function endpoint(path: string): string {
+  return `${LOGIN_HOST}/${authorityTenant()}/${path}`;
+}
+
+function clientId(): string {
+  const value = process.env.ENTRA_CLIENT_ID?.trim();
+  if (!value) throw new Error("ENTRA_CLIENT_ID is not set.");
+  return value;
+}
+
+function clientSecret(): string {
+  const value = process.env.ENTRA_CLIENT_SECRET?.trim();
+  if (!value) throw new Error("ENTRA_CLIENT_SECRET is not set.");
+  return value;
 }
 
 /**
- * Rejects any identity that is not from the configured tenant.
- *
- * Throws rather than returning false: this is the last line between "someone
- * from another company signed in" and a populated user record, and a thrown
- * error cannot be accidentally ignored by a caller that forgets to check a
- * boolean.
+ * Signing keys, fetched once and cached for the process lifetime with jose
+ * handling rotation. Built lazily so that importing this module does not
+ * require Entra configuration to be present — the dev provider is the default,
+ * and its users have no tenant to name.
  */
-export function assertTenantAllowed(claims: EntraClaims): void {
-  const expected = process.env.ENTRA_TENANT_ID?.trim();
-  if (!expected) {
-    throw new Error("ENTRA_TENANT_ID is not set; refusing to accept any Entra sign-in.");
+let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+let jwksTenant: string | null = null;
+
+function keySet() {
+  const tenant = authorityTenant();
+  if (!jwks || jwksTenant !== tenant) {
+    jwks = createRemoteJWKSet(new URL(`${LOGIN_HOST}/${tenant}/discovery/v2.0/keys`));
+    jwksTenant = tenant;
+  }
+  return jwks;
+}
+
+/** Where to send the browser to start the flow. */
+export function authorizationUrl(params: {
+  redirectUri: string;
+  state: string;
+  nonce: string;
+  codeChallenge: string;
+}): string {
+  const url = new URL(endpoint("oauth2/v2.0/authorize"));
+  url.searchParams.set("client_id", clientId());
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("redirect_uri", params.redirectUri);
+  url.searchParams.set("response_mode", "query");
+  url.searchParams.set("scope", SCOPES);
+  url.searchParams.set("state", params.state);
+  url.searchParams.set("nonce", params.nonce);
+  url.searchParams.set("code_challenge", params.codeChallenge);
+  url.searchParams.set("code_challenge_method", "S256");
+  return url.toString();
+}
+
+/** Trades the authorization code for an ID token. */
+export async function exchangeCode(params: {
+  code: string;
+  codeVerifier: string;
+  redirectUri: string;
+}): Promise<string> {
+  const response = await fetch(endpoint("oauth2/v2.0/token"), {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId(),
+      client_secret: clientSecret(),
+      grant_type: "authorization_code",
+      code: params.code,
+      redirect_uri: params.redirectUri,
+      code_verifier: params.codeVerifier,
+      scope: SCOPES,
+    }),
+    cache: "no-store",
+  });
+
+  const body = (await response.json()) as { id_token?: string; error_description?: string };
+  if (!response.ok || !body.id_token) {
+    // Microsoft's error_description carries the AADSTS code, which is the only
+    // thing that makes these diagnosable. It names no user and no secret.
+    throw new Error(`Token exchange failed: ${body.error_description ?? response.status}`);
+  }
+  return body.id_token;
+}
+
+/**
+ * Verifies the ID token's signature and claims, then the tenant allowlist.
+ *
+ * The order is the point: nothing in the token is trusted — including the `tid`
+ * the allowlist is checked against — until the signature has been verified
+ * against Microsoft's published keys.
+ */
+export async function verifyIdToken(idToken: string, expectedNonce: string): Promise<EntraClaims> {
+  const { payload } = await jwtVerify(idToken, keySet(), {
+    audience: clientId(),
+    // Not `issuer`: where several tenants are allowed each issues under its own
+    // id, so the issuer is checked against the token's verified `tid` instead —
+    // see assertTenantAllowed.
+    clockTolerance: 60,
+  });
+
+  const claims = payload as EntraClaims;
+
+  // Binds the token to the sign-in this browser started, so one captured
+  // elsewhere cannot be replayed into a session here.
+  if (claims.nonce !== expectedNonce) {
+    throw new Error("Sign-in rejected: nonce mismatch.");
   }
 
-  if (claims.tid !== expected) {
-    throw new Error(
-      `Sign-in rejected: token is from tenant ${claims.tid ?? "unknown"}, expected ${expected}. ` +
-        "Check that the app registration is single-tenant and that the authority URL " +
-        "contains the tenant id rather than /common or /organizations.",
-    );
+  assertTenantAllowed(claims);
+  return claims;
+}
+
+/** Maps verified claims onto the shape the rest of the app provisions from. */
+export function identityFromClaims(claims: EntraClaims): ExternalIdentity {
+  const externalId = claims.oid;
+  // `preferred_username` is the sign-in name and is present far more reliably
+  // than `email`, which needs an address set on the directory object.
+  const email = claims.preferred_username ?? claims.email;
+
+  if (!externalId || !email) {
+    throw new Error("Sign-in rejected: token is missing the object id or an email address.");
   }
 
-  // The issuer independently encodes the tenant; a mismatch means the token
-  // came from somewhere other than where it claims.
-  if (claims.iss && !claims.iss.includes(expected)) {
-    throw new Error(`Sign-in rejected: issuer ${claims.iss} does not match tenant ${expected}.`);
-  }
+  return {
+    externalId,
+    email,
+    displayName: claims.name?.trim() || email,
+  };
+}
 
-  const allowGuests = process.env.ENTRA_ALLOW_GUESTS !== "false";
-  if (!allowGuests && claims.acct === 1) {
-    throw new Error("Sign-in rejected: guest accounts are not permitted.");
-  }
+/** Ends the Microsoft session too, not just ours. */
+export function endSessionUrl(postLogoutRedirectUri: string): string {
+  const url = new URL(endpoint("oauth2/v2.0/logout"));
+  url.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
+  return url.toString();
 }
 
 export const entraAuthProvider: AuthProvider = {
@@ -105,19 +185,35 @@ export const entraAuthProvider: AuthProvider = {
 
   isConfigured() {
     return Boolean(
-      process.env.ENTRA_TENANT_ID && process.env.ENTRA_CLIENT_ID && process.env.ENTRA_CLIENT_SECRET,
+      allowedTenantIds().length > 0 &&
+        process.env.ENTRA_CLIENT_ID &&
+        process.env.ENTRA_CLIENT_SECRET,
     );
   },
 
+  /**
+   * Identical in shape to the dev provider's: by this point the callback route
+   * has done the OAuth work and written the session cookie, so a request costs
+   * one cookie read and one row lookup rather than a round trip to Microsoft.
+   */
   async getIdentity(): Promise<ExternalIdentity | null> {
-    throw new Error(
-      "Entra ID authentication is selected but not implemented yet. " +
-        "Set AUTH_PROVIDER=dev to use the development sign-in, or implement " +
-        "src/lib/auth/entra-provider.ts as documented in that file.",
-    );
+    const store = await cookies();
+    const userId = unsignValue(store.get(SESSION_COOKIE)?.value);
+    if (!userId) return null;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, displayName: true, externalId: true },
+    });
+    if (!user) return null;
+
+    return {
+      externalId: user.externalId ?? user.id,
+      email: user.email,
+      displayName: user.displayName,
+    };
   },
 
-  /** Must point at the tenant-scoped authority — see the notes above. */
   signInUrl() {
     return "/api/auth/signin";
   },

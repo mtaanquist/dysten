@@ -96,8 +96,12 @@ services:
       BRAND_NAME: "${BRAND_NAME}"
       APP_SECRET: "${APP_SECRET}"
       APP_TIMEZONE: "${APP_TIMEZONE}"
+      APP_URL: "${APP_URL}"
       AUTH_PROVIDER: "${AUTH_PROVIDER}"
       ALLOW_DEV_AUTH: "${ALLOW_DEV_AUTH}"
+      ENTRA_TENANT_IDS: "${ENTRA_TENANT_IDS}"
+      ENTRA_CLIENT_ID: "${ENTRA_CLIENT_ID}"
+      ENTRA_CLIENT_SECRET: "${ENTRA_CLIENT_SECRET}"
       SEED_ADMIN_EMAILS: "${SEED_ADMIN_EMAILS}"
       SEED_ON_START: "${SEED_ON_START}"
     volumes:
@@ -124,10 +128,21 @@ APP_SECRET=CHANGE-ME-openssl-rand-base64-32
 # Decides when "today" rolls over for logging.
 APP_TIMEZONE=Europe/Copenhagen
 
-# "dev" lets you pick an account from a list, with no identity provider.
-# Switch to "entra" once Microsoft 365 sign-in is wired up.
+# Public origin of this deployment. Required for Microsoft sign-in, because the
+# redirect URI must match the app registration exactly.
+APP_URL=https://dysten.example.com
+
+# "dev" lets you pick an account from a list, with no identity provider — fine
+# for a first look, never for real use. Switch to "entra" for Microsoft 365 and
+# fill in the three variables below; then drop ALLOW_DEV_AUTH entirely.
 AUTH_PROVIDER=dev
 ALLOW_DEV_AUTH=true
+
+# Only needed when AUTH_PROVIDER=entra. ENTRA_TENANT_IDS is a comma-separated
+# allowlist — normally just your own tenant. See "Restricting who may sign in".
+ENTRA_TENANT_IDS=
+ENTRA_CLIENT_ID=
+ENTRA_CLIENT_SECRET=
 
 # Anyone signing in with one of these addresses becomes an admin.
 # Comma-separated. The very first person to sign in becomes an admin anyway.
@@ -224,7 +239,8 @@ same published image serves any organisation.
 | `ALLOW_DEV_AUTH` | unset | Lets the dev sign-in run in a production build |
 | `SEED_ADMIN_EMAILS` | empty | Comma-separated addresses provisioned as admins |
 | `SEED_ON_START` | `false` | Loads demo data on start. **Deletes existing data** |
-| `ENTRA_TENANT_ID` | — | Required when `AUTH_PROVIDER=entra` |
+| `APP_URL` | request origin | Public origin, e.g. `https://dysten.example.com`. Builds the OAuth redirect URI |
+| `ENTRA_TENANT_IDS` | — | Required when `AUTH_PROVIDER=entra`. Comma-separated allowlist of tenant ids |
 | `ENTRA_CLIENT_ID` | — | Required when `AUTH_PROVIDER=entra` |
 | `ENTRA_CLIENT_SECRET` | — | Required when `AUTH_PROVIDER=entra` |
 | `ENTRA_ALLOW_GUESTS` | `true` | Set `false` to reject B2B guest accounts |
@@ -246,40 +262,61 @@ It refuses to run in a production build unless you also set
 
 ### Microsoft 365 (Entra ID)
 
-This is the intended production sign-in and it is **not finished** — everything
-around it is in place, but the token exchange itself needs a tenant that only
-you can create. It is a self-contained job:
+The production sign-in: the authorisation-code flow with PKCE, straight against
+the v2.0 endpoints. The app never calls Graph — the object id, e-mail and display
+name it needs are all in the ID token — so there is no access token to keep and
+nothing to refresh.
 
-1. Register an application in Entra ID. Add a web redirect URI of
-   `{your-url}/api/auth/callback` and grant the delegated `User.Read` scope.
-2. Set `AUTH_PROVIDER=entra`, `ENTRA_TENANT_ID`, `ENTRA_CLIENT_ID` and
-   `ENTRA_CLIENT_SECRET`.
-3. Implement the authorisation-code exchange in
-   [`src/lib/auth/entra-provider.ts`](src/lib/auth/entra-provider.ts). That file
-   documents exactly what to map to what.
+1. **Register an application** in Entra ID. Set "Supported account types" to
+   **"Accounts in this organizational directory only"**. Add a *web* redirect URI
+   of `{your-url}/api/auth/callback`. The delegated `User.Read` scope is enough;
+   `openid profile email` is what the app actually asks for.
+2. **Add a client secret** and note it — Entra shows it once.
+3. **Set the environment**: `AUTH_PROVIDER=entra`, `ENTRA_TENANT_IDS` (your
+   tenant id), `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_SECRET`, and `APP_URL` set to the
+   public origin.
 
-Account creation, the first-user-becomes-admin rule, and role assignment already
-work and need no changes.
+`APP_URL` matters more than it looks. The redirect URI has to match the app
+registration byte for byte, and behind a reverse proxy the request's own idea of
+its origin is whatever the proxy forwarded. Setting it explicitly is the
+difference between working and `AADSTS50011`.
 
-#### Restricting sign-in to your tenant only
+Account creation, the first-user-becomes-admin rule and role assignment already
+work and need no changes: the callback provisions the user and writes the same
+signed session cookie the dev provider uses, and every request after that just
+reads the cookie.
 
-Do all three. The first two are configuration that is easy to get subtly wrong;
-the third is the check that catches it when it is.
+#### Restricting who may sign in
 
-1. **Register the app as single-tenant** — "Accounts in this organizational
-   directory only". Microsoft then refuses to issue tokens for other tenants.
-2. **Use the tenant-scoped authority.** `https://login.microsoftonline.com/{tenant-id}/v2.0`,
-   never `/common` or `/organizations`. Using `/common` is the single most common
-   way an app meant for one company ends up accepting sign-ins from every
-   Microsoft tenant in the world.
-3. **Verify the `tid` claim** matches your tenant id. `assertTenantAllowed()` in
-   the provider file does this and throws if it does not — call it on the
-   validated claims before trusting them. Configuration drifts; an assertion in
-   code does not.
+`ENTRA_TENANT_IDS` is a comma-separated allowlist. **With one id** — the normal
+case for a single company — three independent layers hold:
+
+1. **The app registration is single-tenant**, so Microsoft itself refuses to
+   issue a token to anyone else. This is the strongest of the three, because it
+   does not depend on this code being right.
+2. **The authority names your tenant**: `https://login.microsoftonline.com/{tenant-id}/v2.0`,
+   never `/common`. Using `/common` is the single most common way an app meant
+   for one company ends up accepting sign-ins from every Microsoft tenant in the
+   world. The app builds this from your list, so there is nothing to get wrong.
+3. **The `tid` claim is checked** against the list, on the verified token, and
+   the sign-in is refused if it does not match. Configuration drifts; an
+   assertion in code does not.
+
+**With more than one id, the first two are gone and cannot be recovered.** No
+authority URL names a *subset* of tenants, so the registration has to be
+multi-tenant and the authority becomes `/organizations`. The allowlist stops
+being a backstop and becomes the only thing between the app and every Microsoft
+tenant on earth. It still works, and the check is tested — but add a second
+tenant deliberately, knowing that is the trade.
 
 Guest (B2B) accounts invited into your directory carry *your* tenant id while
 belonging to another organisation, so they pass all three checks. If contractors
 and partners should not appear on the leaderboard, set `ENTRA_ALLOW_GUESTS=false`.
+
+The rules live in [`src/lib/auth/entra-tenant.ts`](src/lib/auth/entra-tenant.ts),
+kept free of framework imports so they can be tested as plain functions — see
+`entra-tenant.test.ts`. That is deliberate: this is the code you least want to be
+exercising for the first time in production.
 
 ---
 

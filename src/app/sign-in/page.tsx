@@ -17,12 +17,12 @@ import styles from "./sign-in.module.css";
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ accounts?: string }>;
+  searchParams: Promise<{ accounts?: string; error?: string }>;
 }) {
   const user = await getCurrentUser();
   if (user) redirect("/");
 
-  const { accounts } = await searchParams;
+  const { accounts, error } = await searchParams;
   const store = await cookies();
   const locale = resolveLocale(store.get(LOCALE_COOKIE)?.value);
   // Nobody is signed in here, so both preferences come from this browser.
@@ -31,6 +31,14 @@ export default async function SignInPage({
 
   const provider = authProvider();
   const isDev = provider.name === "dev";
+
+  // Set by /api/auth/callback when a sign-in comes back refused. Only these
+  // three are recognised, so a hand-typed ?error= cannot put arbitrary text on
+  // the page.
+  const errorKey =
+    error === "tenant" || error === "denied" || error === "config" || error === "failed"
+      ? (`signIn.error.${error}` as const)
+      : null;
   const showPicker = isDev && accounts === "1";
 
   // Only needed for the development account picker; with Entra ID the identity
@@ -53,6 +61,12 @@ export default async function SignInPage({
             <span className={styles.wordmark}>{BRAND_NAME ?? ORG_NAME}</span>
             <span className={styles.tagline}>{BRAND_NAME ? ORG_NAME : t("app.tagline")}</span>
           </div>
+
+          {errorKey ? (
+            <p className={styles.error} role="alert">
+              {t(errorKey)}
+            </p>
+          ) : null}
 
           {showPicker ? (
             <>

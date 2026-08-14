@@ -32,7 +32,13 @@
     "hint": "Single sign-on · Entra ID",
     "devTitle": "Development sign-in",
     "devSubtitle": "Entra ID is not configured. Pick an account to continue — this shortcut is disabled once real authentication is wired up.",
-    "devContinue": "Continue"
+    "devContinue": "Continue",
+    "error": {
+      "tenant": "Your account is not from an organisation allowed to use Dysten. Sign in with your work account.",
+      "denied": "You cancelled the sign-in. Try again whenever you are ready.",
+      "config": "Sign-in is not configured yet. Let an administrator know.",
+      "failed": "Sign-in failed. Try again — if it keeps happening, let an administrator know."
+    }
   },
   "roles": {
     "member": "Member",
