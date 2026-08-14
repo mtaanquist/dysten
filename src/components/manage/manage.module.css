@@ -325,3 +325,54 @@
   font-weight: var(--fw-semibold);
   cursor: pointer;
 }
+
+/* Someone who has left is dimmed rather than hidden: they are still the person
+   who won last spring, and the roles list is where you go to look them up. */
+.roleRowInactive {
+  opacity: 0.65;
+}
+
+.leftBadge {
+  margin-left: var(--sp-2);
+  background: var(--c-surface-mute);
+  color: var(--c-ink-soft);
+  border-radius: var(--r-pill);
+  padding: 2px var(--sp-2);
+  font-size: var(--fs-nano);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+}
+
+.deactivate,
+.reactivate {
+  flex: 0 0 auto;
+  min-height: var(--touch-min);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.deactivate {
+  background: var(--c-surface);
+  border: 1px solid var(--c-maroon-outline);
+  color: var(--c-maroon-fg);
+}
+
+.deactivate:hover:not(:disabled) {
+  border-color: var(--c-maroon);
+}
+
+.reactivate {
+  background: var(--c-blue-soft);
+  border: var(--bd-default);
+  color: var(--c-heading);
+}
+
+.reactivate:hover:not(:disabled) {
+  border-color: var(--c-border-hover);
+}

@@ -164,7 +164,11 @@
     "deleteCampaign": "Delete campaign",
     "roleAssignment": "Role assignment",
     "confirmDelete": "Delete this campaign and every entry in it? This cannot be undone.",
-    "confirmClose": "Close this campaign now? Entries become read-only."
+    "confirmClose": "Close this campaign now? Entries become read-only.",
+    "hasLeft": "Has left",
+    "deactivate": "Mark as left",
+    "reactivate": "Reactivate",
+    "confirmDeactivate": "Mark this person as having left? They cannot sign in or be added to new campaigns, but stay on the campaigns they already took part in."
   },
   "toast": {
     "saved": "Saved",
@@ -179,7 +183,9 @@
     "roleUpdated": "Role updated",
     "remindersOn": "Reminders on",
     "remindersOff": "Reminders off",
-    "languageChanged": "Language updated"
+    "languageChanged": "Language updated",
+    "userDeactivated": "Marked as left",
+    "userReactivated": "Reactivated"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -189,7 +195,17 @@
     "negativeValue": "Values cannot be negative.",
     "notAuthorised": "You do not have permission to do that.",
     "notFound": "Not found.",
-    "campaignLocked": "This campaign is closed for entries."
+    "campaignLocked": "This campaign is closed for entries.",
+    "pageTitle": "Something went wrong",
+    "pageBody": "This page could not be loaded. Try again — you will land back where you were.",
+    "notFoundTitle": "This page does not exist",
+    "notFoundBody": "The link may be out of date, or the campaign may have been deleted.",
+    "retry": "Try again",
+    "backHome": "Back to dashboard",
+    "reference": "Reference:",
+    "signedOut": "You have been signed out. Reload the page to sign in again.",
+    "cannotDeactivateSelf": "You cannot deactivate your own account. Ask another admin to do it.",
+    "userDeactivated": "That person has left the organisation and cannot be added."
   },
   "campaignTypes": {
     "step": {

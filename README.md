@@ -562,16 +562,50 @@ closed rather than open by default.
 
 ## Backups and data
 
-Everything lives in one SQLite file on the `data` volume. To back it up:
+Everything lives in one SQLite file on the `data` volume.
+
+### Why SQLite
+
+One writer, a few dozen readers, a few thousand rows a year. SQLite is not a
+compromise at this size — it is faster than a network round trip to Postgres,
+it has no second container to run or connection string to get wrong, and the
+whole dataset is one file you can copy to your laptop and open. Adding Postgres
+would add operational surface and buy nothing this app can use.
+
+Write-ahead logging is enabled on first start, so readers never block the
+writer.
+
+### Taking a backup
+
+**Do not copy `app.db` while the app is running.** In WAL mode the most recent
+commits live in the `-wal` sidecar, so a copy of `app.db` alone is missing them.
+It will usually restore fine, which is the dangerous part — the failure shows up
+on the day you actually need it.
+
+Use the backup script instead. `VACUUM INTO` writes a complete, compacted
+snapshot in one statement, safely, while the app keeps serving:
 
 ```bash
-docker compose exec app sh -c "cp /data/app.db /data/backup-$(date +%F).db"
-docker compose cp app:/data/backup-$(date +%F).db ./
+docker compose exec app node ./prisma/backup.ts /data/backups/app.db
 ```
 
-Restore by stopping the app, copying a file back to `/data/app.db`, and starting
-it again. Migrations run automatically on every start and only ever apply
-migrations that already exist — they never reset anything.
+From source, `npm run backup` does the same and writes to
+`prisma/backups/app-YYYY-MM-DD.db`.
+
+The snapshot is an ordinary, quiescent file. **Point your backup agent at that,
+not at `app.db`.** If you run something like Duplicacy, Restic or Borg over the
+volume, schedule the snapshot to run first — a file-level agent copying a live
+database has exactly the problem above, and it cannot tell that anything went
+wrong.
+
+`VACUUM INTO` refuses to overwrite an existing file, so a backup can never
+silently truncate the one before it.
+
+### Restoring
+
+Stop the app, copy a snapshot over `/data/app.db`, delete any `app.db-wal` and
+`app.db-shm` beside it, and start again. Migrations run automatically on start
+and only ever apply migrations that already exist — they never reset anything.
 
 ---
 

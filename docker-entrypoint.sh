@@ -7,6 +7,18 @@ set -e
 echo "Applying database migrations…"
 node ./cli/node_modules/prisma/build/index.js migrate deploy
 
+# Write-ahead logging: readers stop blocking the writer, which matters because
+# every page render is a burst of reads. It is recorded in the database header,
+# so this is idempotent — it only does anything the first time.
+#
+# It also changes what a backup has to be. In WAL mode recent commits live in
+# the -wal sidecar, so copying app.db alone loses them; use prisma/backup.ts,
+# which writes a complete snapshot with VACUUM INTO.
+echo "Ensuring write-ahead logging…"
+node ./cli/node_modules/prisma/build/index.js db execute --stdin --schema ./prisma/schema.prisma <<'SQL' || echo "  (skipped: could not set journal_mode)"
+PRAGMA journal_mode=WAL;
+SQL
+
 # Optional demo data. Off by default, and deliberately so: seeding clears the
 # existing rows first, which would wipe real data on a restart.
 #

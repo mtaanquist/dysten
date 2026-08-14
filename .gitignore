@@ -7,6 +7,10 @@ dist/
 # Local database + Prisma artefacts
 *.db
 *.db-journal
+# Write-ahead logging puts recent commits in these two sidecars, so they appear
+# next to every SQLite file the moment WAL is on.
+*.db-wal
+*.db-shm
 prisma/*.db
 prisma/*.db-journal
 prisma/dev.db*
@@ -27,3 +31,4 @@ next-env.d.ts
 # Design handoff bundle — kept locally as reference, not versioned
 design/
 scratchpad/
+prisma/backups/

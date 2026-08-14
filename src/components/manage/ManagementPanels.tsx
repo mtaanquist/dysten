@@ -14,6 +14,7 @@ import {
   removeParticipant,
   saveCampaign,
   setUserRole,
+  setUserActive,
 } from "@/app/actions/campaigns";
 import { Avatar, Panel, PanelTitle } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
@@ -341,28 +342,63 @@ export function RoleTable({ users }: { users: ManagementData["users"] }) {
 
       <div className={styles.roleList}>
         {users.map((user) => (
-          <div key={user.id} className={styles.roleRow}>
+          <div
+            key={user.id}
+            className={`${styles.roleRow} ${user.active ? "" : styles.roleRowInactive}`}
+          >
             <Avatar name={user.displayName} />
             <div className={styles.roleText}>
-              <div className={styles.roleName}>{user.displayName}</div>
+              <div className={styles.roleName}>
+                {user.displayName}
+                {user.active ? null : (
+                  <span className={styles.leftBadge}>{t("manage.hasLeft")}</span>
+                )}
+              </div>
               <div className={styles.roleEmail}>{user.email}</div>
             </div>
-            <select
-              className={styles.roleSelect}
-              value={user.role}
+
+            {/* Role is meaningless for someone who cannot sign in, so the
+                select goes away and the only thing left to do is bring them
+                back. Their entries and standings are untouched either way. */}
+            {user.active ? (
+              <select
+                className={styles.roleSelect}
+                value={user.role}
+                disabled={pending}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  startTransition(async () => {
+                    const result = await setUserRole(user.id, next);
+                    showToast(result.ok ? "toast.roleUpdated" : result.error);
+                  });
+                }}
+              >
+                <option value={Role.MEMBER}>{t("roles.member")}</option>
+                <option value={Role.CAPTAIN}>{t("roles.captain")}</option>
+                <option value={Role.ADMIN}>{t("roles.admin")}</option>
+              </select>
+            ) : null}
+
+            <button
+              type="button"
+              className={user.active ? styles.deactivate : styles.reactivate}
               disabled={pending}
-              onChange={(event) => {
-                const next = event.target.value;
+              onClick={() => {
+                if (user.active && !window.confirm(t("manage.confirmDeactivate"))) return;
                 startTransition(async () => {
-                  const result = await setUserRole(user.id, next);
-                  showToast(result.ok ? "toast.roleUpdated" : result.error);
+                  const result = await setUserActive(user.id, !user.active);
+                  showToast(
+                    result.ok
+                      ? user.active
+                        ? "toast.userDeactivated"
+                        : "toast.userReactivated"
+                      : result.error,
+                  );
                 });
               }}
             >
-              <option value={Role.MEMBER}>{t("roles.member")}</option>
-              <option value={Role.CAPTAIN}>{t("roles.captain")}</option>
-              <option value={Role.ADMIN}>{t("roles.admin")}</option>
-            </select>
+              {user.active ? t("manage.deactivate") : t("manage.reactivate")}
+            </button>
           </div>
         ))}
       </div>

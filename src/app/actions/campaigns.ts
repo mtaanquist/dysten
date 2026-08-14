@@ -22,7 +22,7 @@ export type { ActionResult } from "./entries";
 /** Opting into a campaign. Members do this themselves; captains use the roster. */
 export async function joinCampaign(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId },
@@ -58,7 +58,7 @@ interface CampaignInput {
 /** Creates or updates a campaign, depending on whether an id came along. */
 export async function saveCampaign(input: CampaignInput): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canManageCampaigns(user)) return { ok: false, error: "errors.notAuthorised" };
 
   const name = input.name?.trim() ?? "";
@@ -103,7 +103,7 @@ export async function saveCampaign(input: CampaignInput): Promise<ActionResult> 
 /** Ends a running campaign now. Entries become read-only from this moment. */
 export async function closeCampaign(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canCloseCampaign(user)) return { ok: false, error: "errors.notAuthorised" };
 
   await prisma.campaign.update({
@@ -121,7 +121,7 @@ export async function closeCampaign(campaignId: string): Promise<ActionResult> {
  */
 export async function reopenCampaign(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canReopenCampaign(user)) return { ok: false, error: "errors.notAuthorised" };
 
   await prisma.campaign.update({
@@ -136,7 +136,7 @@ export async function reopenCampaign(campaignId: string): Promise<ActionResult> 
 /** Admin-only, and genuinely destructive: entries cascade away with it. */
 export async function deleteCampaign(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canDeleteCampaign(user)) return { ok: false, error: "errors.notAuthorised" };
 
   await prisma.campaign.delete({ where: { id: campaignId } });
@@ -147,8 +147,18 @@ export async function deleteCampaign(campaignId: string): Promise<ActionResult> 
 
 export async function addParticipant(campaignId: string, userId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canManageRoster(user)) return { ok: false, error: "errors.notAuthorised" };
+
+  // Checked here and not only in the picker: the picker already hides people
+  // who have left, but a roster is written by a server action, and an action
+  // that trusts its own UI is not a check.
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { deactivatedAt: true },
+  });
+  if (!target) return { ok: false, error: "errors.notFound" };
+  if (target.deactivatedAt) return { ok: false, error: "errors.userDeactivated" };
 
   await prisma.participation.upsert({
     where: { campaignId_userId: { campaignId, userId } },
@@ -166,7 +176,7 @@ export async function addParticipant(campaignId: string, userId: string): Promis
  */
 export async function removeParticipant(campaignId: string, userId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canManageRoster(user)) return { ok: false, error: "errors.notAuthorised" };
 
   await prisma.$transaction([
@@ -181,7 +191,7 @@ export async function removeParticipant(campaignId: string, userId: string): Pro
 /** Admin-only role assignment. */
 export async function setUserRole(userId: string, role: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canAssignRoles(user)) return { ok: false, error: "errors.notAuthorised" };
   if (!(role in Role)) return { ok: false, error: "errors.generic" };
 
@@ -194,6 +204,32 @@ export async function setUserRole(userId: string, role: string): Promise<ActionR
   }
 
   await prisma.user.update({ where: { id: userId }, data: { role: role as Role } });
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/**
+ * Marks someone as having left, or brings them back.
+ *
+ * Deactivating keeps every entry and every standing they appear in: a finished
+ * campaign should say who actually took part, and quietly deleting the person
+ * who came second rewrites it. What it stops is the two things that would be
+ * wrong going forward — signing in, and being added to a new roster.
+ */
+export async function setUserActive(userId: string, active: boolean): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "errors.signedOut" };
+  if (!canAssignRoles(user)) return { ok: false, error: "errors.notAuthorised" };
+
+  // Deactivating yourself signs you out mid-click, and if you are the only
+  // admin it locks the door behind you. Someone else has to do it.
+  if (user.id === userId && !active) return { ok: false, error: "errors.cannotDeactivateSelf" };
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { deactivatedAt: active ? null : new Date() },
+  });
 
   revalidatePath("/", "layout");
   return { ok: true };

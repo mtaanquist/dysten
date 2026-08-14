@@ -30,7 +30,7 @@ export async function saveEntry(input: {
   value2?: string | number | null;
 }): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
 
   if (!isIsoDate(input.date)) return { ok: false, error: "errors.dateOutOfRange" };
 
@@ -104,7 +104,7 @@ export async function deleteEntry(input: {
   date: string;
 }): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "errors.notAuthorised" };
+  if (!user) return { ok: false, error: "errors.signedOut" };
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: input.campaignId },

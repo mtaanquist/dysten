@@ -84,6 +84,12 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 
   const user = await provisionUser(identity);
 
+  // Someone who has left keeps their entries and their place in past standings,
+  // but stops being a user. Checked on every request rather than only at
+  // sign-in, so deactivating takes effect on the next click instead of whenever
+  // a thirty-day cookie happens to expire.
+  if (user.deactivatedAt) return null;
+
   return {
     id: user.id,
     email: user.email,
@@ -93,13 +99,6 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     theme: resolveTheme(user.theme),
     remindersEnabled: user.remindersEnabled,
   };
-}
-
-/** For pages and actions that must have a user; redirect is the caller's job. */
-export async function requireUser(): Promise<SessionUser> {
-  const user = await getCurrentUser();
-  if (!user) throw new Error("UNAUTHENTICATED");
-  return user;
 }
 
 export function atLeast(role: Role, minimum: Role): boolean {

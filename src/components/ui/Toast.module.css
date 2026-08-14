@@ -16,7 +16,11 @@
   font-weight: var(--fw-semibold);
   box-shadow: var(--sh-toast);
   animation: fadeUp var(--dur-drawer) var(--ease-out) both;
-  white-space: nowrap;
+  /* Most toasts are one word and used to be nowrap. "You have been signed out.
+     Reload the page to sign in again." is a sentence, and a sentence that runs
+     off the side of the screen is not a message. */
+  max-width: min(90vw, 480px);
+  text-wrap: pretty;
 }
 
 @media (max-width: 640px) {
@@ -33,8 +37,6 @@
   /* A message that fits on one line at 1180px does not fit at 390px, so it
      wraps here instead of running off the side. */
   .toast {
-    white-space: normal;
-    text-wrap: pretty;
     border-radius: var(--r-inner);
     padding: var(--sp-3) var(--sp-5);
   }

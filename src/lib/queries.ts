@@ -552,7 +552,7 @@ export interface ManagementData {
     status: CampaignStatus;
     participantCount: number;
   }[];
-  users: { id: string; displayName: string; email: string; role: string }[];
+  users: { id: string; displayName: string; email: string; role: string; active: boolean }[];
   roster: {
     campaignId: string;
     campaignName: string;
@@ -588,8 +588,10 @@ export async function getManagementData(rosterCampaignId?: string): Promise<Mana
           id: p.user.id,
           displayName: p.user.displayName,
         })),
+        // People who have left stay on the rosters they were already on —
+        // history keeps them — but are not offered for new ones.
         candidates: users
-          .filter((user) => !memberIds.has(user.id))
+          .filter((user) => !memberIds.has(user.id) && !user.deactivatedAt)
           .map((user) => ({ id: user.id, displayName: user.displayName })),
       };
     }
@@ -610,6 +612,7 @@ export async function getManagementData(rosterCampaignId?: string): Promise<Mana
       displayName: user.displayName,
       email: user.email,
       role: user.role,
+      active: !user.deactivatedAt,
     })),
     roster,
   };

@@ -164,7 +164,11 @@
     "deleteCampaign": "Slet kampagne",
     "roleAssignment": "Rollestyring",
     "confirmDelete": "Slet denne kampagne og alle registreringer i den? Det kan ikke fortrydes.",
-    "confirmClose": "Afslut kampagnen nu? Registreringer bliver skrivebeskyttede."
+    "confirmClose": "Afslut kampagnen nu? Registreringer bliver skrivebeskyttede.",
+    "hasLeft": "Er stoppet",
+    "deactivate": "Markér som stoppet",
+    "reactivate": "Aktivér igen",
+    "confirmDeactivate": "Markér denne person som stoppet? De kan ikke logge ind eller tilføjes til nye kampagner, men bliver stående i tidligere kampagner."
   },
   "toast": {
     "saved": "Gemt",
@@ -179,7 +183,9 @@
     "roleUpdated": "Rolle opdateret",
     "remindersOn": "Påmindelser slået til",
     "remindersOff": "Påmindelser slået fra",
-    "languageChanged": "Sprog opdateret"
+    "languageChanged": "Sprog opdateret",
+    "userDeactivated": "Markeret som stoppet",
+    "userReactivated": "Aktiveret igen"
   },
   "errors": {
     "generic": "Noget gik galt. Prøv igen.",
@@ -189,7 +195,17 @@
     "negativeValue": "Værdier kan ikke være negative.",
     "notAuthorised": "Du har ikke rettigheder til det.",
     "notFound": "Ikke fundet.",
-    "campaignLocked": "Kampagnen er lukket for registreringer."
+    "campaignLocked": "Kampagnen er lukket for registreringer.",
+    "pageTitle": "Noget gik galt",
+    "pageBody": "Siden kunne ikke indlæses. Prøv igen — så lander du samme sted, som du var.",
+    "notFoundTitle": "Siden findes ikke",
+    "notFoundBody": "Linket er måske forældet, eller kampagnen er blevet slettet.",
+    "retry": "Prøv igen",
+    "backHome": "Til overblikket",
+    "reference": "Reference:",
+    "signedOut": "Du er blevet logget ud. Genindlæs siden for at logge ind igen.",
+    "cannotDeactivateSelf": "Du kan ikke deaktivere din egen konto. Bed en anden administrator om det.",
+    "userDeactivated": "Personen har forladt organisationen og kan ikke tilføjes."
   },
   "campaignTypes": {
     "step": {

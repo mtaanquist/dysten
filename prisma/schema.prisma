@@ -41,6 +41,13 @@ model User {
   /// Opt-in e-mail nudge when yesterday has no entry during an active campaign.
   remindersEnabled Boolean @default(true)
 
+  /// Set when someone leaves the organisation. They keep every entry and stay
+  /// on the standings of campaigns they took part in — history should be honest
+  /// about who was there — but they cannot sign in or be added to a new roster.
+  /// A timestamp rather than a flag, because "when" is the question that gets
+  /// asked afterwards.
+  deactivatedAt DateTime?
+
   createdAt DateTime @default(now())
   lastSeenAt DateTime?
 
