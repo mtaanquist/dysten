@@ -12,11 +12,12 @@ import {
   OAUTH_NONCE_COOKIE,
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
+  appUrl,
   callbackUrl,
 } from "@/lib/auth/oauth-flow";
 
 function failure(request: Request, reason: "denied" | "tenant" | "failed") {
-  const response = NextResponse.redirect(new URL(`/sign-in?error=${reason}`, request.url));
+  const response = NextResponse.redirect(appUrl(request, `/sign-in?error=${reason}`));
   // A half-finished attempt leaves cookies that would break the next one.
   for (const name of OAUTH_COOKIES) response.cookies.delete(name);
   return response;
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
     const claims = await verifyIdToken(idToken, nonce);
     const user = await provisionUser(identityFromClaims(claims));
 
-    const response = NextResponse.redirect(new URL("/", request.url));
+    const response = NextResponse.redirect(appUrl(request, "/"));
     response.cookies.set(SESSION_COOKIE, signValue(user.id), COOKIE_OPTIONS);
     for (const name of OAUTH_COOKIES) response.cookies.delete(name);
     return response;
