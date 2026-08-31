@@ -33,6 +33,12 @@ services:
       # Decides when "today" rolls over for daily entries.
       APP_TIMEZONE: "${APP_TIMEZONE:-Europe/Copenhagen}"
 
+      # Public origin, e.g. https://dysten.example.com. Required for Entra: it
+      # builds the OAuth redirect URI and every redirect back into the app.
+      # Without it the container falls back to its own bound address —
+      # http://0.0.0.0:3000, which no browser can follow.
+      APP_URL: "${APP_URL:-}"
+
       # "dev" is the account-picker sign-in; "entra" is Microsoft 365.
       AUTH_PROVIDER: "${AUTH_PROVIDER:-dev}"
       # Needed only while AUTH_PROVIDER=dev in a production build.
@@ -46,9 +52,10 @@ services:
       SEED_ON_START: "${SEED_ON_START:-false}"
 
       # Entra ID — see src/lib/auth/entra-provider.ts.
-      ENTRA_TENANT_ID: "${ENTRA_TENANT_ID:-}"
+      ENTRA_TENANT_IDS: "${ENTRA_TENANT_IDS:-}"
       ENTRA_CLIENT_ID: "${ENTRA_CLIENT_ID:-}"
       ENTRA_CLIENT_SECRET: "${ENTRA_CLIENT_SECRET:-}"
+      ENTRA_ALLOW_GUESTS: "${ENTRA_ALLOW_GUESTS:-true}"
 
       # Reminder delivery. Both transports are stubs until implemented.
       SMTP_URL: "${SMTP_URL:-}"

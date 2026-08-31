@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { authProvider } from "@/lib/auth";
 import { SESSION_COOKIE } from "@/lib/auth/cookies";
 import { endSessionUrl, entraAuthProvider } from "@/lib/auth/entra-provider";
-import { OAUTH_COOKIES, appOrigin } from "@/lib/auth/oauth-flow";
+import { OAUTH_COOKIES, appOrigin, appUrl } from "@/lib/auth/oauth-flow";
 
 /**
  * Ends the session here and at Microsoft.
@@ -18,7 +18,7 @@ function endSession(request: Request) {
   } catch {
     // Not configured for Entra, or configured wrongly. Our own sign-out still
     // has to work: never strand someone signed in because of a bad env var.
-    destination = new URL("/sign-in", request.url).toString();
+    destination = appUrl(request, "/sign-in");
   }
 
   const response = NextResponse.redirect(destination);
@@ -29,7 +29,7 @@ function endSession(request: Request) {
 
 export async function GET(request: Request) {
   if (authProvider().name !== entraAuthProvider.name) {
-    const response = NextResponse.redirect(new URL("/sign-in", request.url));
+    const response = NextResponse.redirect(appUrl(request, "/sign-in"));
     response.cookies.delete(SESSION_COOKIE);
     return response;
   }

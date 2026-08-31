@@ -58,12 +58,23 @@ export function createPkce(): { verifier: string; challenge: string } {
  * registered with Microsoft — which fails as AADSTS50011 at the worst moment.
  */
 export function callbackUrl(request: Request): string {
-  const configured = process.env.APP_URL?.trim().replace(/\/+$/, "");
-  const origin = configured || new URL(request.url).origin;
-  return `${origin}/api/auth/callback`;
+  return appUrl(request, "/api/auth/callback");
 }
 
 export function appOrigin(request: Request): string {
   const configured = process.env.APP_URL?.trim().replace(/\/+$/, "");
   return configured || new URL(request.url).origin;
+}
+
+/**
+ * An absolute URL back into this app.
+ *
+ * Redirects must not be built from `request.url`: the server binds to
+ * 0.0.0.0 and a reverse proxy rewrites the Host, so the request's own origin
+ * is an internal address the browser cannot reach — which is how a successful
+ * sign-in ends up at https://0.0.0.0:3000/. APP_URL is the origin the outside
+ * world uses, so every redirect goes through here.
+ */
+export function appUrl(request: Request, path: string): string {
+  return new URL(path, `${appOrigin(request)}/`).toString();
 }

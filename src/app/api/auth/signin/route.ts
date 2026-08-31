@@ -6,6 +6,7 @@ import {
   OAUTH_NONCE_COOKIE,
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
+  appUrl,
   callbackUrl,
   createPkce,
   randomToken,
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
   if (authProvider().name !== entraAuthProvider.name) {
     // The dev provider owns /sign-in; landing here means AUTH_PROVIDER is not
     // entra and something linked to the wrong place.
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(appUrl(request, "/sign-in"));
   }
 
   const state = randomToken();
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
     // Missing configuration. The message names an environment variable, never
     // a secret, so it is safe to log and useless to an attacker.
     console.error("[auth] cannot start Entra sign-in:", error);
-    return NextResponse.redirect(new URL("/sign-in?error=config", request.url));
+    return NextResponse.redirect(appUrl(request, "/sign-in?error=config"));
   }
 
   const response = NextResponse.redirect(destination);

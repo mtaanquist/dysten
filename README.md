@@ -239,7 +239,7 @@ same published image serves any organisation.
 | `ALLOW_DEV_AUTH` | unset | Lets the dev sign-in run in a production build |
 | `SEED_ADMIN_EMAILS` | empty | Comma-separated addresses provisioned as admins |
 | `SEED_ON_START` | `false` | Loads demo data on start. **Deletes existing data** |
-| `APP_URL` | request origin | Public origin, e.g. `https://dysten.example.com`. Builds the OAuth redirect URI |
+| `APP_URL` | request origin | Public origin, e.g. `https://dysten.example.com`. Builds the OAuth redirect URI and every redirect back into the app. In Docker the fallback is the container's own `http://0.0.0.0:3000`, so set it |
 | `ENTRA_TENANT_IDS` | — | Required when `AUTH_PROVIDER=entra`. Comma-separated allowlist of tenant ids |
 | `ENTRA_CLIENT_ID` | — | Required when `AUTH_PROVIDER=entra` |
 | `ENTRA_CLIENT_SECRET` | — | Required when `AUTH_PROVIDER=entra` |
