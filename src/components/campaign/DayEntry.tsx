@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useFormatters, useTranslator } from "@/i18n/provider";
 import { campaignType } from "@/lib/campaign-types";
+import type { CampaignStatus } from "@/lib/campaign-status";
 import { addDays, dayRange, mondayIndex, type IsoDate } from "@/lib/dates";
 import { saveEntry } from "@/app/actions/entries";
 import { useToast } from "@/components/ui/Toast";
@@ -16,6 +17,8 @@ interface DayEntryProps {
   startDate: IsoDate;
   endDate: IsoDate;
   today: IsoDate;
+  status: CampaignStatus;
+  /** Separate from `editable`: an unstarted campaign is locked, but not over. */
   editable: boolean;
   entries: EntryMap;
   /** Whose entries these are; an admin correcting someone else passes their id. */
@@ -51,6 +54,7 @@ export function DayEntry({
   startDate,
   endDate,
   today,
+  status,
   editable,
   entries,
   ownerId,
@@ -286,7 +290,13 @@ export function DayEntry({
           <p className={styles.stripHint}>{t("campaign.swipeHint")}</p>
         </div>
 
-        {!editable ? <p className={styles.locked}>{t("campaign.entriesLocked")}</p> : null}
+        {!editable ? (
+          <p className={styles.locked}>
+            {status === "upcoming"
+              ? t("campaign.entriesNotStarted")
+              : t("campaign.entriesLocked")}
+          </p>
+        ) : null}
 
         <div className={styles.fields}>
           <label className={styles.field}>

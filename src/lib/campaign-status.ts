@@ -1,4 +1,4 @@
-import { today as currentDay, type IsoDate } from "./dates";
+import { daysBetween, today as currentDay, type IsoDate } from "./dates";
 
 /**
  * Campaign status is *derived*, never stored — a campaign becomes active or
@@ -43,6 +43,18 @@ export function scoringHorizon(campaign: StatusInput, today: IsoDate = currentDa
   if (status === "ended") return campaign.endDate < today ? campaign.endDate : today;
   if (status === "upcoming") return campaign.startDate;
   return today;
+}
+
+/**
+ * Whole days from `today` until the campaign opens; 0 once it has.
+ *
+ * Counted exclusively, unlike a campaign's *length*: a campaign starting
+ * tomorrow starts in 1 day, even though the span "today through tomorrow"
+ * covers 2 of them. Conflating the two is what showed a campaign starting
+ * tomorrow as "2 days remaining".
+ */
+export function daysUntilStart(campaign: StatusInput, today: IsoDate = currentDay()): number {
+  return Math.max(0, daysBetween(today, campaign.startDate));
 }
 
 /** A future day can never be logged, whatever the campaign's state. */

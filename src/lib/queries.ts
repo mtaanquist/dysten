@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/db";
-import { campaignStatus, entriesEditable, scoringHorizon, type CampaignStatus } from "./campaign-status";
+import {
+  campaignStatus,
+  daysUntilStart,
+  entriesEditable,
+  scoringHorizon,
+  type CampaignStatus,
+} from "./campaign-status";
 import { campaignType } from "./campaign-types";
 import { today as currentDay, type IsoDate } from "./dates";
 import {
@@ -124,7 +130,7 @@ export function buildCampaignSummary(
     status,
     editable: entriesEditable(campaign, today),
     daysRemaining: Math.max(0, totalDays - elapsedDays),
-    daysUntilStart: Math.max(0, dayCount(today, campaign.startDate)),
+    daysUntilStart: daysUntilStart(campaign, today),
     participantCount: campaign.participants.length,
     isParticipant: Boolean(participation),
 
