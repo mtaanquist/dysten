@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getHistoryDetail, getPersonDetail } from "@/lib/queries";
-import { canAdminister, canReopenCampaign } from "@/lib/permissions";
+import { canAdminister, canDrawWinner, canReopenCampaign } from "@/lib/permissions";
 import { accentStyle, ranksByActiveDays } from "@/lib/campaign-types";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
@@ -11,6 +11,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, Panel, PanelTitle, Pill } from "@/components/ui";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
 import { ReopenButton } from "@/components/history/ReopenButton";
+import { DrawWinnerButton } from "@/components/history/DrawWinnerButton";
 import styles from "../history.module.css";
 
 export default async function HistoryDetailPage({
@@ -34,6 +35,10 @@ export default async function HistoryDetailPage({
   const unit = t(`campaignTypes.${detail.type}.unit` as never);
   const byDays = ranksByActiveDays(detail.type);
 
+  // A raffle campaign that has finished but not yet been drawn has no winner
+  // to name — and must not borrow the top of the leaderboard as a stand-in.
+  const awaitingDraw = detail.wonByDraw && !detail.drawn;
+
   const personDetail = person ? await getPersonDetail(id, person) : null;
 
   return (
@@ -52,18 +57,25 @@ export default async function HistoryDetailPage({
 
           <div className={styles.winnerBanner}>
             <div className={styles.winnerLabel}>{t("history.winner")}</div>
-            <div className={styles.winnerBig}>{detail.winnerName ?? "–"}</div>
-            <div className={styles.winnerBigTotal}>
-              {byDays
-                ? t("campaign.daysOutCount", { count: detail.winnerScore })
-                : `${format.value(detail.type, detail.winnerScore)} ${unit}`}
+            <div className={styles.winnerBig}>
+              {detail.winnerName ?? (awaitingDraw ? t("history.notDrawnYet") : "–")}
             </div>
-
-            {canReopenCampaign(user) ? (
-              <div className={styles.reopenSlot}>
-                <ReopenButton campaignId={detail.id} alreadyReopened={detail.reopenedForCorrections} />
+            {detail.winnerName ? (
+              <div className={styles.winnerBigTotal}>
+                {byDays
+                  ? t("campaign.daysOutCount", { count: detail.winnerScore })
+                  : `${format.value(detail.type, detail.winnerScore)} ${unit}`}
               </div>
             ) : null}
+
+            <div className={styles.actionSlot}>
+              {awaitingDraw && canDrawWinner(user) ? (
+                <DrawWinnerButton campaignId={detail.id} />
+              ) : null}
+              {canReopenCampaign(user) ? (
+                <ReopenButton campaignId={detail.id} alreadyReopened={detail.reopenedForCorrections} />
+              ) : null}
+            </div>
           </div>
         </Panel>
 
@@ -81,12 +93,19 @@ export default async function HistoryDetailPage({
                   <div className={styles.right}>{t("campaign.averagePerDay")}</div>
                 </div>
 
-                {detail.standings.map((row) => (
+                {detail.standings.map((row) => {
+                  // Topping a raffle campaign's board is not winning it, so the
+                  // highlight follows whoever was drawn rather than rank 1.
+                  const won = detail.wonByDraw
+                    ? row.userId === detail.winnerUserId
+                    : row.rank === 1;
+
+                  return (
                   <Link
                     key={row.userId}
                     href={`/history/${id}?person=${row.userId}`}
                     scroll={false}
-                    className={`${styles.standingsRow} ${row.rank === 1 ? styles.winnerRow : ""}`}
+                    className={`${styles.standingsRow} ${won ? styles.winnerRow : ""}`}
                   >
                     <div className={styles.rank}>{row.rank}</div>
                     <div className={styles.person}>
@@ -114,7 +133,8 @@ export default async function HistoryDetailPage({
                       {format.value(detail.type, row.average)}
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </Panel>

@@ -132,8 +132,14 @@
   font-weight: var(--fw-semibold);
 }
 
-.reopenSlot {
+/* Holds the draw and reopen buttons; both can be present at once for an
+   admin looking at a finished raffle that has not been drawn. */
+.actionSlot {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
 }
 
 .detailColumns {

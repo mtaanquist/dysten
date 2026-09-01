@@ -133,7 +133,8 @@
     "savedOnBlur": "Gemmes når feltet forlades",
     "missingTitle": "Dage du mangler",
     "logIt": "Registrér",
-    "missingHint": "En dag forsvinder herfra i samme øjeblik den får et tal."
+    "missingHint": "En dag forsvinder herfra i samme øjeblik den får et tal.",
+    "raffleRule": "Hver {amount} registreret giver et lod i lodtrækningen, og alle, der registrerer mindst én dag, har et lod."
   },
   "history": {
     "title": "Tidligere kampagner",
@@ -142,7 +143,11 @@
     "backToHistory": "Tilbage til historik",
     "winner": "Vinder",
     "reopen": "Genåbn for rettelser",
-    "empty": "Ingen kampagner er afsluttet endnu."
+    "empty": "Ingen kampagner er afsluttet endnu.",
+    "draw": "Træk vinderen",
+    "notDrawnYet": "Ikke trukket endnu",
+    "drawnFrom": "Trukket blandt {count} lodder",
+    "wonByDraw": "Vandt lodtrækningen"
   },
   "manage": {
     "title": "Administration",
@@ -188,7 +193,8 @@
     "remindersOff": "Påmindelser slået fra",
     "languageChanged": "Sprog opdateret",
     "userDeactivated": "Markeret som stoppet",
-    "userReactivated": "Aktiveret igen"
+    "userReactivated": "Aktiveret igen",
+    "winnerDrawn": "Vinder trukket"
   },
   "errors": {
     "generic": "Noget gik galt. Prøv igen.",
@@ -208,7 +214,11 @@
     "reference": "Reference:",
     "signedOut": "Du er blevet logget ud. Genindlæs siden for at logge ind igen.",
     "cannotDeactivateSelf": "Du kan ikke deaktivere din egen konto. Bed en anden administrator om det.",
-    "userDeactivated": "Personen har forladt organisationen og kan ikke tilføjes."
+    "userDeactivated": "Personen har forladt organisationen og kan ikke tilføjes.",
+    "notARaffle": "Denne kampagnes vinder afgøres ikke ved lodtrækning.",
+    "campaignNotEnded": "Lodtrækningen kan først foretages, når kampagnen er afsluttet.",
+    "alreadyDrawn": "Der er allerede trukket lod for denne kampagne.",
+    "nothingToDraw": "Ingen har registreret noget, så der er ingen at trække imellem."
   },
   "campaignTypes": {
     "step": {

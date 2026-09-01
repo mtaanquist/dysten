@@ -90,6 +90,18 @@
 
 /* The shared goal sits above the calendar — it breaks up the white panels and
    gives the page something to open on. */
+/* States the raffle rule. The leaderboard shows steps, not tickets, so this
+   is the only place the draw is explained. */
+.raffleRule {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--c-maroon-soft);
+  border-radius: var(--r-inner);
+  color: var(--c-maroon-fg);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+}
+
 .goalSlot:not(:empty) {
   margin-top: var(--sp-4);
 }

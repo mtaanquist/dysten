@@ -133,7 +133,8 @@
     "savedOnBlur": "Saved when the field loses focus",
     "missingTitle": "Days you are missing",
     "logIt": "Log it",
-    "missingHint": "A day leaves this list the moment it gets a number."
+    "missingHint": "A day leaves this list the moment it gets a number.",
+    "raffleRule": "Every {amount} logged earns a ticket in the prize draw, and anyone who logs at least one day holds a ticket."
   },
   "history": {
     "title": "Past campaigns",
@@ -142,7 +143,11 @@
     "backToHistory": "Back to history",
     "winner": "Winner",
     "reopen": "Reopen for corrections",
-    "empty": "No campaigns have finished yet."
+    "empty": "No campaigns have finished yet.",
+    "draw": "Draw the winner",
+    "notDrawnYet": "Not drawn yet",
+    "drawnFrom": "Drawn from {count} tickets",
+    "wonByDraw": "Won the draw"
   },
   "manage": {
     "title": "Management",
@@ -188,7 +193,8 @@
     "remindersOff": "Reminders off",
     "languageChanged": "Language updated",
     "userDeactivated": "Marked as left",
-    "userReactivated": "Reactivated"
+    "userReactivated": "Reactivated",
+    "winnerDrawn": "Winner drawn"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -208,7 +214,11 @@
     "reference": "Reference:",
     "signedOut": "You have been signed out. Reload the page to sign in again.",
     "cannotDeactivateSelf": "You cannot deactivate your own account. Ask another admin to do it.",
-    "userDeactivated": "That person has left the organisation and cannot be added."
+    "userDeactivated": "That person has left the organisation and cannot be added.",
+    "notARaffle": "This campaign's winner is not decided by a draw.",
+    "campaignNotEnded": "The draw can only be run once the campaign has finished.",
+    "alreadyDrawn": "This campaign has already been drawn.",
+    "nothingToDraw": "Nobody logged anything, so there is no one to draw."
   },
   "campaignTypes": {
     "step": {
