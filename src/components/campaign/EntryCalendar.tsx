@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useFormatters, useLocale, useTranslator } from "@/i18n/provider";
 import { weekdayHeaders } from "@/lib/format";
 import { campaignType } from "@/lib/campaign-types";
+import type { CampaignStatus } from "@/lib/campaign-status";
 import { dayRange, mondayIndex, monthKey, type IsoDate } from "@/lib/dates";
 import { saveEntry } from "@/app/actions/entries";
 import { useToast } from "@/components/ui/Toast";
@@ -17,6 +18,8 @@ interface EntryCalendarProps {
   startDate: IsoDate;
   endDate: IsoDate;
   today: IsoDate;
+  status: CampaignStatus;
+  /** Separate from `editable`: an unstarted campaign is locked, but not over. */
   editable: boolean;
   entries: EntryMap;
   /** Whose entries these are; an admin correcting someone else passes their id. */
@@ -57,6 +60,7 @@ export function EntryCalendar({
   startDate,
   endDate,
   today,
+  status,
   editable,
   entries,
   ownerId,
@@ -147,7 +151,13 @@ export function EntryCalendar({
         <LegendSwatch className={styles.swatchToday} label={t("campaign.today")} />
       </div>
 
-      {!editable ? <p className={styles.locked}>{t("campaign.entriesLocked")}</p> : null}
+      {!editable ? (
+        <p className={styles.locked}>
+          {status === "upcoming"
+            ? t("campaign.entriesNotStarted")
+            : t("campaign.entriesLocked")}
+        </p>
+      ) : null}
 
       {months.map((month) => (
         <div key={month.key} className={styles.month}>

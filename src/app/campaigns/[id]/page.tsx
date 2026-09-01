@@ -76,9 +76,9 @@ export default async function CampaignPage({
                   {summary.status === "upcoming" ? summary.daysUntilStart : summary.daysRemaining}
                 </div>
                 <div className={styles.countdownLabel}>
-                  {t("campaign.daysRemaining", {
-                    count: summary.status === "upcoming" ? summary.daysUntilStart : summary.daysRemaining,
-                  })}
+                  {summary.status === "upcoming"
+                    ? t("campaign.untilStart", { count: summary.daysUntilStart })
+                    : t("campaign.daysRemaining", { count: summary.daysRemaining })}
                 </div>
               </>
             )}
@@ -105,6 +105,7 @@ export default async function CampaignPage({
                 startDate={summary.startDate}
                 endDate={summary.endDate}
                 today={today()}
+                status={summary.status}
                 editable={summary.editable}
                 entries={detail.myEntries}
               />
@@ -114,6 +115,7 @@ export default async function CampaignPage({
                 startDate={summary.startDate}
                 endDate={summary.endDate}
                 today={today()}
+                status={summary.status}
                 editable={summary.editable}
                 entries={detail.myEntries}
               />
