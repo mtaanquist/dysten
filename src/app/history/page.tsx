@@ -40,12 +40,17 @@ export default async function HistoryPage() {
                 </div>
                 <div className={styles.winnerBlock}>
                   <div className={styles.winnerLabel}>{t("history.winner")}</div>
-                  <div className={styles.winnerName}>{campaign.winnerName ?? "–"}</div>
-                  <div className={styles.winnerTotal}>
-                    {ranksByActiveDays(campaign.type)
-                      ? t("campaign.daysOutCount", { count: campaign.winnerScore })
-                      : `${format.value(campaign.type, campaign.winnerScore)} ${t(`campaignTypes.${campaign.type}.unit` as never)}`}
+                  <div className={styles.winnerName}>
+                    {campaign.winnerName ??
+                      (campaign.wonByDraw ? t("history.notDrawnYet") : "–")}
                   </div>
+                  {campaign.winnerName ? (
+                    <div className={styles.winnerTotal}>
+                      {ranksByActiveDays(campaign.type)
+                        ? t("campaign.daysOutCount", { count: campaign.winnerScore })
+                        : `${format.value(campaign.type, campaign.winnerScore)} ${t(`campaignTypes.${campaign.type}.unit` as never)}`}
+                    </div>
+                  ) : null}
                 </div>
               </Link>
             ))}

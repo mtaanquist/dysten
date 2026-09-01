@@ -29,6 +29,21 @@ import type { CSSProperties } from "react";
  */
 export type RankBy = "total" | "activeDays";
 
+/**
+ * How the winner is picked — a separate question from how people are ranked.
+ *
+ * `topScore` — the top of the leaderboard wins outright.
+ *
+ * `raffle` — logging earns tickets and the winner is drawn from them. The
+ * leaderboard is unchanged and still sorts on the ranking figure, because
+ * watching the numbers is what makes people walk; what changes is that topping
+ * it no longer wins the prize by itself. See src/lib/raffle.ts.
+ *
+ * Deliberately not folded into RankBy: that drives the sort, the gap to the
+ * next rank and the chart, none of which a raffle touches.
+ */
+export type WinnerBy = "topScore" | "raffle";
+
 export interface CampaignTypeDefinition {
   /** Stable key persisted in Campaign.type and used as the i18n lookup path. */
   key: string;
@@ -41,6 +56,13 @@ export interface CampaignTypeDefinition {
   inputStep: number;
   /** Which figure the leaderboard sorts on. See RankBy. */
   rankBy: RankBy;
+  /** How the winner is decided once the campaign ends. See WinnerBy. */
+  winnerBy: WinnerBy;
+  /**
+   * Units of the ranking figure that earn one raffle ticket — 10,000 steps to
+   * a ticket. Only meaningful when `winnerBy` is "raffle".
+   */
+  ticketsPer?: number;
   /**
    * The type's colour, as a reference to a token in styles/tokens.css rather
    * than a literal — no hex belongs outside that file. Components set it as a
@@ -51,8 +73,23 @@ export interface CampaignTypeDefinition {
 }
 
 export const CAMPAIGN_TYPES = {
-  step: { key: "step", decimals: 0, inputStep: 10, rankBy: "total", accent: "var(--c-type-step)" },
-  bike: { key: "bike", decimals: 1, inputStep: 0.1, rankBy: "activeDays", accent: "var(--c-type-bike)" },
+  step: {
+    key: "step",
+    decimals: 0,
+    inputStep: 10,
+    rankBy: "total",
+    winnerBy: "raffle",
+    ticketsPer: 10_000,
+    accent: "var(--c-type-step)",
+  },
+  bike: {
+    key: "bike",
+    decimals: 1,
+    inputStep: 0.1,
+    rankBy: "activeDays",
+    winnerBy: "topScore",
+    accent: "var(--c-type-bike)",
+  },
 } as const satisfies Record<string, CampaignTypeDefinition>;
 
 export type CampaignTypeKey = keyof typeof CAMPAIGN_TYPES;
@@ -88,6 +125,16 @@ export function accentStyle(key: string): CSSProperties {
 /** Whether this type's standings are decided by days out rather than distance. */
 export function ranksByActiveDays(key: string): boolean {
   return campaignType(key).rankBy === "activeDays";
+}
+
+/** Whether the winner comes out of a draw rather than off the top of the board. */
+export function isRaffleType(key: string): boolean {
+  return campaignType(key).winnerBy === "raffle";
+}
+
+/** Units earning one ticket; 0 when this type does not raffle. */
+export function ticketsPerUnit(key: string): number {
+  return campaignType(key).ticketsPer ?? 0;
 }
 
 /** Rounds a raw input to the precision the type stores. */

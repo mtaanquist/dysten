@@ -59,7 +59,9 @@ export function PreviousCampaigns({
             </div>
             <div>
               <div className={styles.cellLabel}>{t("history.winner")}</div>
-              <div className={styles.winner}>{row.winnerName ?? "–"}</div>
+              <div className={styles.winner}>
+                {row.winnerName ?? (row.wonByDraw ? t("history.notDrawnYet") : "–")}
+              </div>
             </div>
             <div>
               <div className={styles.cellLabel}>{t("dashboard.yourPlacement")}</div>

@@ -30,6 +30,15 @@ export function canReopenCampaign(user: SessionUser): boolean {
   return canAdminister(user);
 }
 
+/**
+ * Drawing a raffle campaign's winner. A captain runs the campaign, so a captain
+ * runs its draw — but only once, which the action enforces: the result is a
+ * stored fact, and permission is not the thing that keeps it from being redone.
+ */
+export function canDrawWinner(user: SessionUser): boolean {
+  return canManageCampaigns(user);
+}
+
 export function canCloseCampaign(user: SessionUser): boolean {
   return canManageCampaigns(user);
 }

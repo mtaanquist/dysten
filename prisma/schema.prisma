@@ -52,6 +52,7 @@ model User {
   lastSeenAt DateTime?
 
   participations   Participation[]
+  campaignsWon     Campaign[]      @relation("CampaignDrawWinner")
   entries          Entry[]         @relation("EntryAuthor")
   entriesEdited    Entry[]         @relation("EntryAdminEditor")
   campaignsCreated Campaign[]      @relation("CampaignCreator")
@@ -80,6 +81,23 @@ model Campaign {
   /// An admin reopening an ended campaign unlocks entry editing without
   /// putting the campaign back on everyone's dashboard as "active".
   reopenedForCorrections Boolean @default(false)
+
+  /// The result of a raffle campaign's prize draw, written down rather than
+  /// derived. Everything else about a campaign's state is recomputed from the
+  /// calendar, but a draw cannot be: it is random, so recomputing it would
+  /// produce a different winner on every read, and an admin correcting an entry
+  /// after the fact must not change who won. See src/lib/raffle.ts.
+  drawnAt         DateTime?
+  drawWinnerId    String?
+  drawWinner      User?     @relation("CampaignDrawWinner", fields: [drawWinnerId], references: [id], onDelete: SetNull)
+  /// Which ticket in the pool was drawn. Together with the snapshot below this
+  /// makes the result checkable afterwards: rebuild the pool from the counts,
+  /// walk to the index, and confirm it lands on the named winner.
+  drawTicketIndex Int?
+  /// JSON — [{ "userId": …, "tickets": n }] exactly as the pool stood when the
+  /// draw was made. A string rather than a column type because it is only ever
+  /// written and read whole, never queried into.
+  drawTickets     String?
 
   createdById String?
   createdBy   User?   @relation("CampaignCreator", fields: [createdById], references: [id], onDelete: SetNull)

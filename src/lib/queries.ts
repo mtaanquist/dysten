@@ -6,7 +6,7 @@ import {
   scoringHorizon,
   type CampaignStatus,
 } from "./campaign-status";
-import { campaignType } from "./campaign-types";
+import { campaignType, isRaffleType, ticketsPerUnit } from "./campaign-types";
 import { today as currentDay, type IsoDate } from "./dates";
 import {
   bestSingleDay,
@@ -48,6 +48,7 @@ const CAMPAIGN_INCLUDE = {
   entries: {
     select: { userId: true, date: true, value1: true, value2: true, editedByAdmin: true },
   },
+  drawWinner: { select: { id: true, displayName: true } },
 } as const;
 
 type CampaignWithData = Awaited<
@@ -68,6 +69,13 @@ export interface CampaignSummary {
   daysUntilStart: number;
   participantCount: number;
   isParticipant: boolean;
+
+  /** True when the winner comes out of a draw rather than off the top of the board. */
+  isRaffle: boolean;
+  /** Units of the ranking figure that earn one ticket; 0 when not a raffle. */
+  ticketsPer: number;
+  /** The drawn winner, once there has been a draw. */
+  drawWinnerName: string | null;
 
   goalName: string | null;
   goalValue: number | null;
@@ -134,6 +142,10 @@ export function buildCampaignSummary(
     participantCount: campaign.participants.length,
     isParticipant: Boolean(participation),
 
+    isRaffle: isRaffleType(campaign.type),
+    ticketsPer: ticketsPerUnit(campaign.type),
+    drawWinnerName: campaign.drawWinner?.displayName ?? null,
+
     goalName: campaign.goalName,
     goalValue: campaign.goalValue,
     goalFraction: goalProgress(combined, campaign.goalValue),
@@ -149,6 +161,42 @@ export function buildCampaignSummary(
         ? missingDays(entries, userId, missingFrom, horizon).length
         : 0,
     totalParticipantsRanked: standings.length,
+  };
+}
+
+/**
+ * Who won a campaign that has finished.
+ *
+ * On a raffle campaign the top of the leaderboard is not the winner and never
+ * becomes one by default — the prize belongs to whoever was drawn, so until the
+ * draw has been run there is deliberately no winner to report.
+ */
+function resolveWinner(
+  campaign: CampaignWithData,
+  standings: Standing[],
+): {
+  winnerName: string | null;
+  winnerScore: number;
+  wonByDraw: boolean;
+  winnerUserId: string | null;
+} {
+  if (!isRaffleType(campaign.type)) {
+    const top = standings[0];
+    return {
+      winnerName: top?.displayName ?? null,
+      winnerScore: top?.score ?? 0,
+      wonByDraw: false,
+      winnerUserId: top?.userId ?? null,
+    };
+  }
+
+  const drawn = campaign.drawWinner;
+  const row = drawn ? standings.find((entry) => entry.userId === drawn.id) : undefined;
+  return {
+    winnerName: drawn?.displayName ?? null,
+    winnerScore: row?.total ?? 0,
+    wonByDraw: true,
+    winnerUserId: drawn?.id ?? null,
   };
 }
 
@@ -175,9 +223,17 @@ export interface PastCampaignRow {
   type: string;
   startDate: IsoDate;
   endDate: IsoDate;
+  /**
+   * Null until a raffle campaign has been drawn. A draw is an event somebody
+   * runs, so "not yet" is a real state rather than missing data.
+   */
   winnerName: string | null;
-  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
+  /** True when the winner was drawn rather than topped the board. */
+  wonByDraw: boolean;
+  /** The winner's id, so a row can be marked without re-deriving who won. */
+  winnerUserId: string | null;
   myRank: number | null;
   participantCount: number;
 }
@@ -209,7 +265,6 @@ export async function getDashboardData(userId: string, pastPage = 0): Promise<Da
       campaign.type,
     );
     const mine = standings.find((row) => row.userId === userId);
-    const winner = standings[0];
 
     return {
       id: campaign.id,
@@ -217,8 +272,7 @@ export async function getDashboardData(userId: string, pastPage = 0): Promise<Da
       type: campaign.type,
       startDate: campaign.startDate,
       endDate: campaign.endDate,
-      winnerName: winner?.displayName ?? null,
-      winnerScore: winner?.score ?? 0,
+      ...resolveWinner(campaign, standings),
       myRank: mine && mine.daysLogged > 0 ? mine.rank : null,
       participantCount: campaign.participants.length,
     } satisfies PastCampaignRow;
@@ -463,9 +517,17 @@ export interface HistoryRow {
   startDate: IsoDate;
   endDate: IsoDate;
   participantCount: number;
+  /**
+   * Null until a raffle campaign has been drawn. A draw is an event somebody
+   * runs, so "not yet" is a real state rather than missing data.
+   */
   winnerName: string | null;
-  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
+  /** True when the winner was drawn rather than topped the board. */
+  wonByDraw: boolean;
+  /** The winner's id, so a row can be marked without re-deriving who won. */
+  winnerUserId: string | null;
 }
 
 export async function getHistoryList(): Promise<HistoryRow[]> {
@@ -484,7 +546,6 @@ export async function getHistoryList(): Promise<HistoryRow[]> {
         campaign.endDate,
         campaign.type,
       );
-      const winner = standings[0];
       return {
         id: campaign.id,
         name: campaign.name,
@@ -492,8 +553,7 @@ export async function getHistoryList(): Promise<HistoryRow[]> {
         startDate: campaign.startDate,
         endDate: campaign.endDate,
         participantCount: campaign.participants.length,
-        winnerName: winner?.displayName ?? null,
-        winnerScore: winner?.score ?? 0,
+        ...resolveWinner(campaign, standings),
       };
     });
 }
@@ -506,9 +566,19 @@ export interface HistoryDetail {
   startDate: IsoDate;
   endDate: IsoDate;
   reopenedForCorrections: boolean;
+  /**
+   * Null until a raffle campaign has been drawn. A draw is an event somebody
+   * runs, so "not yet" is a real state rather than missing data.
+   */
   winnerName: string | null;
-  /** The winner's ranking figure — steps, or days out on a bike campaign. */
+  /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
+  /** True when the winner was drawn rather than topped the board. */
+  wonByDraw: boolean;
+  /** The winner's id, so a row can be marked without re-deriving who won. */
+  winnerUserId: string | null;
+  /** True once the draw has been run, whatever it produced. */
+  drawn: boolean;
   standings: Standing[];
   roster: { id: string; displayName: string }[];
 }
@@ -536,8 +606,8 @@ export async function getHistoryDetail(campaignId: string): Promise<HistoryDetai
     startDate: campaign.startDate,
     endDate: campaign.endDate,
     reopenedForCorrections: campaign.reopenedForCorrections,
-    winnerName: standings[0]?.displayName ?? null,
-    winnerScore: standings[0]?.score ?? 0,
+    ...resolveWinner(campaign, standings),
+    drawn: campaign.drawnAt !== null,
     standings,
     roster: campaign.participants.map((participation) => ({
       id: participation.user.id,

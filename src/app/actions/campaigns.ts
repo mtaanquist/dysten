@@ -1,5 +1,6 @@
 "use server";
 
+import { randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
@@ -8,12 +9,15 @@ import {
   canAssignRoles,
   canCloseCampaign,
   canDeleteCampaign,
+  canDrawWinner,
   canManageCampaigns,
   canManageRoster,
   canReopenCampaign,
 } from "@/lib/permissions";
-import { isCampaignTypeKey } from "@/lib/campaign-types";
+import { isCampaignTypeKey, isRaffleType, ticketsPerUnit } from "@/lib/campaign-types";
 import { campaignStatus } from "@/lib/campaign-status";
+import { computeStandings } from "@/lib/scoring";
+import { poolSize, ticketHolders, winnerAt } from "@/lib/raffle";
 import { isIsoDate } from "@/lib/dates";
 import type { ActionResult } from "./entries";
 
@@ -109,6 +113,75 @@ export async function closeCampaign(campaignId: string): Promise<ActionResult> {
   await prisma.campaign.update({
     where: { id: campaignId },
     data: { closedEarlyAt: new Date(), reopenedForCorrections: false },
+  });
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/**
+ * Draws the winner of a finished raffle campaign.
+ *
+ * The result is written down, not derived. It could not be derived even in
+ * principle — a recomputed random winner would differ on every read — and
+ * storing it is also what stops a later admin correction from quietly handing
+ * the prize to somebody else. The ticket counts and the winning index go into
+ * the same row, so the draw can be checked afterwards rather than taken on
+ * trust.
+ *
+ * Drawing once is the rule. There is no redraw: the point of writing the result
+ * down is that it stays written.
+ */
+export async function drawCampaignWinner(campaignId: string): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "errors.signedOut" };
+  if (!canDrawWinner(user)) return { ok: false, error: "errors.notAuthorised" };
+
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: campaignId },
+    select: {
+      id: true,
+      type: true,
+      startDate: true,
+      endDate: true,
+      closedEarlyAt: true,
+      reopenedForCorrections: true,
+      drawnAt: true,
+      participants: { select: { user: { select: { id: true, displayName: true } } } },
+      entries: { select: { userId: true, date: true, value1: true, value2: true } },
+    },
+  });
+
+  if (!campaign) return { ok: false, error: "errors.notFound" };
+  if (!isRaffleType(campaign.type)) return { ok: false, error: "errors.notARaffle" };
+  if (campaignStatus(campaign) !== "ended") return { ok: false, error: "errors.campaignNotEnded" };
+  if (campaign.drawnAt) return { ok: false, error: "errors.alreadyDrawn" };
+
+  // Scored to the end date, not to today: a campaign reopened for corrections
+  // must still be judged on the days it actually ran.
+  const standings = computeStandings(
+    campaign.participants.map((row) => ({ id: row.user.id, displayName: row.user.displayName })),
+    campaign.entries,
+    campaign.endDate,
+    campaign.type,
+  );
+
+  const holders = ticketHolders(standings, ticketsPerUnit(campaign.type));
+  const size = poolSize(holders);
+  if (size === 0) return { ok: false, error: "errors.nothingToDraw" };
+
+  const ticketIndex = randomInt(size);
+  const winnerId = winnerAt(holders, ticketIndex);
+  if (!winnerId) return { ok: false, error: "errors.nothingToDraw" };
+
+  await prisma.campaign.update({
+    where: { id: campaignId },
+    data: {
+      drawnAt: new Date(),
+      drawWinnerId: winnerId,
+      drawTicketIndex: ticketIndex,
+      drawTickets: JSON.stringify(holders),
+    },
   });
 
   revalidatePath("/", "layout");

@@ -1,0 +1,25 @@
+/* Filled rather than outlined, unlike ReopenButton beside it: drawing is the
+   one action on this screen that cannot be taken back. */
+.button {
+  background: var(--c-maroon);
+  border: 1.5px solid var(--c-maroon);
+  color: var(--c-on-dark);
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: var(--c-maroon-dark);
+  border-color: var(--c-maroon-dark);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
