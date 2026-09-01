@@ -1,0 +1,103 @@
+/* Sits under whichever entry control is on screen, separated by a rule rather
+   than a panel of its own — it is an aid to the fields above, not a section in
+   its own right. */
+.root {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--c-border);
+}
+
+.title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  margin: 0;
+}
+
+.intro {
+  margin: 4px 0 var(--sp-4);
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+/* One per line on a phone: three controls across is unusable at 360px. */
+@media (max-width: 560px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: block;
+  min-width: 0;
+}
+
+.label {
+  display: block;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  font-size: var(--fs-body);
+  padding: 11px var(--sp-4);
+  border: 1px solid var(--c-border-field);
+  border-radius: var(--r-field);
+  background: var(--c-field);
+  color: var(--c-ink);
+  min-height: var(--touch-min);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--c-blue);
+  background: var(--c-surface);
+}
+
+.input:disabled {
+  opacity: 0.65;
+}
+
+.result {
+  margin-top: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-inner);
+  background: var(--c-blue-soft);
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.resultLabel {
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  font-weight: var(--fw-bold);
+  color: var(--c-heading);
+}
+
+.resultValue {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--c-heading);
+}
+
+.hint {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+}
+
+.source {
+  margin: 4px 0 0;
+  font-size: var(--fs-micro);
+  color: var(--c-ink-faint);
+}

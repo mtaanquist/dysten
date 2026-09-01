@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { canAdminister } from "@/lib/permissions";
-import { accentStyle } from "@/lib/campaign-types";
+import { accentStyle, hasActivityCalculator } from "@/lib/campaign-types";
 import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
@@ -11,6 +11,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Panel, PanelTitle, Pill } from "@/components/ui";
 import { EntryCalendar } from "@/components/campaign/EntryCalendar";
 import { DayEntry } from "@/components/campaign/DayEntry";
+import { StepCalculator } from "@/components/campaign/StepCalculator";
 import { Leaderboard } from "@/components/campaign/Leaderboard";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
 import { GoalPanel, Highlights, ProgressChart } from "@/components/campaign/panels";
@@ -132,6 +133,13 @@ export default async function CampaignPage({
                 editable={summary.editable}
                 entries={detail.myEntries}
               />
+
+              {/* Below both controls, so it follows whichever one the viewport
+                  is showing. Only where entry is open: it exists to help fill
+                  the field above, and a locked campaign has nothing to fill. */}
+              {hasActivityCalculator(summary.type) && summary.editable ? (
+                <StepCalculator type={summary.type} />
+              ) : null}
             </>
           ) : (
             <p className={styles.notMember}>{t("campaign.notParticipating")}</p>
