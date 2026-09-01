@@ -64,6 +64,13 @@ export interface CampaignTypeDefinition {
    */
   ticketsPer?: number;
   /**
+   * Whether time spent on other activities converts into this type's unit, and
+   * so whether the entry screen offers the calculator in src/lib/activities.ts.
+   * True for steps, where a swim is invisible to a pedometer; meaningless for
+   * cycling, whose figure is the kilometres themselves.
+   */
+  activityCalculator?: boolean;
+  /**
    * The type's colour, as a reference to a token in styles/tokens.css rather
    * than a literal — no hex belongs outside that file. Components set it as a
    * custom property, so adding a type still touches only this registry and the
@@ -80,6 +87,7 @@ export const CAMPAIGN_TYPES = {
     rankBy: "total",
     winnerBy: "raffle",
     ticketsPer: 10_000,
+    activityCalculator: true,
     accent: "var(--c-type-step)",
   },
   bike: {
@@ -130,6 +138,11 @@ export function ranksByActiveDays(key: string): boolean {
 /** Whether the winner comes out of a draw rather than off the top of the board. */
 export function isRaffleType(key: string): boolean {
   return campaignType(key).winnerBy === "raffle";
+}
+
+/** Whether the entry screen should offer the activity-to-steps calculator. */
+export function hasActivityCalculator(key: string): boolean {
+  return campaignType(key).activityCalculator === true;
 }
 
 /** Units earning one ticket; 0 when this type does not raffle. */
