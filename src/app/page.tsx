@@ -42,7 +42,7 @@ export default async function DashboardPage({
             </div>
           ) : (
             <p className={styles.empty}>
-              {t("dashboard.noCampaigns")} {t("dashboard.noCampaignsHint")}
+              {t("dashboard.noCampaigns")}
             </p>
           )}
         </section>

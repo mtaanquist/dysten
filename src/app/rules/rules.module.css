@@ -1,0 +1,72 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-grid);
+}
+
+.header {
+  margin-bottom: calc(var(--sp-3) * -1);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+}
+
+.intro {
+  margin: 6px 0 0;
+  font-size: var(--fs-body);
+  color: var(--c-ink-muted);
+}
+
+/* Prose, so it gets a reading measure rather than the full panel width. */
+.body {
+  margin: var(--sp-3) 0 0;
+  max-width: 68ch;
+  font-size: var(--fs-body);
+  color: var(--c-ink-muted);
+  line-height: 1.6;
+}
+
+/* The one sentence per section that people came to read. */
+.lead {
+  margin: var(--sp-3) 0 0;
+  max-width: 68ch;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--c-ink);
+  line-height: 1.6;
+}
+
+.fields {
+  margin: var(--sp-4) 0 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--sp-2) var(--sp-5);
+  align-items: baseline;
+}
+
+@media (max-width: 560px) {
+  .fields {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .fieldBody {
+    margin-bottom: var(--sp-3);
+  }
+}
+
+.fieldName {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--c-ink);
+}
+
+.fieldBody {
+  margin: 0;
+  font-size: var(--fs-body);
+  color: var(--c-ink-muted);
+  line-height: 1.6;
+}

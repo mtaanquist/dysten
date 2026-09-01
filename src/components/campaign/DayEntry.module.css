@@ -460,14 +460,7 @@
     letter-spacing: var(--ls-button);
   }
 
-  .missingHint {
-    margin: var(--sp-3) 0 0;
-    font-size: var(--fs-label);
-    color: var(--c-ink-soft);
-    text-wrap: pretty;
-  }
-
-  .allDone {
+    .allDone {
     display: flex;
     align-items: center;
     gap: 10px;

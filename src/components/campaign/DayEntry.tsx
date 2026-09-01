@@ -382,7 +382,6 @@ export function DayEntry({
                 </li>
               ))}
             </ul>
-            <p className={styles.missingHint}>{t("campaign.missingHint")}</p>
           </>
         ) : (
           <div className={styles.allDone}>

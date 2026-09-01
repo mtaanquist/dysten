@@ -13,12 +13,6 @@
   margin: 0;
 }
 
-.intro {
-  margin: 4px 0 var(--sp-4);
-  font-size: var(--fs-meta);
-  color: var(--c-ink-soft);
-}
-
 .fields {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
@@ -88,12 +82,6 @@
   font-size: var(--fs-h2);
   font-weight: var(--fw-bold);
   color: var(--c-heading);
-}
-
-.hint {
-  margin: var(--sp-3) 0 0;
-  font-size: var(--fs-meta);
-  color: var(--c-ink-soft);
 }
 
 .source {
