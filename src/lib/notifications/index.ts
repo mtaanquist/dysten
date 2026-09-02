@@ -13,6 +13,7 @@ export type { MissingEntryReminder, NotificationChannel, NotificationEvent } fro
  */
 const consoleChannel: NotificationChannel = {
   name: "console",
+  reachesPeople: false,
   isEnabled: () => true,
   async send(event) {
     if (event.kind !== "missing-entry") return;
@@ -36,6 +37,7 @@ const consoleChannel: NotificationChannel = {
  */
 const emailChannel: NotificationChannel = {
   name: "email",
+  reachesPeople: true,
   isEnabled: () => Boolean(process.env.SMTP_URL),
   async send() {
     throw new Error(
@@ -51,6 +53,7 @@ const emailChannel: NotificationChannel = {
  */
 const teamsChannel: NotificationChannel = {
   name: "teams",
+  reachesPeople: true,
   isEnabled: () => Boolean(process.env.TEAMS_WEBHOOK_URL),
   async send() {
     throw new Error(
@@ -61,6 +64,24 @@ const teamsChannel: NotificationChannel = {
 };
 
 const channels: NotificationChannel[] = [consoleChannel, emailChannel, teamsChannel];
+
+/**
+ * Whether a reminder could actually arrive somewhere.
+ *
+ * The dashboard asks this before offering the opt-in. A bell that switches on
+ * notifications nobody can receive is worse than no bell at all: it reads as a
+ * promise, and the promise is not kept. Console output does not count — it
+ * reaches a log file, not a person.
+ *
+ * This reports what is *configured*, which is deliberately not the same as what
+ * works: both transports above are still stubs that throw. Setting SMTP_URL
+ * therefore brings the opt-in back before anything can be delivered, which is
+ * the right moment for it to reappear — whoever sets that variable is the
+ * person implementing the transport.
+ */
+export function remindersDeliverable(): boolean {
+  return channels.some((channel) => channel.reachesPeople && channel.isEnabled());
+}
 
 /**
  * Fans an event out to every enabled channel.

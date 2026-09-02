@@ -541,6 +541,12 @@ is handled by adding the forms it needs.
 People can opt in, with the bell icon beside their e-mail on the dashboard, to
 be nudged when they forget to log a day.
 
+**The bell only appears once a channel that reaches people is configured.**
+With neither `SMTP_URL` nor `TEAMS_WEBHOOK_URL` set there is nowhere for a
+reminder to go, and offering the switch would promise something the deployment
+cannot deliver. Set either one and the opt-in returns. The `console` channel
+does not count towards this: it reaches a log file, not a person.
+
 The delivery layer is built and the **transports are stubs**: choosing an SMTP
 relay or a Teams webhook is a decision for whoever deploys this. Set `SMTP_URL`
 or `TEAMS_WEBHOOK_URL` to enable a channel, then implement it in
