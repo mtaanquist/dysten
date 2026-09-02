@@ -450,11 +450,28 @@ decides how to read them.
 
 ```ts
 export const CAMPAIGN_TYPES = {
-  step: { key: "step", decimals: 0, inputStep: 10, rankBy: "total",      accent: "var(--c-type-step)" },
-  bike: { key: "bike", decimals: 1, inputStep: 0.1, rankBy: "activeDays", accent: "var(--c-type-bike)" },
-  swim: { key: "swim", decimals: 0, inputStep: 50, rankBy: "total",      accent: "var(--c-type-swim)" }, // new
+  step: {
+    key: "step", decimals: 0, inputStep: 10,
+    rankBy: "total", winnerBy: "raffle", ticketsPer: 10_000,
+    activityCalculator: true,
+    accent: "var(--c-type-step)",
+  },
+  bike: {
+    key: "bike", decimals: 1, inputStep: 0.1,
+    rankBy: "activeDays", winnerBy: "topScore",
+    accent: "var(--c-type-bike)",
+  },
+  swim: {                                                    // new
+    key: "swim", decimals: 0, inputStep: 50,
+    rankBy: "total", winnerBy: "topScore",
+    accent: "var(--c-type-swim)",
+  },
 } as const satisfies Record<string, CampaignTypeDefinition>;
 ```
+
+`ticketsPer` is only read when `winnerBy` is `"raffle"`, and
+`activityCalculator` opts the type into the activity-to-steps calculator on the
+entry screen — both may be left out, as the bike and swim entries show.
 
 `accent` names a token you add to
 [`src/styles/tokens.css`](src/styles/tokens.css) — no hex belongs outside that
@@ -481,11 +498,14 @@ both put dark ink on this colour.
 It now appears in the campaign type dropdown. `decimals` controls both display
 and rounding on save; `inputStep` sets the step on the number inputs.
 
-### Deciding the winner
+### Ranking and winning
+
+These are **two separate questions**, and the registry keeps them apart: a
+campaign can rank people one way and pick its winner another.
 
 `rankBy` picks what the standings sort on, and everything that compares people —
-the leaderboard, the gap to the rank above, the progress chart, the winner in
-the history — follows it from that one word.
+the leaderboard, the gap to the rank above, the progress chart — follows it from
+that one word.
 
 - **`total`** — most logged wins. Right when the number is comparable between
   people, as steps are.
@@ -495,6 +515,20 @@ the history — follows it from that one word.
   longest commute. A day counts when something was actually ridden, so logging a
   zero buys nothing, and two people on the same number of days genuinely tie
   rather than being split by distance.
+
+`winnerBy` then decides who actually wins, which is not always the top of that
+board.
+
+- **`topScore`** — the leaderboard decides it. Whoever is first, wins.
+- **`raffle`** — logging earns tickets, one per `ticketsPer` units and at least
+  one for anybody who logged at all, and a captain draws one when the campaign
+  ends. The board still sorts on `rankBy`, because watching the numbers is what
+  makes people turn out; it just no longer hands over the prize by itself. See
+  [`src/lib/raffle.ts`](src/lib/raffle.ts).
+
+Keeping the two apart is deliberate. Folding a raffle into `rankBy` would have
+dragged the sort, the gap and the chart into a change that has nothing to do
+with any of them.
 
 A shared goal is always a raw amount either way — "together we ride around
 Denmark" is a distance the group covers, whoever ends up winning.
@@ -657,10 +691,13 @@ src/
     messages/          One JSON file per language — all user-facing text
   lib/
     auth/              Sign-in seam: dev provider, Entra provider
-    campaign-types.ts  The extensible type registry: fields, ranking, colour
+    campaign-types.ts  The extensible type registry: fields, ranking,
+                       how the winner is picked, colour
     campaign-status.ts Status derived from dates, plus the two overrides
     scoring.ts         Totals, tied ranks, streaks, highlights
     scoring.test.ts    The competitive rules, tested without a database
+    raffle.ts          Tickets and the draw, for raffle campaign types
+    activities.ts      MET table converting other activities into steps
     queries.ts         Read models for the screens
     notifications/     Reminder events and channels
     dates.ts           Calendar-day handling
@@ -688,10 +725,19 @@ A few decisions worth knowing before you change things:
   everyone's dashboard.
 - **Ranks are computed at read time** and shared on ties. Correcting a
   three-year-old entry cannot leave a stale standing behind.
-- **What the winner is decided on lives in the type registry**, as one `rankBy`
-  word. Every comparison — the sort, the gap, the chart, the winner in the
-  history — reads the `score` that word produces, so the rule is stated once and
-  a new campaign type cannot half-adopt it.
+- **A raffle draw is the one result that is written down.** It cannot be
+  derived: recomputing a random winner would name somebody different on every
+  read, and an admin correcting an entry weeks later must not move the prize.
+  The winner is stored with the ticket counts it came from and the index drawn,
+  which is enough to check the result afterwards rather than take it on trust.
+- **The competitive rules live in the type registry**, as two words rather than
+  one. `rankBy` decides what the standings sort on, and every comparison — the
+  sort, the gap, the chart — reads the `score` it produces. `winnerBy` decides
+  who takes the prize, which on a raffle campaign is not whoever tops that
+  board. They are separate on purpose: a draw changes who wins without changing
+  how anyone is ranked, and one word doing both jobs would have tangled the two.
+  Either way the rule is stated once, and a new campaign type cannot half-adopt
+  it.
 - **Scoring is pure functions** in `scoring.ts`, taking data as arguments. The
   competitive rules — the part people will argue about — are testable without a
   database, and the leaderboard, chart and highlights all read from one query.
