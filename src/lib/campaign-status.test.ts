@@ -6,6 +6,7 @@ import {
   daysUntilStart,
   entriesEditable,
   isLoggableDay,
+  lastLoggableDay,
   scoringHorizon,
   type StatusInput,
 } from "./campaign-status";
@@ -115,6 +116,34 @@ describe("scoringHorizon", () => {
 
   it("sits at the start date before it begins", () => {
     assert.equal(scoringHorizon(campaign(), "2026-08-31"), "2026-09-01");
+  });
+});
+
+describe("lastLoggableDay", () => {
+  it("is today while the campaign is running", () => {
+    assert.equal(lastLoggableDay(campaign(), "2026-09-15"), "2026-09-15");
+  });
+
+  it("is the end date once the campaign is over", () => {
+    assert.equal(lastLoggableDay(campaign(), "2026-11-01"), "2026-09-30");
+  });
+
+  it("is the start date before it begins", () => {
+    assert.equal(lastLoggableDay(campaign(), "2026-08-31"), "2026-09-01");
+  });
+
+  it("includes both ends of the range", () => {
+    assert.equal(lastLoggableDay(campaign(), "2026-09-01"), "2026-09-01");
+    assert.equal(lastLoggableDay(campaign(), "2026-09-30"), "2026-09-30");
+  });
+
+  /* It never lands on a day the campaign does not cover, which is what makes it
+     safe as the default target for the calculator's copy button. */
+  it("always names a day inside the campaign", () => {
+    for (const day of ["2026-01-01", "2026-09-01", "2026-09-14", "2026-09-30", "2027-05-05"]) {
+      const answer = lastLoggableDay(campaign(), day);
+      assert.ok(answer >= "2026-09-01" && answer <= "2026-09-30", `${day} -> ${answer}`);
+    }
   });
 });
 

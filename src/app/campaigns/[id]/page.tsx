@@ -5,12 +5,14 @@ import { canAdminister } from "@/lib/permissions";
 import { accentStyle, hasActivityCalculator } from "@/lib/campaign-types";
 import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
 import { today } from "@/lib/dates";
+import { lastLoggableDay } from "@/lib/campaign-status";
 import { createTranslator } from "@/i18n/translate";
 import { createFormatters } from "@/lib/format";
 import { AppShell } from "@/components/layout/AppShell";
 import { Panel, PanelTitle, Pill } from "@/components/ui";
 import { EntryCalendar } from "@/components/campaign/EntryCalendar";
 import { DayEntry } from "@/components/campaign/DayEntry";
+import { EntryDayProvider } from "@/components/campaign/EntryDay";
 import { StepCalculator } from "@/components/campaign/StepCalculator";
 import { Leaderboard } from "@/components/campaign/Leaderboard";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
@@ -98,8 +100,20 @@ export default async function CampaignPage({
 
           {summary.isParticipant ? (
             /* Two controls over the same data, one visible per viewport: the
-               month grid at desk widths, the day-at-a-time form on a phone. */
-            <>
+               month grid at desk widths, the day-at-a-time form on a phone.
+               They share one selected day, so the calculator underneath can
+               write into whichever of them is on screen. */
+            <EntryDayProvider
+              initial={lastLoggableDay(
+                {
+                  startDate: summary.startDate,
+                  endDate: summary.endDate,
+                  closedEarlyAt: null,
+                  reopenedForCorrections: false,
+                },
+                today(),
+              )}
+            >
               <EntryCalendar
                 campaignId={summary.id}
                 type={summary.type}
@@ -125,9 +139,9 @@ export default async function CampaignPage({
                   is showing. Only where entry is open: it exists to help fill
                   the field above, and a locked campaign has nothing to fill. */}
               {hasActivityCalculator(summary.type) && summary.editable ? (
-                <StepCalculator type={summary.type} />
+                <StepCalculator campaignId={summary.id} type={summary.type} />
               ) : null}
-            </>
+            </EntryDayProvider>
           ) : (
             <p className={styles.notMember}>{t("campaign.notParticipating")}</p>
           )}

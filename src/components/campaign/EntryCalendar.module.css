@@ -112,6 +112,15 @@
   background: var(--c-blue-tint);
 }
 
+/* The day the calculator will copy into. An outline rather than a fill, so it
+   can sit on top of today's tint or a logged day's surface without hiding
+   either — the cell still has to say whether it was logged. Placed after those
+   rules so its border wins. */
+.cellSelected {
+  outline: 2px solid var(--c-blue);
+  outline-offset: 1px;
+}
+
 .cellFuture {
   background: var(--c-cell-future);
 }
