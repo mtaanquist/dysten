@@ -1,7 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useFormatters, useLocale, useTranslator } from "@/i18n/provider";
+import { saveEntry } from "@/app/actions/entries";
+import { useToast } from "@/components/ui/Toast";
+import { useEntryDay } from "./EntryDay";
 import {
   ACTIVITIES,
   INTENSITIES,
@@ -21,10 +24,13 @@ import styles from "./StepCalculator.module.css";
  * deciding whether a second activity on the same day adds to the first or
  * replaces it, and quietly choosing wrong loses somebody's swim.
  */
-export function StepCalculator({ type }: { type: string }) {
+export function StepCalculator({ campaignId, type }: { campaignId: string; type: string }) {
   const t = useTranslator();
   const format = useFormatters();
   const locale = useLocale();
+  const { showToast } = useToast();
+  const { selected, noteWrite } = useEntryDay();
+  const [saving, startSaving] = useTransition();
 
   const [activityKey, setActivityKey] = useState(ACTIVITIES[0].key);
   const [intensity, setIntensity] = useState<Intensity>("moderate");
@@ -108,7 +114,28 @@ export function StepCalculator({ type }: { type: string }) {
         <span className={styles.resultValue}>
           {format.value(type, steps)} {t(`campaignTypes.${type}.unit` as never)}
         </span>
+
+        {/* Names the day rather than saying "the selected day", so nobody has to
+            work out which one that is before pressing it. Replaces what is
+            there: two activities on one day is the case for adding them up, but
+            a button that adds is a button you cannot press twice safely. */}
+        <button
+          type="button"
+          className={styles.copy}
+          disabled={steps === 0 || saving}
+          onClick={() =>
+            startSaving(async () => {
+              const result = await saveEntry({ campaignId, date: selected, value2: steps });
+              if (result.ok) noteWrite(selected, "value2");
+              showToast(result.ok ? "toast.calculatedCopied" : result.error);
+            })
+          }
+        >
+          {t("calculator.copyTo", { date: format.dateMedium(selected) })}
+        </button>
       </div>
+
+      <p className={styles.copyHint}>{t("calculator.copyHint")}</p>
 
       <p className={styles.source}>
         {t("calculator.source")}

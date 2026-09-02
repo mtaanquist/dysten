@@ -191,7 +191,8 @@
     "languageChanged": "Sprog opdateret",
     "userDeactivated": "Markeret som stoppet",
     "userReactivated": "Aktiveret igen",
-    "winnerDrawn": "Vinder trukket"
+    "winnerDrawn": "Vinder trukket",
+    "calculatedCopied": "Kopieret til Beregnet"
   },
   "errors": {
     "generic": "Noget gik galt. Prøv igen.",
@@ -281,7 +282,9 @@
     "estimated": "Estimeret: der er ingen post for denne i kompendiet.",
     "light": "Let",
     "moderate": "Moderat",
-    "vigorous": "Hård"
+    "vigorous": "Hård",
+    "copyTo": "Kopiér til {date}",
+    "copyHint": "Erstatter det, der står i Beregnet den dag."
   },
   "rules": {
     "title": "Regler",

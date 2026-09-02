@@ -6,6 +6,7 @@ import { weekdayHeaders } from "@/lib/format";
 import { campaignType } from "@/lib/campaign-types";
 import type { CampaignStatus } from "@/lib/campaign-status";
 import { dayRange, mondayIndex, monthKey, type IsoDate } from "@/lib/dates";
+import { useEntryDay } from "./EntryDay";
 import { saveEntry } from "@/app/actions/entries";
 import { useToast } from "@/components/ui/Toast";
 import styles from "./EntryCalendar.module.css";
@@ -74,6 +75,32 @@ export function EntryCalendar({
   // Local echo of what's on screen, so a saved value doesn't flicker back to
   // its old figure while the server round-trips.
   const [draft, setDraft] = useState<Record<string, string>>({});
+
+  // Shared with the day-at-a-time form and the calculator — see ./EntryDay.
+  const { selected, select, lastWrite } = useEntryDay();
+
+  /*
+   * Forget a draft the calculator has just overwritten.
+   *
+   * A draft is what has been typed but not yet committed, and it shadows the
+   * stored value so a half-typed number is not yanked away mid-edit. That is
+   * wrong when the value was replaced from outside: the field would go on
+   * showing text that is no longer what is saved.
+   *
+   * Adjusted during render rather than in an effect. React documents this as
+   * the way to react to a changed input, and an effect would run a beat later,
+   * after the stale text had already been painted.
+   */
+  const [seenWrite, setSeenWrite] = useState(0);
+  if (lastWrite && lastWrite.count !== seenWrite) {
+    setSeenWrite(lastWrite.count);
+    const written = `${lastWrite.date}:${lastWrite.field}`;
+    if (written in draft) {
+      const remaining = { ...draft };
+      delete remaining[written];
+      setDraft(remaining);
+    }
+  }
 
   const { decimals, inputStep } = campaignType(type);
   const headers = useMemo(() => weekdayHeaders(locale), [locale]);
@@ -185,13 +212,29 @@ export function EntryCalendar({
                   styles.cell,
                   cell.isToday ? styles.cellToday : logged ? styles.cellLogged : styles.cellMissing,
                   cell.isFuture ? styles.cellFuture : "",
+                  cell.date === selected ? styles.cellSelected : "",
                 ]
                   .filter(Boolean)
                   .join(" ");
 
                 return (
                   <div key={cell.key} className={styles.cellSlot}>
-                    <div className={cellClass}>
+                    {/* Clicking anywhere on a day picks it, which is what makes
+                        the calculator's copy button have somewhere to go. The
+                        handler sits on the wrapper so it also catches clicks on
+                        the day number and the running total, not just the
+                        inputs; focusing an input selects it too, so arrowing
+                        through the grid keeps the two in step. A future day
+                        cannot be logged, so it cannot be selected either. */}
+                    <div
+                      className={cellClass}
+                      onClickCapture={() => {
+                        if (!cell.isFuture && cell.date) select(cell.date);
+                      }}
+                      onFocusCapture={() => {
+                        if (!cell.isFuture && cell.date) select(cell.date);
+                      }}
+                    >
                       <div className={styles.cellHead}>
                         <span className={cell.isFuture ? styles.dayNumberFuture : styles.dayNumber}>
                           {cell.dayNumber}

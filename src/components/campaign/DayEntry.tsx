@@ -5,6 +5,8 @@ import { useFormatters, useTranslator } from "@/i18n/provider";
 import { campaignType } from "@/lib/campaign-types";
 import type { CampaignStatus } from "@/lib/campaign-status";
 import { addDays, dayRange, mondayIndex, type IsoDate } from "@/lib/dates";
+import { lastLoggableDay } from "@/lib/campaign-status";
+import { useEntryDay } from "./EntryDay";
 import { saveEntry } from "@/app/actions/entries";
 import { useToast } from "@/components/ui/Toast";
 import styles from "./DayEntry.module.css";
@@ -66,11 +68,10 @@ export function DayEntry({
 
   const { decimals, inputStep } = campaignType(type);
 
-  // The last day anyone could have logged: today, or the final day of a
-  // campaign that has already ended and been reopened for corrections.
-  const lastLoggable = today > endDate ? endDate : today < startDate ? startDate : today;
+  const lastLoggable = lastLoggableDay({ startDate, endDate, closedEarlyAt: null, reopenedForCorrections: false }, today);
 
-  const [selected, setSelected] = useState<IsoDate>(lastLoggable);
+  // Shared with the month grid and the calculator — see ./EntryDay.
+  const { selected, select: setSelected, lastWrite } = useEntryDay();
   const [draft, setDraft] = useState<Record<string, string>>({});
 
   const weeks = useMemo<Week[]>(() => {
@@ -92,15 +93,49 @@ export function DayEntry({
   const [weekIndex, setWeekIndex] = useState(() => weekIndexOf(lastLoggable));
   const stripRef = useRef<HTMLDivElement>(null);
 
-  // The strip is a scroll container, so the opening week has to be scrolled to
-  // rather than rendered first.
+  /*
+   * Forget a draft the calculator has just overwritten.
+   *
+   * A draft is what has been typed but not yet committed, and it shadows the
+   * stored value so a half-typed number is not yanked away mid-edit. That is
+   * wrong when the value was replaced from outside: the field would go on
+   * showing text that is no longer what is saved.
+   *
+   * Adjusted during render rather than in an effect. React documents this as
+   * the way to react to a changed input, and an effect would run a beat later,
+   * after the stale text had already been painted.
+   */
+  const [seenWrite, setSeenWrite] = useState(0);
+  if (lastWrite && lastWrite.count !== seenWrite) {
+    setSeenWrite(lastWrite.count);
+    const written = `${lastWrite.date}:${lastWrite.field}`;
+    if (written in draft) {
+      const remaining = { ...draft };
+      delete remaining[written];
+      setDraft(remaining);
+    }
+  }
+
+  /**
+   * Keeps the strip on the selected day's week.
+   *
+   * The strip is a scroll container, so a week has to be scrolled to rather
+   * than rendered first — that is why this runs on mount at all. It also runs
+   * whenever the selection moves, which now includes moves this control did not
+   * make: the month grid shares the selection, and the calculator writes into
+   * it. Swiping is left alone, because a swipe changes the week without
+   * changing the selected day.
+   *
+   * Only the scroll position is set here. Moving it fires the strip's own
+   * onScroll, which is what owns weekIndex — setting both would be two sources
+   * for one fact, and a setState in an effect body besides.
+   */
   useEffect(() => {
     const el = stripRef.current;
-    if (el) el.scrollLeft = el.clientWidth * weekIndex;
-    // Mount only: afterwards the strip is driven by taps and by the user's own
-    // swiping, and re-running this would fight both.
+    if (el) el.scrollLeft = el.clientWidth * weekIndexOf(selected);
+    // weekIndexOf reads `weeks`, which only changes when the campaign does.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selected, weeks]);
 
   /** The biggest day this person has logged — what the strip's bars scale to. */
   const best = useMemo(() => {
@@ -118,11 +153,7 @@ export function DayEntry({
 
   function goTo(date: IsoDate) {
     if (date < startDate || date > lastLoggable) return;
-    const index = weekIndexOf(date);
-    const el = stripRef.current;
-    if (el) el.scrollLeft = el.clientWidth * index;
     setSelected(date);
-    setWeekIndex(index);
   }
 
   function storedValue(date: IsoDate, field: "value1" | "value2"): string {

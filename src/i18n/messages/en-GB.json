@@ -191,7 +191,8 @@
     "languageChanged": "Language updated",
     "userDeactivated": "Marked as left",
     "userReactivated": "Reactivated",
-    "winnerDrawn": "Winner drawn"
+    "winnerDrawn": "Winner drawn",
+    "calculatedCopied": "Copied into Calculated"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -281,7 +282,9 @@
     "estimated": "Estimated: the compendium has no entry for this one.",
     "light": "Light",
     "moderate": "Moderate",
-    "vigorous": "Vigorous"
+    "vigorous": "Vigorous",
+    "copyTo": "Copy to {date}",
+    "copyHint": "Replaces whatever is in Calculated for that day."
   },
   "rules": {
     "title": "Rules",

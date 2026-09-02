@@ -84,6 +84,50 @@
   color: var(--c-heading);
 }
 
+/* Pushed to the far end of the result strip, so the number reads first and the
+   action sits where the eye lands last. */
+.copy {
+  margin-left: auto;
+  background: var(--c-blue);
+  border: 1.5px solid var(--c-blue);
+  color: var(--c-on-dark);
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: var(--touch-min);
+}
+
+.copy:hover:not(:disabled) {
+  background: var(--c-heading);
+  border-color: var(--c-heading);
+}
+
+/* Disabled until there is a number worth copying, which is most of the time the
+   panel is on screen — so it fades rather than disappearing, and the strip does
+   not change shape the moment somebody types a minute. */
+.copy:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.copyHint {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-meta);
+  color: var(--c-ink-soft);
+}
+
+@media (max-width: 560px) {
+  .copy {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
 .source {
   margin: 4px 0 0;
   font-size: var(--fs-micro);

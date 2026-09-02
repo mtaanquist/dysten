@@ -57,6 +57,24 @@ export function daysUntilStart(campaign: StatusInput, today: IsoDate = currentDa
   return Math.max(0, daysBetween(today, campaign.startDate));
 }
 
+/**
+ * The last day anybody could still be filling in.
+ *
+ * Today while a campaign runs. Its end date once it is over, because a campaign
+ * reopened for corrections is edited against the days it actually covered, not
+ * against this week. Its start date before it begins, so that anything needing
+ * a default day has somewhere sensible to sit.
+ *
+ * This currently lands on the same day as `scoringHorizon` in every case, which
+ * is a coincidence of two rules agreeing rather than one rule: that one answers
+ * "what counts towards the standings", this one "what can still be typed into".
+ */
+export function lastLoggableDay(campaign: StatusInput, today: IsoDate = currentDay()): IsoDate {
+  if (today > campaign.endDate) return campaign.endDate;
+  if (today < campaign.startDate) return campaign.startDate;
+  return today;
+}
+
 /** A future day can never be logged, whatever the campaign's state. */
 export function isLoggableDay(
   campaign: StatusInput,
