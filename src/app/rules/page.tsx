@@ -66,6 +66,26 @@ export default async function RulesPage() {
           <p className={styles.body}>{t("rules.numbersEstimate")}</p>
           <p className={styles.body}>{t("rules.numbersPadel")}</p>
         </Panel>
+
+        <Panel>
+          <PanelTitle>{t("rules.creditsTitle")}</PanelTitle>
+          {/* The wording and the link are the ones Flaticon's own "How to
+              attribute?" dialog hands you, kept verbatim and left in English:
+              it names a person and a pack, so translating it would be
+              rewriting somebody's credit. */}
+          <p className={styles.body}>
+            {t("rules.creditsIcon")}{" "}
+            <a
+              className="textLink"
+              href="https://www.flaticon.com/free-icons/athlete"
+              title="athlete icons"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Athlete icons created by Smashicons - Flaticon
+            </a>
+          </p>
+        </Panel>
       </div>
     </AppShell>
   );

@@ -308,6 +308,8 @@
     "numbersTitle": "Where the numbers come from",
     "numbersBody": "The MET values behind the calculator come from the 2024 Adult Compendium of Physical Activities. The sum it does is steps = minutes × MET ÷ 0.065.",
     "numbersEstimate": "It is an estimate rather than a measurement. It does not know your weight, or how hard you were really going.",
-    "numbersPadel": "Padel is not listed in the compendium at all. We use a value from the range people report for it, 4 to 7 depending on effort."
+    "numbersPadel": "Padel is not listed in the compendium at all. We use a value from the range people report for it, 4 to 7 depending on effort.",
+    "creditsTitle": "Credits",
+    "creditsIcon": "The app icon:"
   }
 }
