@@ -308,6 +308,8 @@
     "numbersTitle": "Hvor tallene kommer fra",
     "numbersBody": "MET-værdierne bag beregneren kommer fra 2024 Adult Compendium of Physical Activities. Regnestykket er skridt = minutter × MET ÷ 0,065.",
     "numbersEstimate": "Det er et skøn og ikke en måling. Den kender hverken din vægt eller hvor hårdt du egentlig gik til den.",
-    "numbersPadel": "Padel står slet ikke i kompendiet. Vi bruger en værdi fra det spænd, folk melder om for den, 4 til 7 alt efter intensitet."
+    "numbersPadel": "Padel står slet ikke i kompendiet. Vi bruger en værdi fra det spænd, folk melder om for den, 4 til 7 alt efter intensitet.",
+    "creditsTitle": "Kreditering",
+    "creditsIcon": "Appens ikon:"
   }
 }

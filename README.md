@@ -43,6 +43,7 @@ defaults to Danish. Each person picks their own language and it is remembered.
 - [Published images](#published-images)
 - [Project layout](#project-layout)
 - [How it is built](#how-it-is-built)
+- [Credits](#credits)
 
 ---
 
@@ -693,3 +694,15 @@ A few decisions worth knowing before you change things:
 
 The design mockups this was built from are in [`.design/`](.design/), including
 a component sheet naming the token behind nearly every value.
+
+---
+
+## Credits
+
+The app icon is used under Flaticon's free licence, which asks for the credit
+below. It also appears in the app, on the Rules page.
+
+<a href="https://www.flaticon.com/free-icons/athlete" title="athlete icons">Athlete icons created by Smashicons - Flaticon</a>
+
+The activity-to-steps calculator uses MET values from the
+[2024 Adult Compendium of Physical Activities](https://pacompendium.com/adult-compendium/).
