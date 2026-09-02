@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getDashboardData } from "@/lib/queries";
+import { remindersDeliverable } from "@/lib/notifications";
 import { createTranslator } from "@/i18n/translate";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProfileBar } from "@/components/dashboard/ProfileBar";
@@ -30,6 +31,7 @@ export default async function DashboardPage({
           email={user.email}
           role={user.role}
           remindersEnabled={user.remindersEnabled}
+          remindersAvailable={remindersDeliverable()}
         />
 
         <section>

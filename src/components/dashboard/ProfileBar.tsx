@@ -18,11 +18,14 @@ export function ProfileBar({
   email,
   role,
   remindersEnabled,
+  remindersAvailable,
 }: {
   displayName: string;
   email: string;
   role: Role;
   remindersEnabled: boolean;
+  /** False when no transport is configured — see remindersDeliverable(). */
+  remindersAvailable: boolean;
 }) {
   const t = useTranslator();
   const { showToast } = useToast();
@@ -42,22 +45,27 @@ export function ProfileBar({
           <span className={styles.email}>
             {email} · {t(roleKey)}
           </span>
-          <button
-            type="button"
-            className={`${styles.bell} ${remindersEnabled ? styles.bellOn : styles.bellOff}`}
-            title={reminderLabel}
-            aria-label={reminderLabel}
-            aria-pressed={remindersEnabled}
-            disabled={pending}
-            onClick={() =>
-              startTransition(async () => {
-                await toggleReminders();
-                showToast(remindersEnabled ? "toast.remindersOff" : "toast.remindersOn");
-              })
-            }
-          >
-            <BellIcon crossed={!remindersEnabled} />
-          </button>
+          {/* Hidden outright rather than disabled: a greyed-out bell still
+              says "there is a setting here", and there is not one worth
+              having until something can deliver. */}
+          {remindersAvailable ? (
+            <button
+              type="button"
+              className={`${styles.bell} ${remindersEnabled ? styles.bellOn : styles.bellOff}`}
+              title={reminderLabel}
+              aria-label={reminderLabel}
+              aria-pressed={remindersEnabled}
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  await toggleReminders();
+                  showToast(remindersEnabled ? "toast.remindersOff" : "toast.remindersOn");
+                })
+              }
+            >
+              <BellIcon crossed={!remindersEnabled} />
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

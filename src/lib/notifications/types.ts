@@ -33,6 +33,13 @@ export type NotificationEvent = MissingEntryReminder;
 
 export interface NotificationChannel {
   readonly name: string;
+  /**
+   * Whether this channel reaches an actual person. The console channel does
+   * not — it writes to the server log, which is how you check the reminder
+   * logic works, but nobody is notified by it. The app asks this before
+   * offering anyone a reminder opt-in.
+   */
+  readonly reachesPeople: boolean;
   /** Skipped silently when false, so an unconfigured channel is not an error. */
   isEnabled(): boolean;
   send(event: NotificationEvent): Promise<void>;
