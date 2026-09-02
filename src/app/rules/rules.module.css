@@ -1,7 +1,21 @@
+/*
+ * A document, not a dashboard.
+ *
+ * The panels are held to a reading measure so the prose fills them. Letting
+ * them run the full 1180px and constraining each paragraph instead is what
+ * produced the original complaint: text stopping halfway across a wide panel
+ * reads as though the lines had broken for no reason, and the one row without
+ * that constraint ran the full width, which made it look arbitrary rather than
+ * deliberate. Sizing the container puts every line on the same measure.
+ *
+ * 760px is roughly 68 characters of body text once the panels' own 26px of
+ * side padding is taken off — the width the paragraphs already wrapped at.
+ */
 .page {
   display: flex;
   flex-direction: column;
   gap: var(--gap-grid);
+  max-width: 760px;
 }
 
 .header {
@@ -23,7 +37,6 @@
 /* Prose, so it gets a reading measure rather than the full panel width. */
 .body {
   margin: var(--sp-3) 0 0;
-  max-width: 68ch;
   font-size: var(--fs-body);
   color: var(--c-ink-muted);
   line-height: 1.6;
@@ -32,7 +45,6 @@
 /* The one sentence per section that people came to read. */
 .lead {
   margin: var(--sp-3) 0 0;
-  max-width: 68ch;
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
   color: var(--c-ink);
