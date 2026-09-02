@@ -86,19 +86,6 @@ export default async function CampaignPage({
           </div>
         </header>
 
-        {/* The draw only makes sense if people know it is happening, and the
-            leaderboard deliberately does not show ticket counts — so the rule
-            is stated once, here, rather than implied by a column. */}
-        {summary.isRaffle ? (
-          <p className={styles.raffleRule}>
-            {t("campaign.raffleRule", {
-              amount: `${format.value(summary.type, summary.ticketsPer)} ${t(
-                `campaignTypes.${summary.type}.unit` as never,
-              )}`,
-            })}
-          </p>
-        ) : null}
-
         <div className={styles.goalSlot}>
           <GoalPanel summary={summary} />
         </div>

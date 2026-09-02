@@ -23,7 +23,8 @@
     "dashboard": "Overblik",
     "campaign": "Kampagne",
     "history": "Historik",
-    "management": "Administration"
+    "management": "Administration",
+    "rules": "Regler"
   },
   "signIn": {
     "title": "Log ind og hold styr på stillingen",
@@ -68,7 +69,6 @@
     "dailyAverage": "Dagligt gennemsnit",
     "yourPlacement": "Din placering",
     "noCampaigns": "Du er ikke tilmeldt en kampagne endnu.",
-    "noCampaignsHint": "Kampagner, du kan tilmelde dig, vises nedenfor.",
     "noneOpen": "Der er ingen kampagner åbne for tilmelding lige nu.",
     "noPrevious": "Ingen kampagner er afsluttet endnu."
   },
@@ -105,7 +105,6 @@
     "daysOut": "Dage ude",
     "daysOutCount_one": "{count} dag",
     "daysOutCount_other": "{count} dage",
-    "rankedByDaysOut": "Placeringen afgøres af antal dage, ikke af distance — hvor langt du bor fra arbejde er ikke en præstation.",
     "averagePerDay": "Gns./dag",
     "move": "Ænd.",
     "dayByDay": "Dag for dag",
@@ -132,9 +131,7 @@
     "swipeHint": "Stryg til siden for at skifte uge.",
     "savedOnBlur": "Gemmes når feltet forlades",
     "missingTitle": "Dage du mangler",
-    "logIt": "Registrér",
-    "missingHint": "En dag forsvinder herfra i samme øjeblik den får et tal.",
-    "raffleRule": "Hver {amount} registreret giver et lod i lodtrækningen, og alle, der registrerer mindst én dag, har et lod."
+    "logIt": "Registrér"
   },
   "history": {
     "title": "Tidligere kampagner",
@@ -276,16 +273,41 @@
   },
   "calculator": {
     "title": "Omregn en aktivitet til skridt",
-    "intro": "Svømning og cykling når aldrig frem til en skridttæller. Find ud af, hvad de er værd, her.",
     "activity": "Aktivitet",
     "effort": "Intensitet",
     "minutes": "Minutter",
     "resultLabel": "Svarer til",
-    "hint": "Skriv selv resultatet i Beregnet ovenfor — det udfyldes ikke automatisk.",
     "source": "MET-værdier fra 2024 Adult Compendium of Physical Activities.",
     "estimated": "Estimeret: der er ingen post for denne i kompendiet.",
     "light": "Let",
     "moderate": "Moderat",
     "vigorous": "Hård"
+  },
+  "rules": {
+    "title": "Regler",
+    "intro": "Sådan fungerer en kampagne, og sådan findes vinderen.",
+    "loggingTitle": "Sådan registrerer du dine dage",
+    "loggingBody": "En kampagne løber mellem to datoer. Hver dag skriver du ind, hvad du har lavet: skridt du har gået, eller kilometer du har cyklet. Mere er der ikke i det.",
+    "loggingLate": "Har du glemt en dag? Du kan skrive den ind senere, så længe kampagnen stadig kører. Når den slutter, låses registreringerne. Er der bagefter noget, der er rigtig galt, kan en administrator genåbne kampagnen, så det kan rettes.",
+    "stepTitle": "Skridtkampagner",
+    "stepBody": "Der er to felter, du skal udfylde.",
+    "stepFieldSteps": "Skridt",
+    "stepFieldStepsBody": "Det, din telefon eller dit ur har talt.",
+    "stepFieldCalculated": "Beregnet",
+    "stepFieldCalculatedBody": "Alt det andet. En svømmetur, en omgang badminton, en time på cyklen. Det tæller ikke med som skridt, så det regner du om i stedet.",
+    "stepCalculator": "Beregneren under dine dage klarer omregningen. Vælg aktiviteten, cirka hvor hårdt det føltes, og hvor mange minutter det tog.",
+    "winnerTitle": "Sådan findes vinderen",
+    "winnerLead": "En skridtkampagne er en lodtrækning, ikke et kapløb.",
+    "winnerTickets": "For hver 10.000 skridt, du registrerer, får du et lod. Registrerer du bare noget som helst, får du mindst ét, så alle, der er med, er også med i lodtrækningen.",
+    "winnerDraw": "Når kampagnen er slut, trækker en kaptajn et lod, og den, der har det, har vundet. Flere skridt giver flere lodder og dermed større chance, men det vinder ikke i sig selv at ligge øverst på listen.",
+    "winnerOnce": "Der trækkes én gang, og resultatet bliver stående. Retter man en registrering bagefter, laver det ikke om på, hvem der vandt.",
+    "bikeTitle": "Cykelkampagner",
+    "bikeLead": "Her afgør antallet af dage placeringen, ikke antallet af kilometer.",
+    "bikeBody": "Hvor langt du bor fra arbejde, er ikke en præstation, så listen tæller de dage, du rent faktisk cyklede, i stedet for kilometrene. Afstanden bliver stadig vist. Den bestemmer bare ikke rækkefølgen.",
+    "bikeZero": "En dag tæller, når du har kørt. At skrive nul tæller ikke.",
+    "numbersTitle": "Hvor tallene kommer fra",
+    "numbersBody": "MET-værdierne bag beregneren kommer fra 2024 Adult Compendium of Physical Activities. Regnestykket er skridt = minutter × MET ÷ 0,065.",
+    "numbersEstimate": "Det er et skøn og ikke en måling. Den kender hverken din vægt eller hvor hårdt du egentlig gik til den.",
+    "numbersPadel": "Padel står slet ikke i kompendiet. Vi bruger en værdi fra det spænd, folk melder om for den, 4 til 7 alt efter intensitet."
   }
 }

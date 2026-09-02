@@ -56,7 +56,6 @@ export function StepCalculator({ type }: { type: string }) {
   return (
     <section className={styles.root}>
       <h3 className={styles.title}>{t("calculator.title")}</h3>
-      <p className={styles.intro}>{t("calculator.intro")}</p>
 
       <div className={styles.fields}>
         <label className={styles.field}>
@@ -111,7 +110,6 @@ export function StepCalculator({ type }: { type: string }) {
         </span>
       </div>
 
-      <p className={styles.hint}>{t("calculator.hint")}</p>
       <p className={styles.source}>
         {t("calculator.source")}
         {level.code === null ? ` ${t("calculator.estimated")}` : null}

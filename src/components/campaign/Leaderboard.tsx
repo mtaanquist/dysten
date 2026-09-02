@@ -40,7 +40,6 @@ export function Leaderboard({
 
   return (
     <div>
-      {byDays ? <p className={styles.rankNote}>{t("campaign.rankedByDaysOut")}</p> : null}
 
       <div className={styles.scroller}>
         <div className={styles.table}>

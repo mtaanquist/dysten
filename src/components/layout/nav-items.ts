@@ -44,6 +44,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: "M12 8v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4",
   },
   {
+    href: "/rules",
+    match: "/rules",
+    key: "nav.rules",
+    icon: "M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5v-15Zm0 15A1.5 1.5 0 0 0 6.5 21H19M9 7.5h6M9 11h6",
+  },
+  {
     href: "/manage",
     match: "/manage",
     key: "nav.management",
