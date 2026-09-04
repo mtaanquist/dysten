@@ -192,6 +192,11 @@
   --cal-cell-min: 88px;    /* calendar column min width before horizontal scroll */
   --cal-cell-h: 104px;
   --touch-min: 44px;       /* mobile hit target floor */
+  /* How far a selection or focus ring paints outside the element it belongs
+     to: the widest is 2px of outline sitting 2px out. A scroll box clips
+     whatever leaves it, so any scroller holding ringed elements pads itself by
+     this much and pulls the padding back off with a negative margin. */
+  --ring-room: 4px;
 
   /* ---- Motion ---- */
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);

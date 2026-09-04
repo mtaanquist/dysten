@@ -112,8 +112,12 @@
   color: var(--c-ink-soft);
 }
 
+/* Padded so the scroll box does not clip the focus rings on the outer
+   columns' inputs and the delete button — see --ring-room. */
 .scroller {
   overflow-x: auto;
+  padding: var(--ring-room);
+  margin: calc(var(--ring-room) * -1);
 }
 
 .table {
