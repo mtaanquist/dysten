@@ -245,7 +245,13 @@ same published image serves any organisation.
 | `ENTRA_CLIENT_ID` | — | Required when `AUTH_PROVIDER=entra` |
 | `ENTRA_CLIENT_SECRET` | — | Required when `AUTH_PROVIDER=entra` |
 | `ENTRA_ALLOW_GUESTS` | `true` | Set `false` to reject B2B guest accounts |
-| `SMTP_URL` | unset | Enables the e-mail reminder channel |
+| `SMTP_HOST` | unset | Relay for reminder e-mails. Enables the channel, together with `SMTP_FROM` |
+| `SMTP_PORT` | `587`, or `465` with implicit TLS | Relay port |
+| `SMTP_USER` | unset | Username. Leave unset for a relay that accepts unauthenticated mail |
+| `SMTP_PASSWORD` | unset | Password |
+| `SMTP_SECURE` | from the port | `true` for implicit TLS (port 465); otherwise STARTTLS |
+| `SMTP_FROM` | unset | **Required for e-mail.** Sender, e.g. `Dysten <noreply@example.com>` |
+| `SMTP_URL` | unset | Shorthand for host, port and credentials: `smtp://user:pass@relay:587`. The variables above win over it, field by field |
 | `TEAMS_WEBHOOK_URL` | unset | Enables the Teams reminder channel |
 | `NOTIFICATIONS_RUN_TOKEN` | unset | Shared secret for the reminder endpoint |
 
@@ -576,17 +582,47 @@ People can opt in, with the bell icon beside their e-mail on the dashboard, to
 be nudged when they forget to log a day.
 
 **The bell only appears once a channel that reaches people is configured.**
-With neither `SMTP_URL` nor `TEAMS_WEBHOOK_URL` set there is nowhere for a
-reminder to go, and offering the switch would promise something the deployment
-cannot deliver. Set either one and the opt-in returns. The `console` channel
-does not count towards this: it reaches a log file, not a person.
+With no relay and no `TEAMS_WEBHOOK_URL` there is nowhere for a reminder to go,
+and offering the switch would promise something the deployment cannot deliver.
+Configure one and the opt-in returns. The `console` channel does not count
+towards this: it reaches a log file, not a person.
 
-The delivery layer is built and the **transports are stubs**: choosing an SMTP
-relay or a Teams webhook is a decision for whoever deploys this. Set `SMTP_URL`
-or `TEAMS_WEBHOOK_URL` to enable a channel, then implement it in
-[`src/lib/notifications/index.ts`](src/lib/notifications/index.ts). Until then a
-`console` channel logs exactly who would have been contacted, so the logic is
-observable.
+### E-mail
+
+Set a relay and a sender:
+
+```bash
+SMTP_HOST=relay.example.com
+SMTP_PORT=587
+SMTP_USER=dysten
+SMTP_PASSWORD=...
+SMTP_FROM="Dysten <noreply@example.com>"
+```
+
+`SMTP_FROM` is as required as the host: a relay with nothing to put on the
+envelope cannot deliver anything, so the channel stays off — and the bell stays
+hidden — until both are set. `SMTP_URL` is a shorthand for the first four
+(`smtp://user:pass@relay.example.com:587`, or `smtps://` for implicit TLS), and
+the discrete variables override it field by field.
+
+Implicit TLS follows the port unless `SMTP_SECURE` says otherwise: 465 connects
+encrypted from the first byte, anything else uses STARTTLS. A value the app
+cannot parse — a port that is not a number, an `SMTP_SECURE` that is neither
+true nor false — counts as unconfigured rather than being guessed at, so the
+bell disappearing after an edit means one of these is malformed.
+
+The message is rendered in each recipient's own language and links to the
+campaign using `APP_URL`; without `APP_URL` the reminder is still sent, without
+the link.
+
+### Teams
+
+Still a stub. Set `TEAMS_WEBHOOK_URL` to enable the channel, then implement it
+in [`src/lib/notifications/index.ts`](src/lib/notifications/index.ts). Until
+then the `console` channel logs exactly who would have been contacted, so the
+logic is observable.
+
+### Running the job
 
 Nothing is scheduled from inside the app. Point a scheduler at the endpoint:
 
@@ -738,6 +774,12 @@ A few decisions worth knowing before you change things:
   how anyone is ranked, and one word doing both jobs would have tangled the two.
   Either way the rule is stated once, and a new campaign type cannot half-adopt
   it.
+- **A campaign's range decides what counts.** Its dates are editable after
+  people have logged against them, so shortening one can leave entries on days
+  the campaign no longer covers. Every read model filters entries through
+  `campaign-range.ts` on the way in, and shortening a campaign asks before
+  deleting what it would strand. The filter is the belt: standings stay right
+  even on a campaign shortened before any of this existed.
 - **Scoring is pure functions** in `scoring.ts`, taking data as arguments. The
   competitive rules — the part people will argue about — are testable without a
   database, and the leaderboard, chart and highlights all read from one query.

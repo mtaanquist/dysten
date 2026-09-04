@@ -170,10 +170,23 @@
     "roleAssignment": "Role assignment",
     "confirmDelete": "Delete this campaign and every entry in it? This cannot be undone.",
     "confirmClose": "Close this campaign now? Entries become read-only.",
+    "confirmShorten_one": "Shortening this campaign permanently deletes {count} entry logged on a day you are cutting away. Continue?",
+    "confirmShorten_other": "Shortening this campaign permanently deletes {count} entries logged on days you are cutting away. Continue?",
     "hasLeft": "Has left",
     "deactivate": "Mark as left",
     "reactivate": "Reactivate",
     "confirmDeactivate": "Mark this person as having left? They cannot sign in or be added to new campaigns, but stay on the campaigns they already took part in."
+  },
+  "notifications": {
+    "missingEntry": {
+      "subject": "{campaign}: {day} is not logged yet",
+      "greeting": "Hi {name},",
+      "body": "You have not logged {day} in {campaign}.",
+      "backlog_one": "That leaves {count} day without an entry so far.",
+      "backlog_other": "That leaves {count} days without an entry so far.",
+      "link": "Fill it in here: {url}",
+      "optOut": "You can turn these reminders off from your dashboard."
+    }
   },
   "toast": {
     "saved": "Saved",
