@@ -1,8 +1,12 @@
+import type { Transporter } from "nodemailer";
+
 import { prisma } from "@/lib/db";
 import { resolveLocale } from "@/i18n/config";
 import { createTranslator } from "@/i18n/translate";
 import { addDays, today as currentDay, type IsoDate } from "@/lib/dates";
 import { campaignStatus } from "@/lib/campaign-status";
+import { renderMissingEntryMail } from "./message";
+import { readSmtpSettings } from "./smtp";
 import type { MissingEntryReminder, NotificationChannel, NotificationEvent } from "./types";
 
 export type { MissingEntryReminder, NotificationChannel, NotificationEvent } from "./types";
@@ -27,23 +31,55 @@ const consoleChannel: NotificationChannel = {
 };
 
 /**
- * E-mail. Intentionally a stub — picking a transport (SMTP relay, Microsoft
- * Graph sendMail, a provider SDK) is an infrastructure decision, and the
- * credentials for it do not exist yet.
+ * E-mail, over SMTP.
  *
- * To finish: set SMTP_URL (or swap in Graph, which reuses the Entra app
- * registration), render the message body from the i18n resources using the
- * recipient's own locale, and return once the transport accepts it.
+ * Configured entirely from the environment — see ./smtp.ts for the variables
+ * and how they resolve. Nothing is sent unless a relay *and* a sender address
+ * are both configured; half of a configuration is not a channel.
+ *
+ * The transport is built once and reused across a run: a reminder job mails a
+ * few dozen people, and nodemailer will keep the connection open across them
+ * rather than paying for a handshake each time. It is rebuilt if the settings
+ * change underneath it, which in practice only happens in a test.
+ *
+ * nodemailer is imported where it is used rather than at the top of the file.
+ * Every page that renders the dashboard asks whether reminders are deliverable,
+ * and that question does not need a mail library loaded to answer it.
  */
+let transport: { key: string; mailer: Transporter } | null = null;
+
+async function mailer() {
+  const settings = readSmtpSettings();
+  if (!settings) return null;
+
+  const key = JSON.stringify(settings);
+  if (!transport || transport.key !== key) {
+    transport?.mailer.close();
+    const { createTransport } = await import("nodemailer");
+    transport = { key, mailer: createTransport(settings) };
+  }
+  return { settings, mailer: transport.mailer };
+}
+
 const emailChannel: NotificationChannel = {
   name: "email",
   reachesPeople: true,
-  isEnabled: () => Boolean(process.env.SMTP_URL),
-  async send() {
-    throw new Error(
-      "E-mail notifications are enabled (SMTP_URL is set) but the transport is not implemented. " +
-        "See src/lib/notifications/index.ts.",
-    );
+  isEnabled: () => readSmtpSettings() !== null,
+  async send(event) {
+    if (event.kind !== "missing-entry") return;
+
+    const active = await mailer();
+    // isEnabled() ran first, so this is a configuration that changed between
+    // the two calls rather than a case worth handling quietly.
+    if (!active) throw new Error("SMTP is not configured.");
+
+    const { subject, text } = renderMissingEntryMail(event);
+    await active.mailer.sendMail({
+      from: active.settings.from,
+      to: event.recipient.email,
+      subject,
+      text,
+    });
   },
 };
 
@@ -73,11 +109,10 @@ const channels: NotificationChannel[] = [consoleChannel, emailChannel, teamsChan
  * promise, and the promise is not kept. Console output does not count — it
  * reaches a log file, not a person.
  *
- * This reports what is *configured*, which is deliberately not the same as what
- * works: both transports above are still stubs that throw. Setting SMTP_URL
- * therefore brings the opt-in back before anything can be delivered, which is
- * the right moment for it to reappear — whoever sets that variable is the
- * person implementing the transport.
+ * This reports what is *configured*, which is not quite the same as what
+ * works: a relay can be named correctly and still refuse the connection. It is
+ * as close as the question can be answered without sending a message to find
+ * out, and it is answered on every render.
  */
 export function remindersDeliverable(): boolean {
   return channels.some((channel) => channel.reachesPeople && channel.isEnabled());
