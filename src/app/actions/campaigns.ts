@@ -14,6 +14,7 @@ import {
   canManageRoster,
   canReopenCampaign,
 } from "@/lib/permissions";
+import { narrowsRange, withinRange } from "@/lib/campaign-range";
 import { isCampaignTypeKey, isRaffleType, ticketsPerUnit } from "@/lib/campaign-types";
 import { campaignStatus } from "@/lib/campaign-status";
 import { computeStandings } from "@/lib/scoring";
@@ -57,10 +58,31 @@ interface CampaignInput {
   description?: string;
   goalValue?: string | number | null;
   goalName?: string | null;
+  /**
+   * Consent to destroy the entries a shortened range would leave behind. Only
+   * that: the action counts them itself and deletes them itself, because a
+   * client that could name them could name the wrong ones.
+   */
+  deleteStrandedEntries?: boolean;
 }
 
+/**
+ * A save that has not happened yet because it would destroy something.
+ *
+ * Distinct from an error: nothing is wrong, the campaign simply cannot be
+ * shortened without taking entries with it, and that is the admin's call to
+ * make. The count is here so the question can name a number.
+ */
+export interface StrandedEntriesPrompt {
+  ok: false;
+  needsConfirmation: "strandedEntries";
+  strandedEntries: number;
+}
+
+export type SaveCampaignResult = ActionResult | StrandedEntriesPrompt;
+
 /** Creates or updates a campaign, depending on whether an id came along. */
-export async function saveCampaign(input: CampaignInput): Promise<ActionResult> {
+export async function saveCampaign(input: CampaignInput): Promise<SaveCampaignResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: "errors.signedOut" };
   if (!canManageCampaigns(user)) return { ok: false, error: "errors.notAuthorised" };
@@ -93,9 +115,52 @@ export async function saveCampaign(input: CampaignInput): Promise<ActionResult> 
   };
 
   if (input.id) {
-    const existing = await prisma.campaign.findUnique({ where: { id: input.id }, select: { id: true } });
+    const existing = await prisma.campaign.findUnique({
+      where: { id: input.id },
+      select: { id: true, startDate: true, endDate: true },
+    });
     if (!existing) return { ok: false, error: "errors.notFound" };
-    await prisma.campaign.update({ where: { id: input.id }, data });
+
+    /*
+     * Shortening a campaign cuts days away, and the entries logged on those
+     * days go with them. Leaving them behind is what this replaced: they went
+     * on counting towards the standings while disappearing from every calendar
+     * that could have removed them.
+     *
+     * Only a narrowing can strand anything, so renaming a campaign — or
+     * extending one that was shortened too far earlier — never asks. When it
+     * does strand something the save stops and reports how much, and only a
+     * second call carrying the admin's consent goes through. The count and the
+     * delete are both done here; the flag is permission, not data.
+     */
+    const stranded = narrowsRange(existing, data)
+      ? await prisma.entry.count({
+          where: {
+            campaignId: input.id,
+            OR: [{ date: { lt: data.startDate } }, { date: { gt: data.endDate } }],
+          },
+        })
+      : 0;
+
+    if (stranded > 0 && !input.deleteStrandedEntries) {
+      return { ok: false, needsConfirmation: "strandedEntries", strandedEntries: stranded };
+    }
+
+    // One transaction: a range without its entries pruned is the bug, and a
+    // half-applied save is how you get one back.
+    await prisma.$transaction([
+      ...(stranded > 0
+        ? [
+            prisma.entry.deleteMany({
+              where: {
+                campaignId: input.id,
+                OR: [{ date: { lt: data.startDate } }, { date: { gt: data.endDate } }],
+              },
+            }),
+          ]
+        : []),
+      prisma.campaign.update({ where: { id: input.id }, data }),
+    ]);
   } else {
     await prisma.campaign.create({ data: { ...data, createdById: user.id } });
   }
@@ -161,7 +226,10 @@ export async function drawCampaignWinner(campaignId: string): Promise<ActionResu
   // must still be judged on the days it actually ran.
   const standings = computeStandings(
     campaign.participants.map((row) => ({ id: row.user.id, displayName: row.user.displayName })),
-    campaign.entries,
+    // Through the range filter for the same reason every read model is: an
+    // entry on a day the campaign no longer covers must not buy a raffle
+    // ticket. See src/lib/campaign-range.ts.
+    withinRange(campaign.entries, campaign),
     campaign.endDate,
     campaign.type,
   );

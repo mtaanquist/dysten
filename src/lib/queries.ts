@@ -6,6 +6,7 @@ import {
   scoringHorizon,
   type CampaignStatus,
 } from "./campaign-status";
+import { withinRange } from "./campaign-range";
 import { campaignType, isRaffleType, ticketsPerUnit } from "./campaign-types";
 import { today as currentDay, type IsoDate } from "./dates";
 import {
@@ -101,8 +102,18 @@ function toRoster(campaign: CampaignWithData): ParticipantLike[] {
   }));
 }
 
+/**
+ * The entries that count.
+ *
+ * A campaign's range is editable after people have logged against it, so
+ * shortening one leaves entries sitting on days the campaign no longer covers.
+ * They are filtered out here, at the single door every read model comes
+ * through, rather than in each scoring function: standings, streaks, the
+ * shared-goal bar and the raffle tickets then all agree without any of them
+ * having to remember the rule. See src/lib/campaign-range.ts.
+ */
 function toEntries(campaign: CampaignWithData): EntryLike[] {
-  return campaign.entries;
+  return withinRange(campaign.entries, campaign);
 }
 
 export function buildCampaignSummary(

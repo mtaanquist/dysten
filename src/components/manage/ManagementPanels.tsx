@@ -59,34 +59,49 @@ export function CampaignForm({
   const update = (field: keyof DraftState) => (value: string) =>
     setDraft((previous) => ({ ...previous, [field]: value }));
 
+  /*
+   * Shortening a campaign destroys the entries on the days being cut away, so
+   * the first save comes back asking rather than doing. The count in the
+   * question is the server's, not this form's — it is the only side that can
+   * see the entries — and the retry carries nothing but the answer.
+   *
+   * Recursion goes one level deep at most: the second call has the consent the
+   * first one lacked, so it cannot ask again.
+   */
+  const submit = async (deleteStrandedEntries = false): Promise<void> => {
+    const result = await saveCampaign({
+      id: draft.id,
+      name: draft.name,
+      type: draft.type,
+      startDate: draft.startDate,
+      endDate: draft.endDate,
+      description: draft.description,
+      goalValue: draft.goalValue,
+      goalName: draft.goalName,
+      deleteStrandedEntries,
+    });
+
+    if (result.ok) {
+      showToast(draft.id ? "toast.campaignUpdated" : "toast.campaignCreated");
+      setDraft(EMPTY_DRAFT);
+      router.push("/manage");
+      return;
+    }
+
+    if ("needsConfirmation" in result) {
+      if (!window.confirm(t("manage.confirmShorten", { count: result.strandedEntries }))) return;
+      await submit(true);
+      return;
+    }
+
+    showToast(result.error);
+  };
+
   return (
     <Panel>
       <PanelTitle>{editing ? t("manage.editCampaign") : t("manage.createCampaign")}</PanelTitle>
 
-      <form
-        className={styles.form}
-        action={() =>
-          startTransition(async () => {
-            const result = await saveCampaign({
-              id: draft.id,
-              name: draft.name,
-              type: draft.type,
-              startDate: draft.startDate,
-              endDate: draft.endDate,
-              description: draft.description,
-              goalValue: draft.goalValue,
-              goalName: draft.goalName,
-            });
-            if (result.ok) {
-              showToast(draft.id ? "toast.campaignUpdated" : "toast.campaignCreated");
-              setDraft(EMPTY_DRAFT);
-              router.push("/manage");
-            } else {
-              showToast(result.error);
-            }
-          })
-        }
-      >
+      <form className={styles.form} action={() => startTransition(() => submit())}>
         <Field label={t("manage.campaignName")}>
           <input
             className={styles.input}

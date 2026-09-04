@@ -57,8 +57,19 @@ services:
       ENTRA_CLIENT_SECRET: "${ENTRA_CLIENT_SECRET:-}"
       ENTRA_ALLOW_GUESTS: "${ENTRA_ALLOW_GUESTS:-true}"
 
-      # Reminder delivery. Both transports are stubs until implemented.
+      # Reminder e-mail. A relay and a sender are both required before the
+      # channel switches on — see src/lib/notifications/smtp.ts. SMTP_URL is a
+      # shorthand for host, port and credentials; the discrete variables win
+      # over it field by field.
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+      SMTP_SECURE: "${SMTP_SECURE:-}"
+      SMTP_FROM: "${SMTP_FROM:-}"
       SMTP_URL: "${SMTP_URL:-}"
+
+      # Teams is still a stub until implemented.
       TEAMS_WEBHOOK_URL: "${TEAMS_WEBHOOK_URL:-}"
       NOTIFICATIONS_RUN_TOKEN: "${NOTIFICATIONS_RUN_TOKEN:-}"
     volumes:

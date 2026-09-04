@@ -170,10 +170,23 @@
     "roleAssignment": "Rollestyring",
     "confirmDelete": "Slet denne kampagne og alle registreringer i den? Det kan ikke fortrydes.",
     "confirmClose": "Afslut kampagnen nu? Registreringer bliver skrivebeskyttede.",
+    "confirmShorten_one": "Hvis du forkorter kampagnen, slettes {count} registrering permanent, fordi den ligger på en dag, du skærer væk. Vil du fortsætte?",
+    "confirmShorten_other": "Hvis du forkorter kampagnen, slettes {count} registreringer permanent, fordi de ligger på dage, du skærer væk. Vil du fortsætte?",
     "hasLeft": "Er stoppet",
     "deactivate": "Markér som stoppet",
     "reactivate": "Aktivér igen",
     "confirmDeactivate": "Markér denne person som stoppet? De kan ikke logge ind eller tilføjes til nye kampagner, men bliver stående i tidligere kampagner."
+  },
+  "notifications": {
+    "missingEntry": {
+      "subject": "{campaign}: {day} er ikke registreret endnu",
+      "greeting": "Hej {name}",
+      "body": "Du har ikke registreret {day} i {campaign}.",
+      "backlog_one": "Så mangler du {count} dag i alt.",
+      "backlog_other": "Så mangler du {count} dage i alt.",
+      "link": "Udfyld den her: {url}",
+      "optOut": "Du kan slå påmindelserne fra på dit overblik."
+    }
   },
   "toast": {
     "saved": "Gemt",

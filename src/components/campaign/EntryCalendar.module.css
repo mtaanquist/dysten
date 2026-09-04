@@ -61,10 +61,18 @@
 }
 
 /* Grids scroll rather than crush: below the min width the calendar slides
-   sideways instead of squeezing two inputs into 40px. */
+   sideways instead of squeezing two inputs into 40px.
+
+   The padding is what keeps the outer columns' rings intact. A scroll box
+   clips anything painted outside it, and both the selected-day outline below
+   and the global focus ring sit outside the cell they belong to — on the
+   Monday and Sunday columns that lands beyond the grid, which is why those
+   two columns lost a side. The negative margin puts the grid back flush with
+   the panel edges. */
 .scroller {
   overflow-x: auto;
-  padding-bottom: var(--sp-1);
+  padding: var(--ring-room) var(--ring-room) calc(var(--sp-1) + var(--ring-room));
+  margin: calc(var(--ring-room) * -1);
 }
 
 .grid {

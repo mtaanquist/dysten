@@ -143,7 +143,14 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    margin-top: var(--sp-2);
+    /* Room for the focus ring on the Monday and Sunday buttons, which would
+       otherwise be clipped by the scroll box. scroll-padding keeps the snap
+       measuring from the same edge the weeks start at, so a swipe still lands
+       a week flush rather than 4px short. */
+    padding: var(--ring-room);
+    margin: calc(var(--sp-2) - var(--ring-room)) calc(var(--ring-room) * -1)
+      calc(var(--ring-room) * -1);
+    scroll-padding-inline: var(--ring-room);
     /* Horizontal swipes drive the strip; vertical ones still scroll the page. */
     touch-action: pan-x pan-y;
   }
