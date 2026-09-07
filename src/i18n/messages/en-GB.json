@@ -276,6 +276,7 @@
     "aerobics": "Aerobics",
     "zumba": "Zumba",
     "dancing": "Dancing",
+    "fitnessGames": "Fitness games",
     "climbing": "Climbing",
     "kayaking": "Kayaking & canoeing",
     "horseRiding": "Horse riding",
@@ -292,7 +293,7 @@
     "minutes": "Minutes",
     "resultLabel": "Equivalent to",
     "source": "MET values from the 2024 Adult Compendium of Physical Activities.",
-    "estimated": "Estimated: the compendium has no entry for this one.",
+    "estimated": "Estimated: no compendium row is quoted for this one.",
     "light": "Light",
     "moderate": "Moderate",
     "vigorous": "Vigorous",
@@ -325,6 +326,7 @@
     "numbersBody": "The MET values behind the calculator come from the 2024 Adult Compendium of Physical Activities. The sum it does is steps = minutes × MET ÷ 0.065.",
     "numbersEstimate": "It is an estimate rather than a measurement. It does not know your weight, or how hard you were really going.",
     "numbersPadel": "Padel is not listed in the compendium at all. We use a value from the range people report for it, 4 to 7 depending on effort.",
+    "numbersFitnessGames": "Fitness games, like Beat Saber or Wii Fit, belong under the video games heading the compendium added in 2024. We use the span its active entries cover, 2.3 for a gentle balance game up to 6 for hard whole-body play, without quoting one row.",
     "creditsTitle": "Credits",
     "creditsIcon": "The app icon:"
   }

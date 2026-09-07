@@ -124,15 +124,17 @@ describe("the activity table", () => {
     }
   });
 
-  /* Padel is the one activity with no row in the compendium. If a second ever
-     appears, that is a decision worth making on purpose rather than by drift. */
-  it("has exactly one activity standing outside the compendium", () => {
+  /* Two activities quote no row: padel, which the compendium does not list, and
+     fitness games, which it lists but whose codes we could not check. If a third
+     ever appears, that is a decision worth making on purpose rather than by
+     drift. */
+  it("has exactly two activities quoting no compendium row", () => {
     const uncited = ACTIVITIES.filter((activity) =>
       activity.levels.some((level) => level.code === null),
     );
     assert.deepEqual(
       uncited.map((activity) => activity.key),
-      ["padel"],
+      ["padel", "fitnessGames"],
     );
   });
 

@@ -40,9 +40,9 @@ export interface ActivityLevel {
   intensity: Intensity;
   /**
    * The 2024 Adult Compendium activity code this MET value is quoted from, or
-   * null where the compendium has no row for the activity and the figure comes
-   * from elsewhere. Null is a marker, not a shrug: it says "do not go looking
-   * for this in the PDF".
+   * null where no single row is being quoted — either because the compendium
+   * has none for the activity, or because the figure sits between rows. Null
+   * is a marker, not a shrug: it says "do not go looking for this in the PDF".
    */
   code: string | null;
   met: number;
@@ -98,6 +98,15 @@ export const ACTIVITIES: Activity[] = [
   { key: "aerobics", levels: [level("moderate", "02005", 4.8), level("vigorous", "02006", 8.0)] },
   { key: "zumba", levels: [level("moderate", "02310", 6.5)] },
   { key: "dancing", levels: [level("moderate", "03025", 4.5)] },
+  // Fitness games do have a home in the 2024 compendium: video games arrived as
+  // a major heading of its own (code 22), covering everything from a controller
+  // on the sofa to motion-sensed, whole-body play. The rows that matter here are
+  // the active ones — a balance or yoga game around 2.3, whole-body play at
+  // moderate effort around 4, and hard play, a Beat Saber expert track or a
+  // boxing game, around 6. No row number is quoted because the codes could not
+  // be checked against the compendium itself, and a code nobody verified is
+  // worse than none.
+  { key: "fitnessGames", levels: [level("light", null, 2.3), level("moderate", null, 4.0), level("vigorous", null, 6.0)] },
   { key: "climbing", levels: [level("moderate", "15533", 8.0), level("vigorous", "15534", 8.8)] },
   { key: "kayaking", levels: [level("light", "18040", 2.8), level("moderate", "18100", 5.0), level("vigorous", "18060", 12.5)] },
   { key: "horseRiding", levels: [level("light", "15400", 3.8), level("moderate", "15370", 5.5), level("vigorous", "15395", 7.3)] },

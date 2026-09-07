@@ -276,6 +276,7 @@
     "aerobics": "Aerobic",
     "zumba": "Zumba",
     "dancing": "Dans",
+    "fitnessGames": "Fitnessspil",
     "climbing": "Klatring",
     "kayaking": "Kajak og kano",
     "horseRiding": "Ridning",
@@ -292,7 +293,7 @@
     "minutes": "Minutter",
     "resultLabel": "Svarer til",
     "source": "MET-værdier fra 2024 Adult Compendium of Physical Activities.",
-    "estimated": "Estimeret: der er ingen post for denne i kompendiet.",
+    "estimated": "Estimeret: der er ikke citeret en post fra kompendiet for denne.",
     "light": "Let",
     "moderate": "Moderat",
     "vigorous": "Hård",
@@ -325,6 +326,7 @@
     "numbersBody": "MET-værdierne bag beregneren kommer fra 2024 Adult Compendium of Physical Activities. Regnestykket er skridt = minutter × MET ÷ 0,065.",
     "numbersEstimate": "Det er et skøn og ikke en måling. Den kender hverken din vægt eller hvor hårdt du egentlig gik til den.",
     "numbersPadel": "Padel står slet ikke i kompendiet. Vi bruger en værdi fra det spænd, folk melder om for den, 4 til 7 alt efter intensitet.",
+    "numbersFitnessGames": "Fitnessspil som Beat Saber og Wii Fit hører under det afsnit om computerspil, kompendiet tilføjede i 2024. Vi bruger det spænd, de aktive poster dækker, 2,3 for et roligt balancespil og op til 6 for hårdt spil med hele kroppen, uden at citere en enkelt post.",
     "creditsTitle": "Kreditering",
     "creditsIcon": "Appens ikon:"
   }

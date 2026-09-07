@@ -65,6 +65,7 @@ export default async function RulesPage() {
           <p className={styles.body}>{t("rules.numbersBody")}</p>
           <p className={styles.body}>{t("rules.numbersEstimate")}</p>
           <p className={styles.body}>{t("rules.numbersPadel")}</p>
+          <p className={styles.body}>{t("rules.numbersFitnessGames")}</p>
         </Panel>
 
         <Panel>
