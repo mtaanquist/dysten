@@ -98,6 +98,19 @@ export const ACTIVITIES: Activity[] = [
   { key: "aerobics", levels: [level("moderate", "02005", 4.8), level("vigorous", "02006", 8.0)] },
   { key: "zumba", levels: [level("moderate", "02310", 6.5)] },
   { key: "dancing", levels: [level("moderate", "03025", 4.5)] },
+  // Video games are a major heading of their own in the 2024 compendium (22),
+  // new in that edition, running from a controller on the sofa at 1.3 up to
+  // virtual reality fitness at 9.8. The three quoted here are its motion-sensed
+  // rows, so the levels differ by how hard the person is going rather than by
+  // which corner of the heading the row came from: upper body only, then whole
+  // body, then whole body at moderate-to-vigorous effort.
+  //
+  // The rows either side are deliberately left out. 22160, at 2.3, is the one
+  // that names Wii Fit, but it is balance and yoga games, which is yoga, and
+  // yoga is already on this list. 22320 at 7.5 and 22360 at 9.8 would put a
+  // game above a game of football, which is more than a screen in a living room
+  // should be worth here.
+  { key: "fitnessGames", levels: [level("light", "22200", 3.0), level("moderate", "22240", 4.0), level("vigorous", "22280", 5.0)] },
   { key: "climbing", levels: [level("moderate", "15533", 8.0), level("vigorous", "15534", 8.8)] },
   { key: "kayaking", levels: [level("light", "18040", 2.8), level("moderate", "18100", 5.0), level("vigorous", "18060", 12.5)] },
   { key: "horseRiding", levels: [level("light", "15400", 3.8), level("moderate", "15370", 5.5), level("vigorous", "15395", 7.3)] },
