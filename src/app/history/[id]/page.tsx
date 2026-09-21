@@ -11,7 +11,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, Panel, PanelTitle, Pill } from "@/components/ui";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
 import { ReopenButton } from "@/components/history/ReopenButton";
-import { DecideWinnerButton } from "@/components/history/DecideWinnerButton";
+import { DecideWinnerButton } from "@/components/campaign/DecideWinnerButton";
 import styles from "../history.module.css";
 
 export default async function HistoryDetailPage({

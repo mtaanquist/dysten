@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { canAdminister } from "@/lib/permissions";
+import { canAdminister, canDecideWinner } from "@/lib/permissions";
 import { accentStyle, hasActivityCalculator } from "@/lib/campaign-types";
 import { getCampaignDetail, getCampaignSwitcher, getPersonDetail } from "@/lib/queries";
 import { today } from "@/lib/dates";
@@ -16,6 +16,7 @@ import { EntryDayProvider } from "@/components/campaign/EntryDay";
 import { StepCalculator } from "@/components/campaign/StepCalculator";
 import { Leaderboard } from "@/components/campaign/Leaderboard";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
+import { DecideWinnerButton } from "@/components/campaign/DecideWinnerButton";
 import { GoalPanel, Highlights, ProgressChart } from "@/components/campaign/panels";
 import styles from "../campaign.module.css";
 
@@ -72,9 +73,20 @@ export default async function CampaignPage({
           </div>
           <div className={styles.countdown}>
             {summary.status === "ended" ? (
-              <div className={styles.endedLabel}>
-                {summary.awaitingWinner ? t("campaign.endedOpen") : t("campaign.ended")}
-              </div>
+              /* A campaign waiting on its winner is still on the dashboard, so
+                 this is where a captain is standing when they want to settle
+                 it. The same button is on the history page, which is where you
+                 land once it has been settled. */
+              <>
+                <div className={styles.endedLabel}>
+                  {summary.awaitingWinner ? t("campaign.endedOpen") : t("campaign.ended")}
+                </div>
+                {summary.awaitingWinner && canDecideWinner(user) ? (
+                  <div className={styles.headerAction}>
+                    <DecideWinnerButton campaignId={summary.id} isRaffle={summary.isRaffle} />
+                  </div>
+                ) : null}
+              </>
             ) : (
               <>
                 <div className={styles.countdownNumber}>

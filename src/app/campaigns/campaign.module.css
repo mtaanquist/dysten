@@ -88,6 +88,12 @@
   color: var(--c-maroon-fg);
 }
 
+/* Sits under the "ended" label at desk widths and beside it on a phone, where
+   the countdown block turns into a row. */
+.headerAction {
+  margin-top: var(--sp-3);
+}
+
 /* The shared goal sits above the calendar — it breaks up the white panels and
    gives the page something to open on. */
 .goalSlot:not(:empty) {
