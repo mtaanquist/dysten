@@ -14,6 +14,7 @@ import {
   longestStreak,
   missingDays,
   rankMovements,
+  registeredOnTime,
   type EntryLike,
   type ParticipantLike,
   type Standing,
@@ -33,9 +34,19 @@ const ROSTER: ParticipantLike[] = [
   { id: "u3", displayName: "Mette Sørensen" },
 ];
 
-/** Shorthand for a step-campaign entry: one day, one person, two values. */
+/**
+ * Shorthand for a step-campaign entry: one day, one person, two values.
+ *
+ * Registered on the day it covers unless `late` says otherwise, which is the
+ * ordinary case and keeps every test that does not care about streaks short.
+ */
 function entry(userId: string, date: string, value1: number, value2 = 0): EntryLike {
-  return { userId, date, value1, value2 };
+  return { userId, date, value1, value2, registeredOn: date };
+}
+
+/** The same day, but typed in on `registeredOn` instead of when it happened. */
+function lateEntry(userId: string, date: string, registeredOn: string, value1 = 1): EntryLike {
+  return { userId, date, value1, value2: 0, registeredOn };
 }
 
 /**
@@ -355,6 +366,34 @@ describe("currentStreak", () => {
   it("is zero for someone who has logged nothing", () => {
     assert.equal(currentStreak(entries, "u2", "2026-08-12"), 0);
   });
+
+  it("does not count a day filled in after it had passed", () => {
+    // The 9th was typed in on the 12th, so it joins the total but cannot join
+    // the run: nothing was registered on the 9th itself.
+    const caughtUp = [...entries, lateEntry("u1", "2026-08-09", "2026-08-12")];
+    assert.equal(currentStreak(caughtUp, "u1", "2026-08-12"), 3);
+  });
+
+  it("does not restart a broken run by catching up", () => {
+    const caughtUp = [
+      entry("u1", "2026-09-01", 1),
+      entry("u1", "2026-09-02", 1),
+      lateEntry("u1", "2026-09-03", "2026-09-04"),
+      lateEntry("u1", "2026-09-04", "2026-09-05"),
+    ];
+
+    assert.equal(currentStreak(caughtUp, "u1", "2026-09-04"), 0);
+  });
+});
+
+describe("registeredOnTime", () => {
+  it("accepts a day registered on itself", () => {
+    assert.equal(registeredOnTime(entry("u1", "2026-08-08", 1)), true);
+  });
+
+  it("rejects a day registered afterwards", () => {
+    assert.equal(registeredOnTime(lateEntry("u1", "2026-08-08", "2026-08-09")), false);
+  });
 });
 
 describe("longestStreak", () => {
@@ -375,6 +414,26 @@ describe("longestStreak", () => {
   it("ignores other people's entries", () => {
     const entries = [entry("u2", "2026-08-01", 1), entry("u2", "2026-08-02", 1)];
     assert.equal(longestStreak(entries, "u1", "2026-08-01", "2026-08-10"), 0);
+  });
+
+  it("stops at a missed day even once it has been filled in", () => {
+    // Day 1 and day 2 on the day, day 3 missed and caught up afterwards: the
+    // best run is the two days that were actually registered as they happened.
+    const entries = [
+      entry("u1", "2026-08-01", 1),
+      entry("u1", "2026-08-02", 1),
+      lateEntry("u1", "2026-08-03", "2026-08-05"),
+      entry("u1", "2026-08-04", 1),
+      entry("u1", "2026-08-05", 1),
+    ];
+
+    assert.equal(longestStreak(entries, "u1", "2026-08-01", "2026-08-05"), 2);
+  });
+
+  it("is zero for a campaign typed up entirely at the end", () => {
+    const days = ["2026-08-01", "2026-08-02", "2026-08-03", "2026-08-04", "2026-08-05"];
+    const entries = days.map((date) => lateEntry("u1", date, "2026-08-31"));
+    assert.equal(longestStreak(entries, "u1", "2026-08-01", "2026-08-05"), 0);
   });
 });
 

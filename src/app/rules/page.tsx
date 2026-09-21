@@ -29,6 +29,7 @@ export default async function RulesPage() {
           <PanelTitle>{t("rules.loggingTitle")}</PanelTitle>
           <p className={styles.body}>{t("rules.loggingBody")}</p>
           <p className={styles.body}>{t("rules.loggingLate")}</p>
+          <p className={styles.body}>{t("rules.loggingStreak")}</p>
         </Panel>
 
         <Panel>

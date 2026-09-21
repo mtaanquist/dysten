@@ -99,6 +99,19 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
                 suffix={unit}
               />
             )}
+
+            {/* The run you are on, and the best one you have managed — so a
+                streak that breaks leaves a number to beat rather than nothing.
+                Held back until there has been a run worth naming, because
+                "streak 0" on every card would be nagging rather than
+                encouraging. */}
+            {summary.myBestStreak >= 2 ? (
+              <Stat
+                label={t("campaign.streak")}
+                value={String(summary.myStreak)}
+                suffix={`${summary.myStreak === 1 ? t("common.day") : t("common.days")} · ${t("campaign.streakBest", { count: summary.myBestStreak })}`}
+              />
+            ) : null}
           </div>
 
           {summary.status === "upcoming" ? null : summary.myMissingDays > 0 ? (

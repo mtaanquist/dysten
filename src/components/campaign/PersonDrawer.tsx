@@ -147,6 +147,16 @@ export function PersonDrawer({
           <div className={styles.summaryValue}>
             {format.value(detail.campaignType, detail.total)} {unit}
           </div>
+          {/* Both figures, quietly: the run they are on says whether they are
+              logging daily, the best one says what they have managed at their
+              most diligent. */}
+          {detail.bestStreak >= 2 ? (
+            <div className={styles.summaryStreak}>
+              {t("campaign.streak")}: {detail.currentStreak}{" "}
+              {detail.currentStreak === 1 ? t("common.day") : t("common.days")} ·{" "}
+              {t("campaign.streakBest", { count: detail.bestStreak })}
+            </div>
+          ) : null}
         </div>
 
         <div className={styles.tableLabel}>
