@@ -16,6 +16,15 @@ export interface EntryLike {
   value1: number;
   value2: number;
   editedByAdmin?: boolean;
+  /**
+   * The calendar day the entry was first saved. Equal to `date` for a day
+   * logged while it was still running, later for one filled in afterwards.
+   *
+   * Only the streaks read it, and they are the reason it exists: a streak is a
+   * record of registering every day, which is a question about when a value was
+   * typed in and not only about which day it landed on.
+   */
+  registeredOn: IsoDate;
 }
 
 export interface ParticipantLike {
@@ -143,17 +152,40 @@ export function assignRanks(rows: Standing[]): Standing[] {
 }
 
 /**
- * Consecutive logged days counting back from `horizon`.
+ * Whether an entry was registered on the day it covers.
+ *
+ * Streaks are the app's nudge toward logging every day, so they count the act
+ * of registering rather than the day a number eventually landed on. Filling in
+ * last Tuesday this morning still adds its steps to the total, the average, the
+ * standings and the shared goal — what it cannot do is mend the run it broke,
+ * because nobody registered anything on Tuesday.
+ *
+ * A future day can never be logged (see `isLoggableDay`), so "saved on or
+ * before its own day" is simply "saved on the day".
+ */
+export function registeredOnTime(entry: EntryLike): boolean {
+  return entry.registeredOn <= entry.date;
+}
+
+/** The days `userId` registered on time — the only days a streak is built of. */
+function onTimeDays(entries: EntryLike[], userId: string): Set<IsoDate> {
+  return new Set(
+    entries
+      .filter((entry) => entry.userId === userId && registeredOnTime(entry))
+      .map((entry) => entry.date),
+  );
+}
+
+/**
+ * Consecutive days registered on time, counting back from `horizon`.
  *
  * If the horizon day itself has no entry the count starts from the day before,
  * so a streak isn't reported as broken at 09:00 simply because today hasn't
- * been logged yet. Two missed days in a row do break it.
+ * been logged yet. Once that day is over, though, it is over: missing it breaks
+ * the run, and typing the day in later does not put it back together.
  */
 export function currentStreak(entries: EntryLike[], userId: string, horizon: IsoDate): number {
-  const logged = new Set(
-    entries.filter((entry) => entry.userId === userId && entry.date <= horizon).map((entry) => entry.date),
-  );
-  if (logged.size === 0) return 0;
+  const logged = onTimeDays(entries, userId);
 
   let cursor = logged.has(horizon) ? horizon : addDays(horizon, -1);
   let streak = 0;
@@ -164,14 +196,20 @@ export function currentStreak(entries: EntryLike[], userId: string, horizon: Iso
   return streak;
 }
 
-/** The longest run of consecutive logged days anywhere in the range. */
+/**
+ * The longest run of consecutive on-time days anywhere in the range.
+ *
+ * Someone who logged the first two days, skipped the third and then caught up
+ * on the fourth has a longest streak of 2, however full their calendar looks
+ * afterwards.
+ */
 export function longestStreak(
   entries: EntryLike[],
   userId: string,
   start: IsoDate,
   end: IsoDate,
 ): number {
-  const logged = new Set(entries.filter((entry) => entry.userId === userId).map((entry) => entry.date));
+  const logged = onTimeDays(entries, userId);
   let best = 0;
   let run = 0;
   for (const day of dayRange(start, end)) {

@@ -314,6 +314,7 @@
     "loggingTitle": "Logging your days",
     "loggingBody": "A campaign runs between two dates. Each day you fill in what you did: steps you walked, or kilometres you cycled. That is all there is to it.",
     "loggingLate": "Forgot a day? You can fill it in later, as long as the campaign is still running — and for a while afterwards, because entries stay open until the winner is decided. After that they are locked. If something is properly wrong once they are, an administrator can reopen the campaign so it can be put right.",
+    "loggingStreak": "Streaks count the days you filled in while they were still running. Catch up on a missed day afterwards and it still counts towards your total, your average and the shared goal, but the run it broke stays broken. The streak is what nudges you into registering every day.",
     "stepTitle": "Step campaigns",
     "stepBody": "There are two boxes to fill in.",
     "stepFieldSteps": "Steps",

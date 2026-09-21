@@ -25,6 +25,12 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+function addDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 function dayRange(start: string, end: string): string[] {
   const out: string[] = [];
   const cursor = new Date(`${start}T00:00:00Z`);
@@ -165,7 +171,7 @@ async function main() {
       const isStep = definition.type === "step";
       const base = isStep ? 5200 + Math.floor(random() * 6500) : 9 + random() * 14;
 
-      const rows: { date: string; value1: number; value2: number }[] = [];
+      const rows: { date: string; value1: number; value2: number; createdAt: Date }[] = [];
       for (let i = 0; i < upTo; i += 1) {
         const date = days[i];
         // A tenth of days go unlogged, so streaks and gaps look real.
@@ -174,16 +180,28 @@ async function main() {
         // "days missing entries" state is visible straight after seeding.
         if (key === "u1" && definition.key === "c1" && date >= "2026-08-11") continue;
 
+        // Most days are typed in the same evening; a few are caught up a day or
+        // two later. Streaks count only the days registered as they happened
+        // (see src/lib/scoring.ts), so a demo where everything was logged on
+        // time would never show a broken one.
+        const caughtUpAfter = random() < 0.18 ? 1 + Math.floor(random() * 2) : 0;
+        const registeredOn = caughtUpAfter === 0 ? date : addDays(date, caughtUpAfter);
+        // 18:30 UTC is a Copenhagen evening either side of daylight saving, so
+        // the calendar day it lands on is the one intended.
+        const createdAt = new Date(`${registeredOn > TODAY ? TODAY : registeredOn}T18:30:00Z`);
+
         const wobble = 0.6 + random() * 0.9;
         rows.push(
           isStep
             ? {
                 date,
+                createdAt,
                 value1: Math.round((base * wobble) / 10) * 10,
                 value2: random() < 0.45 ? Math.round((base * 0.4 * random()) / 10) * 10 : 0,
               }
             : {
                 date,
+                createdAt,
                 value1: Math.round(base * wobble * 10) / 10,
                 value2: random() < 0.5 ? Math.round(base * 0.6 * random() * 10) / 10 : 0,
               },

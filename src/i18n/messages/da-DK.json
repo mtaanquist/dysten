@@ -314,6 +314,7 @@
     "loggingTitle": "Sådan registrerer du dine dage",
     "loggingBody": "En kampagne løber mellem to datoer. Hver dag skriver du ind, hvad du har lavet: skridt du har gået, eller kilometer du har cyklet. Mere er der ikke i det.",
     "loggingLate": "Har du glemt en dag? Du kan skrive den ind senere, så længe kampagnen stadig kører — og et stykke tid efter, for der er åbent, indtil vinderen er fundet. Derefter låses registreringerne. Er der bagefter noget, der er rigtig galt, kan en administrator genåbne kampagnen, så det kan rettes.",
+    "loggingStreak": "Stimer tæller de dage, du skrev ind, mens de stadig var i gang. Skriver du en glemt dag ind bagefter, tæller den stadig med i din total, dit gennemsnit og det fælles mål, men den stime, den brød, bliver ikke hel igen. Stimen er det, der minder dig om at registrere hver dag.",
     "stepTitle": "Skridtkampagner",
     "stepBody": "Der er to felter, du skal udfylde.",
     "stepFieldSteps": "Skridt",

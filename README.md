@@ -67,6 +67,13 @@ row, including days that were never logged, because that is usually what needs
 correcting. Anything an admin changes is stamped as their correction and says so
 wherever it appears.
 
+**Streaks.** The badge on the leaderboard, and the longest-streak highlight,
+count the days you filled in while they were still running — not the days that
+eventually have a number in them. Catching up on a day you missed still adds to
+your total, your average, the standings and the shared goal, but the run it
+broke stays broken. It is the one figure here that rewards turning up every day
+rather than the size of the number.
+
 **History.** Every finished campaign, its final standings with the winner
 highlighted, and the roster exactly as it stood at the end. An admin who reopens
 one for corrections gets the same editable day-by-day panel there.

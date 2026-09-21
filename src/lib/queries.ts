@@ -10,7 +10,7 @@ import {
 } from "./campaign-status";
 import { withinRange } from "./campaign-range";
 import { campaignType, isRaffleType, ticketsPerUnit } from "./campaign-types";
-import { today as currentDay, type IsoDate } from "./dates";
+import { toIsoDate, today as currentDay, type IsoDate } from "./dates";
 import {
   bestSingleDay,
   combinedTotal,
@@ -49,7 +49,16 @@ const CAMPAIGN_INCLUDE = {
     orderBy: { joinedAt: "asc" },
   },
   entries: {
-    select: { userId: true, date: true, value1: true, value2: true, editedByAdmin: true },
+    select: {
+      userId: true,
+      date: true,
+      value1: true,
+      value2: true,
+      editedByAdmin: true,
+      // When the row was first saved, which is what tells a streak apart from
+      // a calendar somebody caught up on afterwards. See `toEntries`.
+      createdAt: true,
+    },
   },
   drawWinner: { select: { id: true, displayName: true } },
 } as const;
@@ -120,7 +129,17 @@ function toRoster(campaign: CampaignWithData): ParticipantLike[] {
  * having to remember the rule. See src/lib/campaign-range.ts.
  */
 function toEntries(campaign: CampaignWithData): EntryLike[] {
-  return withinRange(campaign.entries, campaign);
+  return withinRange(campaign.entries, campaign).map((entry) => ({
+    userId: entry.userId,
+    date: entry.date,
+    value1: entry.value1,
+    value2: entry.value2,
+    editedByAdmin: entry.editedByAdmin,
+    // A timestamp is an instant; a streak is a run of calendar days. Resolving
+    // one to the other here, in the app timezone, is what keeps an entry saved
+    // at 23:30 in Copenhagen counting as that day rather than the next.
+    registeredOn: toIsoDate(entry.createdAt),
+  }));
 }
 
 export function buildCampaignSummary(

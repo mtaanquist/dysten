@@ -19,7 +19,7 @@ import { isCampaignTypeKey, isRaffleType, ticketsPerUnit } from "@/lib/campaign-
 import { awaitingWinner, campaignStatus } from "@/lib/campaign-status";
 import { computeStandings, leader, type Standing } from "@/lib/scoring";
 import { poolSize, ticketHolders, winnerAt } from "@/lib/raffle";
-import { isIsoDate } from "@/lib/dates";
+import { isIsoDate, toIsoDate } from "@/lib/dates";
 import type { ActionResult } from "./entries";
 
 export type { ActionResult } from "./entries";
@@ -237,7 +237,9 @@ export async function decideCampaignWinner(campaignId: string): Promise<ActionRe
       reopenedForCorrections: true,
       drawnAt: true,
       participants: { select: { user: { select: { id: true, displayName: true } } } },
-      entries: { select: { userId: true, date: true, value1: true, value2: true } },
+      entries: {
+        select: { userId: true, date: true, value1: true, value2: true, createdAt: true },
+      },
     },
   });
 
@@ -253,7 +255,10 @@ export async function decideCampaignWinner(campaignId: string): Promise<ActionRe
     // Through the range filter for the same reason every read model is: an
     // entry on a day the campaign no longer covers must not buy a raffle
     // ticket or top a leaderboard. See src/lib/campaign-range.ts.
-    withinRange(campaign.entries, campaign),
+    withinRange(campaign.entries, campaign).map((entry) => ({
+      ...entry,
+      registeredOn: toIsoDate(entry.createdAt),
+    })),
     campaign.endDate,
     campaign.type,
   );
