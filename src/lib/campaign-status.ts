@@ -3,8 +3,8 @@ import { daysBetween, today as currentDay, type IsoDate } from "./dates";
 /**
  * Campaign status is *derived*, never stored — a campaign becomes active or
  * ends because the calendar moved, not because something wrote a column. Only
- * the two genuine overrides are persisted: an early close, and an admin
- * reopening an ended campaign for corrections.
+ * the genuine overrides are persisted: an early close, an admin reopening an
+ * ended campaign for corrections, and the moment its winner was settled.
  *
  * Note that reopening deliberately does not resurrect a campaign as "active":
  * it unlocks editing without pushing a finished campaign back onto everyone's
@@ -18,6 +18,18 @@ export interface StatusInput {
   endDate: IsoDate;
   closedEarlyAt: Date | null;
   reopenedForCorrections: boolean;
+  /**
+   * When the winner was settled — drawn on a raffle campaign, named on one
+   * decided by the leaderboard. Null until that has happened, which is what
+   * keeps the campaign open for late entries. See `awaitingWinner`.
+   */
+  drawnAt: Date | null;
+}
+
+/** Just the two dates — all `lastLoggableDay` needs to answer its question. */
+interface Range {
+  startDate: IsoDate;
+  endDate: IsoDate;
 }
 
 export function campaignStatus(campaign: StatusInput, today: IsoDate = currentDay()): CampaignStatus {
@@ -27,10 +39,29 @@ export function campaignStatus(campaign: StatusInput, today: IsoDate = currentDa
   return "active";
 }
 
+/**
+ * The gap between the last day of a campaign and the moment its winner is
+ * settled — the one window in which a campaign is over but still open.
+ *
+ * It exists because the two things people do at the end of a campaign happen on
+ * different days: the last day passes on its own, and a captain runs the draw
+ * whenever the announcement is due. Locking entries the instant the calendar
+ * turned meant anyone who had not typed up the final weekend simply lost it,
+ * while the prize they were losing it for had not been decided yet.
+ *
+ * Nothing about the standings moves during the window that would not have moved
+ * anyway: every day being filled in is a day inside the campaign's own range,
+ * and scoring still stops at the end date.
+ */
+export function awaitingWinner(campaign: StatusInput, today: IsoDate = currentDay()): boolean {
+  return campaignStatus(campaign, today) === "ended" && campaign.drawnAt === null;
+}
+
 /** Whether entries may be created or changed at all right now. */
 export function entriesEditable(campaign: StatusInput, today: IsoDate = currentDay()): boolean {
   if (campaign.reopenedForCorrections) return true;
-  return campaignStatus(campaign, today) === "active";
+  if (campaignStatus(campaign, today) === "active") return true;
+  return awaitingWinner(campaign, today);
 }
 
 /**
@@ -61,15 +92,16 @@ export function daysUntilStart(campaign: StatusInput, today: IsoDate = currentDa
  * The last day anybody could still be filling in.
  *
  * Today while a campaign runs. Its end date once it is over, because a campaign
- * reopened for corrections is edited against the days it actually covered, not
- * against this week. Its start date before it begins, so that anything needing
- * a default day has somewhere sensible to sit.
+ * still open after its last day — or reopened for corrections — is edited
+ * against the days it actually covered, not against this week. Its start date
+ * before it begins, so that anything needing a default day has somewhere
+ * sensible to sit.
  *
- * This currently lands on the same day as `scoringHorizon` in every case, which
- * is a coincidence of two rules agreeing rather than one rule: that one answers
- * "what counts towards the standings", this one "what can still be typed into".
+ * Deliberately a question about the calendar alone: whether those days accept a
+ * value is `entriesEditable`'s business, and a control that has to disable
+ * itself still needs to know which day to open on.
  */
-export function lastLoggableDay(campaign: StatusInput, today: IsoDate = currentDay()): IsoDate {
+export function lastLoggableDay(campaign: Range, today: IsoDate = currentDay()): IsoDate {
   if (today > campaign.endDate) return campaign.endDate;
   if (today < campaign.startDate) return campaign.startDate;
   return today;

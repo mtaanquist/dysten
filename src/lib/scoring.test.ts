@@ -10,6 +10,7 @@ import {
   currentStreak,
   gapToNextRank,
   goalProgress,
+  leader,
   longestStreak,
   missingDays,
   rankMovements,
@@ -91,6 +92,38 @@ describe("assignRanks", () => {
     const rows = [standing("u1", "Amalie Bech", 10), standing("u2", "Jonas Krogh", 20)];
     assignRanks(rows);
     assert.deepEqual(rows.map((row) => row.userId), ["u1", "u2"]);
+  });
+});
+
+describe("leader", () => {
+  it("is the top row of the board", () => {
+    const ranked = assignRanks([
+      standing("u1", "Amalie Bech", 80),
+      standing("u2", "Jonas Krogh", 100),
+    ]);
+    assert.equal(leader(ranked), "u2");
+  });
+
+  /* Everyone on the roster is in the standings, logged or not, so an empty
+     campaign has a top row with nothing on it. It must not win anything. */
+  it("is nobody when nobody logged anything", () => {
+    const ranked = assignRanks([
+      standing("u1", "Amalie Bech", 0),
+      standing("u2", "Jonas Krogh", 0),
+    ]);
+    assert.equal(leader(ranked), null);
+  });
+
+  it("is nobody at all on an empty roster", () => {
+    assert.equal(leader([]), null);
+  });
+
+  it("takes the first of two tied rows, as the board shows them", () => {
+    const ranked = assignRanks([
+      standing("u2", "Zara Vind", 50),
+      standing("u1", "Amalie Bech", 50),
+    ]);
+    assert.equal(leader(ranked), "u1");
   });
 });
 

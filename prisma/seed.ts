@@ -156,6 +156,10 @@ async function main() {
     const hasEnded = definition.endDate < TODAY;
     const upTo = hasEnded ? days.length : days.indexOf(TODAY) + 1;
 
+    // Who ended up where, so a finished campaign can be given the winner it
+    // needs below.
+    const activeDays = new Map<string, number>();
+
     for (const [rosterIndex, key] of definition.roster.entries()) {
       const random = seededRandom(1000 * (campaignIndex + 1) + 37 * (rosterIndex + 1));
       const isStep = definition.type === "step";
@@ -187,10 +191,38 @@ async function main() {
       }
 
       if (rows.length > 0) {
+        activeDays.set(key, rows.filter((row) => row.value1 + row.value2 > 0).length);
         await prisma.entry.createMany({
           data: rows.map((row) => ({ ...row, campaignId: campaign.id, userId: userIds.get(key)! })),
         });
       }
+    }
+
+    /*
+     * A campaign that finished a year ago has had its winner found — that is
+     * what the history screens are here to show, and it is also what closes a
+     * campaign to late entries (see src/lib/campaign-status.ts). Leaving these
+     * two unsettled would put last year's campaigns back on the dashboard as
+     * still open.
+     *
+     * The draw is imitated with the seeded PRNG rather than run for real: a
+     * demo needs a settled winner, not the ticket evidence a genuine draw
+     * stores alongside it.
+     */
+    if (hasEnded && activeDays.size > 0) {
+      const contenders = [...activeDays.entries()];
+      const winner =
+        definition.type === "bike"
+          ? contenders.sort((a, b) => b[1] - a[1])[0][0]
+          : contenders[Math.floor(seededRandom(7 * (campaignIndex + 1))() * contenders.length)][0];
+
+      await prisma.campaign.update({
+        where: { id: campaign.id },
+        data: {
+          drawnAt: new Date(`${definition.endDate}T12:00:00Z`),
+          drawWinnerId: userIds.get(winner)!,
+        },
+      });
     }
   }
 

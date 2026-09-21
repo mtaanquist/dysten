@@ -227,6 +227,23 @@ export function rankMovements(
 }
 
 /**
+ * Who is top of the standings, or null when nobody has anything to be top of.
+ *
+ * The answer to "who won" on a campaign decided by its leaderboard, and the
+ * reason it is a question at all is that everyone on the roster is in the
+ * standings whether they logged or not. A campaign nobody entered has no winner
+ * rather than an arbitrary one, so a leading score of zero is nobody.
+ *
+ * A tie is not broken here: `assignRanks` has already put the rows in order,
+ * and the first of two equal rows is as good an answer as this function can
+ * honestly give. Whoever settles the campaign is looking at the same board.
+ */
+export function leader(standings: Standing[]): string | null {
+  const top = standings[0];
+  return top && top.score > 0 ? top.userId : null;
+}
+
+/**
  * How far the user is from the rank immediately above them, if any.
  *
  * Measured in whatever the campaign ranks on, so a bike campaign says "3 days

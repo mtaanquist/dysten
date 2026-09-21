@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/db";
 import {
+  awaitingWinner,
   campaignStatus,
   daysUntilStart,
   entriesEditable,
   scoringHorizon,
   type CampaignStatus,
+  type StatusInput,
 } from "./campaign-status";
 import { withinRange } from "./campaign-range";
 import { campaignType, isRaffleType, ticketsPerUnit } from "./campaign-types";
@@ -65,6 +67,11 @@ export interface CampaignSummary {
   endDate: IsoDate;
   status: CampaignStatus;
   editable: boolean;
+  /**
+   * Over on the calendar, but still open: the winner has not been settled yet,
+   * so missed days can still be filled in. See src/lib/campaign-status.ts.
+   */
+  awaitingWinner: boolean;
   /** Days left in a running campaign; days until start for an upcoming one. */
   daysRemaining: number;
   daysUntilStart: number;
@@ -148,6 +155,7 @@ export function buildCampaignSummary(
     endDate: campaign.endDate,
     status,
     editable: entriesEditable(campaign, today),
+    awaitingWinner: awaitingWinner(campaign, today),
     daysRemaining: Math.max(0, totalDays - elapsedDays),
     daysUntilStart: daysUntilStart(campaign, today),
     participantCount: campaign.participants.length,
@@ -178,9 +186,15 @@ export function buildCampaignSummary(
 /**
  * Who won a campaign that has finished.
  *
- * On a raffle campaign the top of the leaderboard is not the winner and never
- * becomes one by default — the prize belongs to whoever was drawn, so until the
- * draw has been run there is deliberately no winner to report.
+ * Once a campaign has been settled the answer is the name that was written
+ * down, whichever way it was arrived at — that is the whole point of recording
+ * it, and a later correction must not move the prize.
+ *
+ * Before that the two types differ. A raffle campaign has no winner at all
+ * until its ticket is pulled, and the top of the leaderboard never becomes one
+ * by default. A campaign decided on the board does have a leader, and showing
+ * it is honest as long as it is not called final — which is what
+ * `decided` is for.
  */
 function resolveWinner(
   campaign: CampaignWithData,
@@ -190,25 +204,42 @@ function resolveWinner(
   winnerScore: number;
   wonByDraw: boolean;
   winnerUserId: string | null;
+  decided: boolean;
 } {
-  if (!isRaffleType(campaign.type)) {
-    const top = standings[0];
+  const decided = campaign.drawnAt !== null;
+  const settled = campaign.drawWinner;
+
+  if (settled) {
+    const row = standings.find((entry) => entry.userId === settled.id);
     return {
-      winnerName: top?.displayName ?? null,
-      winnerScore: top?.score ?? 0,
-      wonByDraw: false,
-      winnerUserId: top?.userId ?? null,
+      winnerName: settled.displayName,
+      winnerScore: scoreOf(row, campaign.type),
+      wonByDraw: isRaffleType(campaign.type),
+      winnerUserId: settled.id,
+      decided,
     };
   }
 
-  const drawn = campaign.drawWinner;
-  const row = drawn ? standings.find((entry) => entry.userId === drawn.id) : undefined;
+  if (isRaffleType(campaign.type)) {
+    return { winnerName: null, winnerScore: 0, wonByDraw: true, winnerUserId: null, decided };
+  }
+
+  // Provisional while the campaign is still open, and the final answer for a
+  // campaign that finished before winners were written down at all.
+  const top = standings[0];
   return {
-    winnerName: drawn?.displayName ?? null,
-    winnerScore: row?.total ?? 0,
-    wonByDraw: true,
-    winnerUserId: drawn?.id ?? null,
+    winnerName: top?.displayName ?? null,
+    winnerScore: top?.score ?? 0,
+    wonByDraw: false,
+    winnerUserId: top?.userId ?? null,
+    decided,
   };
+}
+
+/** The winner's headline figure: days out on a bike campaign, steps on a step one. */
+function scoreOf(row: Standing | undefined, type: string): number {
+  if (!row) return 0;
+  return isRaffleType(type) ? row.total : row.score;
 }
 
 function dayCount(from: IsoDate, to: IsoDate): number {
@@ -239,6 +270,12 @@ export interface PastCampaignRow {
    * runs, so "not yet" is a real state rather than missing data.
    */
   winnerName: string | null;
+  /**
+   * Whether the winner has been settled. Until it has, the campaign is still
+   * taking entries, and a leaderboard campaign's winner is only its current
+   * leader.
+   */
+  decided: boolean;
   /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
   /** True when the winner was drawn rather than topped the board. */
@@ -258,9 +295,19 @@ export async function getDashboardData(userId: string, pastPage = 0): Promise<Da
     orderBy: { startDate: "asc" },
   });
 
-  const live = campaigns.filter((campaign) => campaignStatus(campaign, today) !== "ended");
+  /*
+   * A campaign that has run out of days but has not been settled yet belongs
+   * with the live ones rather than in the archive: it still accepts entries,
+   * and the dashboard is where people go to make them. It moves down to
+   * "previous" when its winner is decided — which is also when it locks.
+   */
+  const live = campaigns.filter(
+    (campaign) => campaignStatus(campaign, today) !== "ended" || awaitingWinner(campaign, today),
+  );
   const ended = campaigns
-    .filter((campaign) => campaignStatus(campaign, today) === "ended")
+    .filter(
+      (campaign) => campaignStatus(campaign, today) === "ended" && !awaitingWinner(campaign, today),
+    )
     .sort((a, b) => b.endDate.localeCompare(a.endDate));
 
   const summaries = live.map((campaign) => buildCampaignSummary(campaign, userId, today));
@@ -421,25 +468,51 @@ export async function getCampaignDetail(
 export async function getDefaultCampaignId(userId: string): Promise<string | null> {
   const today = currentDay();
   const campaigns = await prisma.campaign.findMany({
-    select: { id: true, startDate: true, endDate: true, closedEarlyAt: true, reopenedForCorrections: true, participants: { where: { userId }, select: { id: true } } },
+    select: {
+      id: true,
+      startDate: true,
+      endDate: true,
+      closedEarlyAt: true,
+      reopenedForCorrections: true,
+      drawnAt: true,
+      participants: { where: { userId }, select: { id: true } },
+    },
     orderBy: { startDate: "asc" },
   });
 
-  const active = campaigns.filter((campaign) => campaignStatus(campaign, today) === "active");
+  const active = campaigns.filter((campaign) => isOpenForEntry(campaign, today));
   return (
     active.find((campaign) => campaign.participants.length > 0)?.id ?? active[0]?.id ?? campaigns[0]?.id ?? null
   );
 }
 
-/** Active campaigns, for the campaign page's switcher pills. */
+/**
+ * Whether a campaign is somewhere people should still be sent to log: running,
+ * or finished and waiting on its winner. The switcher and the default landing
+ * campaign both ask this, so a campaign cannot be offered by one and hidden by
+ * the other.
+ */
+function isOpenForEntry(campaign: StatusInput, today: IsoDate): boolean {
+  return campaignStatus(campaign, today) === "active" || awaitingWinner(campaign, today);
+}
+
+/** Campaigns still open for entry, for the campaign page's switcher pills. */
 export async function getCampaignSwitcher(): Promise<{ id: string; name: string }[]> {
   const today = currentDay();
   const campaigns = await prisma.campaign.findMany({
-    select: { id: true, name: true, startDate: true, endDate: true, closedEarlyAt: true, reopenedForCorrections: true },
+    select: {
+      id: true,
+      name: true,
+      startDate: true,
+      endDate: true,
+      closedEarlyAt: true,
+      reopenedForCorrections: true,
+      drawnAt: true,
+    },
     orderBy: { startDate: "asc" },
   });
   return campaigns
-    .filter((campaign) => campaignStatus(campaign, today) === "active")
+    .filter((campaign) => isOpenForEntry(campaign, today))
     .map(({ id, name }) => ({ id, name }));
 }
 
@@ -479,6 +552,7 @@ export async function getPersonDetail(
         endDate: true,
         closedEarlyAt: true,
         reopenedForCorrections: true,
+        drawnAt: true,
       },
     }),
     prisma.user.findUnique({
@@ -533,6 +607,12 @@ export interface HistoryRow {
    * runs, so "not yet" is a real state rather than missing data.
    */
   winnerName: string | null;
+  /**
+   * Whether the winner has been settled. Until it has, the campaign is still
+   * taking entries, and a leaderboard campaign's winner is only its current
+   * leader.
+   */
+  decided: boolean;
   /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
   /** True when the winner was drawn rather than topped the board. */
@@ -582,14 +662,18 @@ export interface HistoryDetail {
    * runs, so "not yet" is a real state rather than missing data.
    */
   winnerName: string | null;
+  /**
+   * Whether the winner has been settled. Until it has, the campaign is still
+   * taking entries, and a leaderboard campaign's winner is only its current
+   * leader.
+   */
+  decided: boolean;
   /** The winner's figure — steps, or days out on a bike campaign. */
   winnerScore: number;
   /** True when the winner was drawn rather than topped the board. */
   wonByDraw: boolean;
   /** The winner's id, so a row can be marked without re-deriving who won. */
   winnerUserId: string | null;
-  /** True once the draw has been run, whatever it produced. */
-  drawn: boolean;
   standings: Standing[];
   roster: { id: string; displayName: string }[];
 }
@@ -618,7 +702,6 @@ export async function getHistoryDetail(campaignId: string): Promise<HistoryDetai
     endDate: campaign.endDate,
     reopenedForCorrections: campaign.reopenedForCorrections,
     ...resolveWinner(campaign, standings),
-    drawn: campaign.drawnAt !== null,
     standings,
     roster: campaign.participants.map((participation) => ({
       id: participation.user.id,

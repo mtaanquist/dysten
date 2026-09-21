@@ -22,10 +22,15 @@ export function OpenCampaignCard({ summary }: { summary: CampaignSummary }) {
   const { showToast } = useToast();
   const [pending, startTransition] = useTransition();
 
+  // A campaign only appears here while it can still be joined, which now
+  // includes one that is over but not yet settled — "0 days remaining" is not
+  // what to say about that one.
   const timeLabel =
     summary.status === "upcoming"
       ? t("campaign.startsIn", { count: summary.daysUntilStart })
-      : `${summary.daysRemaining} ${t("campaign.daysRemaining", { count: summary.daysRemaining })}`;
+      : summary.status === "ended"
+        ? t("campaign.endedOpen")
+        : `${summary.daysRemaining} ${t("campaign.daysRemaining", { count: summary.daysRemaining })}`;
 
   return (
     <article className={styles.card}>

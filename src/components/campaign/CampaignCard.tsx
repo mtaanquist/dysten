@@ -25,7 +25,9 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
     summary.status === "upcoming"
       ? t("campaign.startsIn", { count: summary.daysUntilStart })
       : summary.status === "ended"
-        ? t("campaign.ended")
+        ? summary.awaitingWinner
+          ? t("campaign.endedOpen")
+          : t("campaign.ended")
         : `${summary.daysRemaining} ${t("campaign.daysRemaining", { count: summary.daysRemaining })}`;
 
   return (

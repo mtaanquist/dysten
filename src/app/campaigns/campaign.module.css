@@ -104,6 +104,18 @@
   color: var(--c-ink-soft);
 }
 
+/* The campaign is over but still open for the days people owe. Deliberately a
+   note rather than a warning: nothing is wrong, there is just still time. */
+.afterEnd {
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-inner);
+  background: var(--c-blue-soft);
+  color: var(--c-ink);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+}
+
 .highlightSlot {
   margin-top: var(--sp-4);
 }
