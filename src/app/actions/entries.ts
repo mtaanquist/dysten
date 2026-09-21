@@ -43,6 +43,7 @@ export async function saveEntry(input: {
       endDate: true,
       closedEarlyAt: true,
       reopenedForCorrections: true,
+      drawnAt: true,
     },
   });
   if (!campaign) return { ok: false, error: "errors.notFound" };
@@ -113,6 +114,7 @@ export async function deleteEntry(input: {
       endDate: true,
       closedEarlyAt: true,
       reopenedForCorrections: true,
+      drawnAt: true,
     },
   });
   if (!campaign) return { ok: false, error: "errors.notFound" };

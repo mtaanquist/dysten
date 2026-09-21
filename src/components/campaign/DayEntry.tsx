@@ -68,7 +68,7 @@ export function DayEntry({
 
   const { decimals, inputStep } = campaignType(type);
 
-  const lastLoggable = lastLoggableDay({ startDate, endDate, closedEarlyAt: null, reopenedForCorrections: false }, today);
+  const lastLoggable = lastLoggableDay({ startDate, endDate }, today);
 
   // Shared with the month grid and the calculator — see ./EntryDay.
   const { selected, select: setSelected, lastWrite } = useEntryDay();

@@ -75,24 +75,35 @@ model Campaign {
   goalValue Float?
   goalName  String?
 
-  /// Set when a captain/admin closes the campaign before its end date.
+  /// Set when a captain/admin closes the campaign before its end date. It ends
+  /// the campaign as though its last day had passed; entries stay open until
+  /// the winner is settled, exactly as they would have.
   /// Status is otherwise derived from the dates — see src/lib/campaign-status.ts.
   closedEarlyAt DateTime?
   /// An admin reopening an ended campaign unlocks entry editing without
   /// putting the campaign back on everyone's dashboard as "active".
   reopenedForCorrections Boolean @default(false)
 
-  /// The result of a raffle campaign's prize draw, written down rather than
-  /// derived. Everything else about a campaign's state is recomputed from the
-  /// calendar, but a draw cannot be: it is random, so recomputing it would
-  /// produce a different winner on every read, and an admin correcting an entry
-  /// after the fact must not change who won. See src/lib/raffle.ts.
+  /// When the campaign's winner was settled — a ticket drawn from the pool on
+  /// a raffle campaign, the top of the board named on one decided by the
+  /// leaderboard. Written down rather than derived. Everything else about a
+  /// campaign's state is recomputed from the calendar, but a draw cannot be:
+  /// it is random, so recomputing it would produce a different winner on every
+  /// read, and an admin correcting an entry after the fact must not change who
+  /// won. See src/lib/raffle.ts.
+  ///
+  /// It is also the moment a finished campaign stops taking entries. The
+  /// calendar cannot decide that on its own: people are still typing up their
+  /// last days while the prize is still undecided. See
+  /// src/lib/campaign-status.ts.
   drawnAt         DateTime?
   drawWinnerId    String?
   drawWinner      User?     @relation("CampaignDrawWinner", fields: [drawWinnerId], references: [id], onDelete: SetNull)
   /// Which ticket in the pool was drawn. Together with the snapshot below this
   /// makes the result checkable afterwards: rebuild the pool from the counts,
-  /// walk to the index, and confirm it lands on the named winner.
+  /// walk to the index, and confirm it lands on the named winner. Both stay
+  /// null on a campaign won off the top of the board, where the standings
+  /// themselves are the evidence.
   drawTicketIndex Int?
   /// JSON — [{ "userId": …, "tickets": n }] exactly as the pool stood when the
   /// draw was made. A string rather than a column type because it is only ever

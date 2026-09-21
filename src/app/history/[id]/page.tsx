@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getHistoryDetail, getPersonDetail } from "@/lib/queries";
-import { canAdminister, canDrawWinner, canReopenCampaign } from "@/lib/permissions";
+import { canAdminister, canDecideWinner, canReopenCampaign } from "@/lib/permissions";
 import { accentStyle, ranksByActiveDays } from "@/lib/campaign-types";
 import { today } from "@/lib/dates";
 import { createTranslator } from "@/i18n/translate";
@@ -11,7 +11,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Avatar, Panel, PanelTitle, Pill } from "@/components/ui";
 import { PersonDrawer } from "@/components/campaign/PersonDrawer";
 import { ReopenButton } from "@/components/history/ReopenButton";
-import { DrawWinnerButton } from "@/components/history/DrawWinnerButton";
+import { DecideWinnerButton } from "@/components/history/DecideWinnerButton";
 import styles from "../history.module.css";
 
 export default async function HistoryDetailPage({
@@ -35,9 +35,15 @@ export default async function HistoryDetailPage({
   const unit = t(`campaignTypes.${detail.type}.unit` as never);
   const byDays = ranksByActiveDays(detail.type);
 
-  // A raffle campaign that has finished but not yet been drawn has no winner
-  // to name — and must not borrow the top of the leaderboard as a stand-in.
-  const awaitingDraw = detail.wonByDraw && !detail.drawn;
+  /*
+   * A campaign nobody has settled yet is still taking entries, so whatever the
+   * standings say is provisional. A raffle campaign has no winner at all until
+   * its ticket is drawn and must not borrow the top of the leaderboard as a
+   * stand-in; one decided on the board has a leader, which is worth showing as
+   * long as it is labelled as the lead rather than the result.
+   */
+  const undecided = !detail.decided;
+  const awaitingDraw = detail.wonByDraw && undecided;
 
   const personDetail = person ? await getPersonDetail(id, person) : null;
 
@@ -56,7 +62,9 @@ export default async function HistoryDetailPage({
           <div className={styles.meta}>{format.dateRange(detail.startDate, detail.endDate)}</div>
 
           <div className={styles.winnerBanner}>
-            <div className={styles.winnerLabel}>{t("history.winner")}</div>
+            <div className={styles.winnerLabel}>
+              {undecided && !detail.wonByDraw ? t("history.leading") : t("history.winner")}
+            </div>
             <div className={styles.winnerBig}>
               {detail.winnerName ?? (awaitingDraw ? t("history.notDrawnYet") : "–")}
             </div>
@@ -68,9 +76,11 @@ export default async function HistoryDetailPage({
               </div>
             ) : null}
 
+            {undecided ? <div className={styles.stillOpen}>{t("history.stillOpen")}</div> : null}
+
             <div className={styles.actionSlot}>
-              {awaitingDraw && canDrawWinner(user) ? (
-                <DrawWinnerButton campaignId={detail.id} />
+              {undecided && canDecideWinner(user) ? (
+                <DecideWinnerButton campaignId={detail.id} isRaffle={detail.wonByDraw} />
               ) : null}
               {canReopenCampaign(user) ? (
                 <ReopenButton campaignId={detail.id} alreadyReopened={detail.reopenedForCorrections} />
@@ -81,7 +91,11 @@ export default async function HistoryDetailPage({
 
         <div className={styles.detailColumns}>
           <Panel>
-            <PanelTitle>{t("history.finalStandings")}</PanelTitle>
+            {/* Nothing is final while the campaign still takes entries, so it
+                is only called that once the winner has been settled. */}
+            <PanelTitle>
+              {undecided ? t("campaign.leaderboard") : t("history.finalStandings")}
+            </PanelTitle>
             <div className={styles.scroller}>
               <div className={styles.standings}>
                 <div className={styles.standingsHead}>

@@ -72,7 +72,9 @@ export default async function CampaignPage({
           </div>
           <div className={styles.countdown}>
             {summary.status === "ended" ? (
-              <div className={styles.endedLabel}>{t("campaign.ended")}</div>
+              <div className={styles.endedLabel}>
+                {summary.awaitingWinner ? t("campaign.endedOpen") : t("campaign.ended")}
+              </div>
             ) : (
               <>
                 <div className={styles.countdownNumber}>
@@ -98,22 +100,19 @@ export default async function CampaignPage({
               subtitle said both again on the way past. */}
           <PanelTitle>{t("campaign.myEntries")}</PanelTitle>
 
+          {/* The campaign has run out of days but nobody has settled it yet, so
+              the days somebody never got round to typing in are still theirs to
+              fill. Said once, here, rather than inside both entry controls. */}
+          {summary.awaitingWinner && summary.isParticipant ? (
+            <p className={styles.afterEnd}>{t("campaign.entriesAfterEnd")}</p>
+          ) : null}
+
           {summary.isParticipant ? (
             /* Two controls over the same data, one visible per viewport: the
                month grid at desk widths, the day-at-a-time form on a phone.
                They share one selected day, so the calculator underneath can
                write into whichever of them is on screen. */
-            <EntryDayProvider
-              initial={lastLoggableDay(
-                {
-                  startDate: summary.startDate,
-                  endDate: summary.endDate,
-                  closedEarlyAt: null,
-                  reopenedForCorrections: false,
-                },
-                today(),
-              )}
-            >
+            <EntryDayProvider initial={lastLoggableDay(summary, today())}>
               <EntryCalendar
                 campaignId={summary.id}
                 type={summary.type}

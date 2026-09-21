@@ -8,16 +8,16 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   canAssignRoles,
   canCloseCampaign,
+  canDecideWinner,
   canDeleteCampaign,
-  canDrawWinner,
   canManageCampaigns,
   canManageRoster,
   canReopenCampaign,
 } from "@/lib/permissions";
 import { narrowsRange, withinRange } from "@/lib/campaign-range";
 import { isCampaignTypeKey, isRaffleType, ticketsPerUnit } from "@/lib/campaign-types";
-import { campaignStatus } from "@/lib/campaign-status";
-import { computeStandings } from "@/lib/scoring";
+import { awaitingWinner, campaignStatus } from "@/lib/campaign-status";
+import { computeStandings, leader, type Standing } from "@/lib/scoring";
 import { poolSize, ticketHolders, winnerAt } from "@/lib/raffle";
 import { isIsoDate } from "@/lib/dates";
 import type { ActionResult } from "./entries";
@@ -31,13 +31,25 @@ export async function joinCampaign(campaignId: string): Promise<ActionResult> {
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId },
-    select: { id: true, startDate: true, endDate: true, closedEarlyAt: true, reopenedForCorrections: true },
+    select: {
+      id: true,
+      startDate: true,
+      endDate: true,
+      closedEarlyAt: true,
+      reopenedForCorrections: true,
+      drawnAt: true,
+    },
   });
   if (!campaign) return { ok: false, error: "errors.notFound" };
 
-  // Joining a campaign that has already finished would put someone on a
-  // historical roster they were never part of.
-  if (campaignStatus(campaign) === "ended") return { ok: false, error: "errors.campaignLocked" };
+  // Joining a campaign whose winner has been settled would put someone on a
+  // historical roster they were never part of. A campaign that has run out of
+  // days but not yet been decided is a different case: it still accepts
+  // entries, so somebody who was left off the roster can still be let on to
+  // type up the days they walked.
+  if (campaignStatus(campaign) === "ended" && !awaitingWinner(campaign)) {
+    return { ok: false, error: "errors.campaignLocked" };
+  }
 
   await prisma.participation.upsert({
     where: { campaignId_userId: { campaignId, userId: user.id } },
@@ -169,7 +181,13 @@ export async function saveCampaign(input: CampaignInput): Promise<SaveCampaignRe
   return { ok: true };
 }
 
-/** Ends a running campaign now. Entries become read-only from this moment. */
+/**
+ * Ends a running campaign now, as though its last day had passed.
+ *
+ * It does not lock the entries: like a campaign that simply ran out of days,
+ * this one stays open until its winner is settled, so nobody loses the days
+ * they had not typed up yet. Deciding the winner is what closes it.
+ */
 export async function closeCampaign(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: "errors.signedOut" };
@@ -185,22 +203,28 @@ export async function closeCampaign(campaignId: string): Promise<ActionResult> {
 }
 
 /**
- * Draws the winner of a finished raffle campaign.
+ * Settles who won a finished campaign, and with it closes the campaign to
+ * further entries.
  *
- * The result is written down, not derived. It could not be derived even in
- * principle — a recomputed random winner would differ on every read — and
- * storing it is also what stops a later admin correction from quietly handing
- * the prize to somebody else. The ticket counts and the winning index go into
- * the same row, so the draw can be checked afterwards rather than taken on
- * trust.
+ * Two campaign types, one decision. A raffle campaign pulls a ticket out of the
+ * pool; a campaign decided on the leaderboard takes whoever is on top of it.
+ * Either way the answer is written down rather than left to be derived, for the
+ * same two reasons: a redrawn random winner would differ on every read, and an
+ * admin correcting an entry afterwards must not quietly hand the prize to
+ * somebody else. The ticket counts and the winning index go into the same row
+ * on a raffle, so the draw can be checked afterwards rather than taken on trust.
  *
- * Drawing once is the rule. There is no redraw: the point of writing the result
- * down is that it stays written.
+ * Deciding once is the rule. There is no redraw: the point of writing the
+ * result down is that it stays written.
+ *
+ * It is also the moment late entries stop being accepted — a campaign is over
+ * on the calendar but still open until somebody settles it. See
+ * src/lib/campaign-status.ts.
  */
-export async function drawCampaignWinner(campaignId: string): Promise<ActionResult> {
+export async function decideCampaignWinner(campaignId: string): Promise<ActionResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: "errors.signedOut" };
-  if (!canDrawWinner(user)) return { ok: false, error: "errors.notAuthorised" };
+  if (!canDecideWinner(user)) return { ok: false, error: "errors.notAuthorised" };
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId },
@@ -218,42 +242,69 @@ export async function drawCampaignWinner(campaignId: string): Promise<ActionResu
   });
 
   if (!campaign) return { ok: false, error: "errors.notFound" };
-  if (!isRaffleType(campaign.type)) return { ok: false, error: "errors.notARaffle" };
   if (campaignStatus(campaign) !== "ended") return { ok: false, error: "errors.campaignNotEnded" };
-  if (campaign.drawnAt) return { ok: false, error: "errors.alreadyDrawn" };
+  if (campaign.drawnAt) return { ok: false, error: "errors.alreadyDecided" };
 
-  // Scored to the end date, not to today: a campaign reopened for corrections
-  // must still be judged on the days it actually ran.
+  // Scored to the end date, not to today: the days logged after the campaign
+  // ran out are days inside its range, and the campaign is still judged on the
+  // days it actually ran.
   const standings = computeStandings(
     campaign.participants.map((row) => ({ id: row.user.id, displayName: row.user.displayName })),
     // Through the range filter for the same reason every read model is: an
     // entry on a day the campaign no longer covers must not buy a raffle
-    // ticket. See src/lib/campaign-range.ts.
+    // ticket or top a leaderboard. See src/lib/campaign-range.ts.
     withinRange(campaign.entries, campaign),
     campaign.endDate,
     campaign.type,
   );
 
-  const holders = ticketHolders(standings, ticketsPerUnit(campaign.type));
-  const size = poolSize(holders);
-  if (size === 0) return { ok: false, error: "errors.nothingToDraw" };
-
-  const ticketIndex = randomInt(size);
-  const winnerId = winnerAt(holders, ticketIndex);
-  if (!winnerId) return { ok: false, error: "errors.nothingToDraw" };
+  const outcome = isRaffleType(campaign.type)
+    ? drawFromPool(standings, ticketsPerUnit(campaign.type))
+    : topOfBoard(standings);
+  if (!outcome) return { ok: false, error: "errors.nobodyToDecide" };
 
   await prisma.campaign.update({
     where: { id: campaignId },
     data: {
       drawnAt: new Date(),
-      drawWinnerId: winnerId,
-      drawTicketIndex: ticketIndex,
-      drawTickets: JSON.stringify(holders),
+      drawWinnerId: outcome.winnerId,
+      drawTicketIndex: outcome.ticketIndex,
+      drawTickets: outcome.tickets,
     },
   });
 
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+/**
+ * How a decision is recorded. The two ticket columns are a raffle's evidence
+ * and stay null on a campaign won off the top of the board — there is nothing
+ * to check afterwards when the standings themselves are the answer.
+ */
+interface WinnerOutcome {
+  winnerId: string;
+  ticketIndex: number | null;
+  tickets: string | null;
+}
+
+/** A ticket out of the pool. Null when nobody logged anything to draw from. */
+function drawFromPool(standings: Standing[], per: number): WinnerOutcome | null {
+  const holders = ticketHolders(standings, per);
+  const size = poolSize(holders);
+  if (size === 0) return null;
+
+  const ticketIndex = randomInt(size);
+  const winnerId = winnerAt(holders, ticketIndex);
+  if (!winnerId) return null;
+
+  return { winnerId, ticketIndex, tickets: JSON.stringify(holders) };
+}
+
+/** Whoever leads the standings, with nothing to check afterwards. */
+function topOfBoard(standings: Standing[]): WinnerOutcome | null {
+  const winnerId = leader(standings);
+  return winnerId ? { winnerId, ticketIndex: null, tickets: null } : null;
 }
 
 /**

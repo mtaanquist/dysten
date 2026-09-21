@@ -31,11 +31,16 @@ export function canReopenCampaign(user: SessionUser): boolean {
 }
 
 /**
- * Drawing a raffle campaign's winner. A captain runs the campaign, so a captain
- * runs its draw — but only once, which the action enforces: the result is a
- * stored fact, and permission is not the thing that keeps it from being redone.
+ * Settling a finished campaign's winner — drawing a ticket on a raffle
+ * campaign, naming the top of the board on one decided by the leaderboard. A
+ * captain runs the campaign, so a captain settles it — but only once, which the
+ * action enforces: the result is a stored fact, and permission is not the thing
+ * that keeps it from being redone.
+ *
+ * It is also what closes the campaign to late entries, so it is deliberately a
+ * person's decision and not a date. See src/lib/campaign-status.ts.
  */
-export function canDrawWinner(user: SessionUser): boolean {
+export function canDecideWinner(user: SessionUser): boolean {
   return canManageCampaigns(user);
 }
 

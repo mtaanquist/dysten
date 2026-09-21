@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  awaitingWinner,
   campaignStatus,
   daysUntilStart,
   entriesEditable,
@@ -20,15 +21,21 @@ import {
  * beginning tomorrow has ended.
  */
 
-/** September 2026, with neither override set. */
+/** September 2026, with no override set and no winner decided. */
 function campaign(overrides: Partial<StatusInput> = {}): StatusInput {
   return {
     startDate: "2026-09-01",
     endDate: "2026-09-30",
     closedEarlyAt: null,
     reopenedForCorrections: false,
+    drawnAt: null,
     ...overrides,
   };
+}
+
+/** The same campaign, with its winner settled on the 5th of October. */
+function decided(overrides: Partial<StatusInput> = {}): StatusInput {
+  return campaign({ drawnAt: new Date("2026-10-05T10:00:00Z"), ...overrides });
 }
 
 describe("campaignStatus", () => {
@@ -57,6 +64,36 @@ describe("campaignStatus", () => {
     const reopened = campaign({ reopenedForCorrections: true });
     assert.equal(campaignStatus(reopened, "2026-10-05"), "ended");
   });
+
+  it("is ended from its last day on, decided or not", () => {
+    assert.equal(campaignStatus(decided(), "2026-10-01"), "ended");
+  });
+});
+
+/* The window between the calendar running out and somebody settling the
+   winner. Both ends matter: a campaign still running is not in it, and one
+   whose winner is decided has left it for good. */
+describe("awaitingWinner", () => {
+  it("is false while the campaign is still running", () => {
+    assert.equal(awaitingWinner(campaign(), "2026-09-30"), false);
+  });
+
+  it("opens the day after the end date", () => {
+    assert.equal(awaitingWinner(campaign(), "2026-10-01"), true);
+  });
+
+  it("does not close on its own, however long nobody draws", () => {
+    assert.equal(awaitingWinner(campaign(), "2027-03-01"), true);
+  });
+
+  it("closes when the winner is decided", () => {
+    assert.equal(awaitingWinner(decided(), "2026-10-06"), false);
+  });
+
+  it("covers a campaign closed early, not just one that ran out of days", () => {
+    const closed = campaign({ closedEarlyAt: new Date("2026-09-10T09:00:00Z") });
+    assert.equal(awaitingWinner(closed, "2026-09-15"), true);
+  });
 });
 
 describe("entriesEditable", () => {
@@ -68,22 +105,34 @@ describe("entriesEditable", () => {
     assert.equal(entriesEditable(campaign(), "2026-09-15"), true);
   });
 
-  it("is false once it has ended", () => {
-    assert.equal(entriesEditable(campaign(), "2026-10-01"), false);
+  /* The point of the window: the last weekend of a campaign is typed up after
+     it has ended, and the prize it counts towards has not been handed out yet
+     either. */
+  it("stays true after the end date while the winner is still undecided", () => {
+    assert.equal(entriesEditable(campaign(), "2026-10-01"), true);
   });
 
-  it("is true again when an admin reopens it", () => {
-    const reopened = campaign({ reopenedForCorrections: true });
-    assert.equal(entriesEditable(reopened, "2026-10-01"), true);
+  it("is false once the winner has been decided", () => {
+    assert.equal(entriesEditable(decided(), "2026-10-06"), false);
+  });
+
+  it("is false once a closed-early campaign has been decided", () => {
+    const closed = decided({ closedEarlyAt: new Date("2026-09-10T09:00:00Z") });
+    assert.equal(entriesEditable(closed, "2026-09-15"), false);
+  });
+
+  it("is true again when an admin reopens a decided campaign", () => {
+    const reopened = decided({ reopenedForCorrections: true });
+    assert.equal(entriesEditable(reopened, "2026-10-10"), true);
   });
 
   /* Locked before and locked after are the same boolean but not the same
      sentence, so the UI must ask status, not just editability. */
-  it("locks upcoming and ended alike, leaving them distinguishable by status", () => {
+  it("locks upcoming and settled alike, leaving them distinguishable by status", () => {
     const before = "2026-08-31";
-    const after = "2026-10-01";
-    assert.equal(entriesEditable(campaign(), before), entriesEditable(campaign(), after));
-    assert.notEqual(campaignStatus(campaign(), before), campaignStatus(campaign(), after));
+    const after = "2026-10-06";
+    assert.equal(entriesEditable(campaign(), before), entriesEditable(decided(), after));
+    assert.notEqual(campaignStatus(campaign(), before), campaignStatus(decided(), after));
   });
 });
 
@@ -148,6 +197,14 @@ describe("lastLoggableDay", () => {
 });
 
 describe("isLoggableDay", () => {
+  it("accepts a day inside the range after the campaign ended, until it is decided", () => {
+    assert.equal(isLoggableDay(campaign(), "2026-09-30", "2026-10-03"), true);
+  });
+
+  it("refuses the same day once the winner has been decided", () => {
+    assert.equal(isLoggableDay(decided(), "2026-09-30", "2026-10-06"), false);
+  });
+
   it("refuses a day before the campaign has started", () => {
     assert.equal(isLoggableDay(campaign(), "2026-09-01", "2026-08-31"), false);
   });

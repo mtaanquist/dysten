@@ -71,6 +71,13 @@ wherever it appears.
 highlighted, and the roster exactly as it stood at the end. An admin who reopens
 one for corrections gets the same editable day-by-day panel there.
 
+**The days after a campaign ends.** A campaign does not lock the moment its last
+day passes. It stays open — on the dashboard, in the campaign switcher, taking
+entries for the days it covered — until a captain settles the winner, which on a
+step campaign means drawing a ticket and on a bike campaign naming whoever got
+out most. Nobody loses the weekend they had not typed up yet, and the prize is
+decided on a complete set of numbers.
+
 **Management.** For captains and admins: create and edit campaigns, manage
 rosters, close a campaign early. Admins can additionally assign roles, delete
 campaigns, and reopen a finished one to correct entries.
@@ -431,6 +438,7 @@ exercising for the first time in production.
 | See everyone's stats and daily entries | ✓ | ✓ | ✓ |
 | Create and edit campaigns | | ✓ | ✓ |
 | Manage rosters, close a campaign early | | ✓ | ✓ |
+| Decide a finished campaign's winner | | ✓ | ✓ |
 | Assign roles | | | ✓ |
 | Correct or delete anyone's entry | | | ✓ |
 | Delete a campaign, reopen a finished one | | | ✓ |
@@ -527,10 +535,14 @@ board.
 
 - **`topScore`** — the leaderboard decides it. Whoever is first, wins.
 - **`raffle`** — logging earns tickets, one per `ticketsPer` units and at least
-  one for anybody who logged at all, and a captain draws one when the campaign
-  ends. The board still sorts on `rankBy`, because watching the numbers is what
-  makes people turn out; it just no longer hands over the prize by itself. See
+  one for anybody who logged at all, and the winner is the ticket drawn. The
+  board still sorts on `rankBy`, because watching the numbers is what makes
+  people turn out; it just no longer hands over the prize by itself. See
   [`src/lib/raffle.ts`](src/lib/raffle.ts).
+
+Either way a captain settles it with a button once the campaign is over, and
+that moment — not the last day on the calendar — is what closes the campaign to
+entries.
 
 Keeping the two apart is deliberate. Folding a raffle into `rankBy` would have
 dragged the sort, the gap and the chart into a change that has nothing to do
@@ -755,17 +767,25 @@ A few decisions worth knowing before you change things:
   logged at 23:00 in Copenhagen lands on the previous day once it passes through
   UTC.
 - **Status is derived, never stored.** A campaign is upcoming, active or ended
-  because of its dates. Only two real overrides are persisted: closing early,
-  and reopening for corrections. Reopening deliberately does not make a finished
-  campaign "active" again — it unlocks editing without putting it back on
-  everyone's dashboard.
+  because of its dates. Only the real overrides are persisted: closing early,
+  reopening for corrections, and the moment the winner was settled. Reopening
+  deliberately does not make a finished campaign "active" again — it unlocks
+  editing without putting it back on everyone's dashboard.
+- **Ending and locking are two different moments.** The calendar ends a
+  campaign; a person settling its winner locks it. In between it is over but
+  still open, which is the only state in which an entry can be written against a
+  campaign that has already finished. The rule lives in
+  [`campaign-status.ts`](src/lib/campaign-status.ts), so every screen and every
+  action agrees on where the line is.
 - **Ranks are computed at read time** and shared on ties. Correcting a
   three-year-old entry cannot leave a stale standing behind.
-- **A raffle draw is the one result that is written down.** It cannot be
-  derived: recomputing a random winner would name somebody different on every
-  read, and an admin correcting an entry weeks later must not move the prize.
-  The winner is stored with the ticket counts it came from and the index drawn,
-  which is enough to check the result afterwards rather than take it on trust.
+- **The winner is the one result that is written down.** A draw cannot be
+  derived — recomputing a random winner would name somebody different on every
+  read — and an admin correcting an entry weeks later must not move the prize,
+  whichever way it was won. A raffle stores the ticket counts it came from and
+  the index drawn, which is enough to check the result afterwards rather than
+  take it on trust; a campaign won off the top of the board stores the name,
+  because the standings are their own evidence.
 - **The competitive rules live in the type registry**, as two words rather than
   one. `rankBy` decides what the standings sort on, and every comparison — the
   sort, the gap, the chart — reads the `score` it produces. `winnerBy` decides

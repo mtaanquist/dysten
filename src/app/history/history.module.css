@@ -132,8 +132,17 @@
   font-weight: var(--fw-semibold);
 }
 
-/* Holds the draw and reopen buttons; both can be present at once for an
-   admin looking at a finished raffle that has not been drawn. */
+/* Says the campaign is over but still open, so the name beside it is where
+   things stand rather than who won. */
+.stillOpen {
+  font-size: var(--fs-meta);
+  color: var(--c-maroon-fg);
+  font-weight: var(--fw-semibold);
+  max-width: 34ch;
+}
+
+/* Holds the decide-winner and reopen buttons; both can be present at once for
+   an admin looking at a finished campaign nobody has settled yet. */
 .actionSlot {
   margin-left: auto;
   display: flex;
