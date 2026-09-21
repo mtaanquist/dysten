@@ -37,7 +37,11 @@ export function CampaignCard({ summary }: { summary: CampaignSummary }) {
           <Pill tone="type" style={accentStyle(summary.type)}>
             {t(`campaignTypes.${summary.type}.name` as never)}
           </Pill>
-          {summary.myStreak >= 2 ? (
+          {/* A streak is a run you are keeping going, so it belongs on a
+              campaign that can still be added to. A finished one — which now
+              stays on the dashboard while it waits for its winner — would be
+              showing a badge about a run that ended with it. */}
+          {summary.status !== "ended" && summary.myStreak >= 2 ? (
             <Pill tone="maroon">{t("campaign.streakBadge", { count: summary.myStreak })}</Pill>
           ) : null}
         </div>

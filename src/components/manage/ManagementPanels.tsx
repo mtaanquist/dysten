@@ -10,6 +10,7 @@ import type { ManagementData } from "@/lib/queries";
 import {
   addParticipant,
   closeCampaign,
+  decideCampaignWinner,
   deleteCampaign,
   removeParticipant,
   saveCampaign,
@@ -254,6 +255,37 @@ export function CampaignAdminList({
                   }}
                 >
                   {t("manage.closeEarly")}
+                </button>
+              ) : null}
+
+              {/* The other half of closing a campaign: ending it stops the
+                  clock, settling the winner stops the entries. Plain secondary
+                  styling rather than the filled button the campaign and history
+                  screens use — this is a row of management actions, not the
+                  moment itself. */}
+              {campaign.awaitingWinner ? (
+                <button
+                  type="button"
+                  className={styles.secondary}
+                  disabled={pending}
+                  onClick={() => {
+                    const confirmKey = campaign.isRaffle
+                      ? "campaign.confirmDrawWinner"
+                      : "campaign.confirmDecideWinner";
+                    if (!window.confirm(t(confirmKey))) return;
+                    startTransition(async () => {
+                      const result = await decideCampaignWinner(campaign.id);
+                      showToast(
+                        result.ok
+                          ? campaign.isRaffle
+                            ? "toast.winnerDrawn"
+                            : "toast.winnerDecided"
+                          : result.error,
+                      );
+                    });
+                  }}
+                >
+                  {t(campaign.isRaffle ? "campaign.drawWinner" : "campaign.decideWinner")}
                 </button>
               ) : null}
 

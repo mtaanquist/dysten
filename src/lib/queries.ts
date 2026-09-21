@@ -720,6 +720,10 @@ export interface ManagementData {
     startDate: IsoDate;
     endDate: IsoDate;
     status: CampaignStatus;
+    /** Finished, still open, and waiting for somebody to settle the winner. */
+    awaitingWinner: boolean;
+    /** Whether settling it means drawing a ticket or naming the top of the board. */
+    isRaffle: boolean;
     participantCount: number;
   }[];
   users: { id: string; displayName: string; email: string; role: string; active: boolean }[];
@@ -775,6 +779,8 @@ export async function getManagementData(rosterCampaignId?: string): Promise<Mana
       startDate: campaign.startDate,
       endDate: campaign.endDate,
       status: campaignStatus(campaign, today),
+      awaitingWinner: awaitingWinner(campaign, today),
+      isRaffle: isRaffleType(campaign.type),
       participantCount: campaign._count.participants,
     })),
     users: users.map((user) => ({
