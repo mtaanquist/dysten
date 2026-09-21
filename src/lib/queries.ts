@@ -106,6 +106,13 @@ export interface CampaignSummary {
   /** Days the user actually got out — what decides the rank on a bike campaign. */
   myActiveDays: number;
   myStreak: number;
+  /**
+   * The user's best run on this campaign, so a broken streak leaves something
+   * to chase rather than nothing at all. Personal, like the rest of the `my*`
+   * figures: the leaderboard stays a comparison of what people did, not of how
+   * diligently they filled the form in.
+   */
+  myBestStreak: number;
   myMissingDays: number;
   totalParticipantsRanked: number;
 }
@@ -194,6 +201,7 @@ export function buildCampaignSummary(
     myAverage: mine?.average ?? 0,
     myActiveDays: mine?.activeDays ?? 0,
     myStreak: participation ? currentStreak(entries, userId, horizon) : 0,
+    myBestStreak: participation ? longestStreak(entries, userId, campaign.startDate, horizon) : 0,
     myMissingDays:
       participation && status !== "upcoming"
         ? missingDays(entries, userId, missingFrom, horizon).length
@@ -553,6 +561,9 @@ export interface PersonDetail {
    */
   editable: boolean;
   total: number;
+  /** The run this person is on, and the best one they have put together. */
+  currentStreak: number;
+  bestStreak: number;
   rows: { date: IsoDate; value1: number; value2: number; total: number; editedByAdmin: boolean }[];
 }
 
@@ -584,8 +595,19 @@ export async function getPersonDetail(
   const entries = await prisma.entry.findMany({
     where: { campaignId, userId: personId },
     orderBy: { date: "asc" },
-    select: { date: true, value1: true, value2: true, editedByAdmin: true },
+    select: { date: true, value1: true, value2: true, editedByAdmin: true, createdAt: true },
   });
+
+  // The same shape the read models score on, so the drawer's streaks are the
+  // ones the rest of the app reports. See `toEntries`.
+  const scored: EntryLike[] = withinRange(entries, campaign).map((entry) => ({
+    userId: person.id,
+    date: entry.date,
+    value1: entry.value1,
+    value2: entry.value2,
+    registeredOn: toIsoDate(entry.createdAt),
+  }));
+  const horizon = scoringHorizon(campaign);
 
   const { decimals } = campaignType(campaign.type);
   const factor = 10 ** decimals;
@@ -601,6 +623,8 @@ export async function getPersonDetail(
     campaignStart: campaign.startDate,
     campaignEnd: campaign.endDate,
     editable: entriesEditable(campaign),
+    currentStreak: currentStreak(scored, person.id, horizon),
+    bestStreak: longestStreak(scored, person.id, campaign.startDate, horizon),
     total: round(entries.reduce((sum, entry) => sum + entry.value1 + entry.value2, 0)),
     rows: entries.map((entry) => ({
       date: entry.date,

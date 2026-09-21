@@ -74,6 +74,11 @@ your total, your average, the standings and the shared goal, but the run it
 broke stays broken. It is the one figure here that rewards turning up every day
 rather than the size of the number.
 
+Your best run is kept beside the one you are on, on your own card and in your
+day-by-day drawer, so a streak that breaks costs you the current number and not
+everything. Both are personal: the leaderboard compares what people did, not how
+diligently they filled the form in.
+
 **History.** Every finished campaign, its final standings with the winner
 highlighted, and the roster exactly as it stood at the end. An admin who reopens
 one for corrections gets the same editable day-by-day panel there.
@@ -653,6 +658,21 @@ curl -X POST https://your-host/api/notifications/run \
 It checks yesterday by default; add `?date=2026-08-11` to replay a missed run.
 The endpoint returns 404 unless `NOTIFICATIONS_RUN_TOKEN` is set, so it is
 closed rather than open by default.
+
+**Schedule it for the evening, and point it at today.** A streak only counts
+days registered while they were still running, so a morning reminder about
+yesterday arrives once the run is already broken: it reports a failure instead
+of preventing one. Run it at, say, 19:00 in the app's timezone and pass that
+day, and the nudge lands while the day can still be logged:
+
+```bash
+curl -X POST "https://your-host/api/notifications/run?date=$(TZ=Europe/Copenhagen date +%F)" \
+  -H "Authorization: Bearer $NOTIFICATIONS_RUN_TOKEN"
+```
+
+Use the scheduler's own timezone if it already matches `APP_TIMEZONE`. The
+message is the same either way — it names the day it is about — so nothing else
+changes, and the backlog line still tells people how much is outstanding.
 
 ---
 

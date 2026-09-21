@@ -94,6 +94,8 @@
     "missingNone": "Every day logged",
     "streakBadge_one": "{count} day in a row",
     "streakBadge_other": "{count} days in a row",
+    "streak": "Streak",
+    "streakBest": "best {count}",
     "myEntries": "My daily entries",
     "leaderboard": "Leaderboard",
     "participants": "Participants",

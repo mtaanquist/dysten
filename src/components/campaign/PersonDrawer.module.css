@@ -91,6 +91,12 @@
   margin-top: var(--sp-1);
 }
 
+.summaryStreak {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-micro);
+  color: var(--c-ink-soft);
+}
+
 .tableLabel {
   font-size: var(--fs-label);
   text-transform: uppercase;

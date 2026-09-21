@@ -94,6 +94,8 @@
     "missingNone": "Alle dage registreret",
     "streakBadge_one": "{count} dag i træk",
     "streakBadge_other": "{count} dage i træk",
+    "streak": "Stime",
+    "streakBest": "bedste {count}",
     "myEntries": "Mine daglige registreringer",
     "leaderboard": "Stillingen",
     "participants": "Deltagere",
