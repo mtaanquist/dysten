@@ -198,6 +198,14 @@
       "optOut": "Du kan slå påmindelserne fra på dit overblik."
     }
   },
+  "winnerAnnouncement": {
+    "drawnTitle": "Vinderen er trukket",
+    "decidedTitle": "Vinderen er kåret",
+    "itsYou": "Det er dig. Tillykke!",
+    "seeResults": "Se resultatet",
+    "next": "Næste vinder",
+    "close": "Luk"
+  },
   "toast": {
     "saved": "Gemt",
     "entryDeleted": "Registrering slettet",
@@ -214,8 +222,6 @@
     "languageChanged": "Sprog opdateret",
     "userDeactivated": "Markeret som stoppet",
     "userReactivated": "Aktiveret igen",
-    "winnerDrawn": "Vinder trukket",
-    "winnerDecided": "Vinderen er kåret",
     "calculatedCopied": "Kopieret til Beregnet"
   },
   "errors": {

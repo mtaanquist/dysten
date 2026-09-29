@@ -56,6 +56,7 @@ model User {
   entries          Entry[]         @relation("EntryAuthor")
   entriesEdited    Entry[]         @relation("EntryAdminEditor")
   campaignsCreated Campaign[]      @relation("CampaignCreator")
+  winnersSeen      WinnerSeen[]
 }
 
 model Campaign {
@@ -118,6 +119,7 @@ model Campaign {
   /// The roster lives with the campaign, so history shows exactly who took part.
   participants Participation[]
   entries      Entry[]
+  winnerSeenBy WinnerSeen[]
 
   @@index([startDate, endDate])
 }
@@ -161,4 +163,18 @@ model Entry {
 
   @@unique([campaignId, userId, date])
   @@index([campaignId, date])
+}
+
+/// Someone has been shown a campaign's winner announcement and closed it.
+/// Stored per person rather than in the browser so the announcement is shown
+/// once per person, not once per device, and the captain who pressed the
+/// button is not shown it a second time on their next page load.
+model WinnerSeen {
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  seenAt     DateTime @default(now())
+
+  @@id([userId, campaignId])
 }

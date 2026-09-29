@@ -431,3 +431,31 @@ export async function setUserActive(userId: string, active: boolean): Promise<Ac
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+/**
+ * Closing the winner announcement. Recorded per person so it is shown once,
+ * whichever device they open next. Only settled campaigns are recorded: there
+ * is nothing to have seen on one that is still undecided.
+ */
+export async function dismissWinnerAnnouncements(campaignIds: string[]): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "errors.signedOut" };
+
+  const ids = Array.isArray(campaignIds) ? campaignIds.filter((id) => typeof id === "string") : [];
+  const settled = await prisma.campaign.findMany({
+    where: { id: { in: ids }, drawnAt: { not: null } },
+    select: { id: true },
+  });
+
+  await prisma.$transaction(
+    settled.map(({ id }) =>
+      prisma.winnerSeen.upsert({
+        where: { userId_campaignId: { userId: user.id, campaignId: id } },
+        create: { userId: user.id, campaignId: id },
+        update: {},
+      }),
+    ),
+  );
+
+  return { ok: true };
+}

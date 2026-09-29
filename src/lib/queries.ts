@@ -836,3 +836,57 @@ export async function getManagementData(rosterCampaignId?: string): Promise<Mana
     roster,
   };
 }
+
+/** How long a settled campaign's winner is announced to people who have not seen it yet. */
+const ANNOUNCE_WINNER_FOR_DAYS = 30;
+
+export interface WinnerAnnouncement {
+  campaignId: string;
+  campaignName: string;
+  campaignType: string;
+  winnerName: string;
+  isRaffle: boolean;
+  /** The reader is the winner, which gets its own line. */
+  isYou: boolean;
+}
+
+/**
+ * Winners this person has not been shown yet, oldest first.
+ *
+ * Everyone gets them, not only the people on the roster: a winner is news for
+ * the whole organisation. Bounded to the last few weeks so someone returning
+ * after a long break is not handed a queue of old results.
+ */
+export async function getWinnerAnnouncements(userId: string): Promise<WinnerAnnouncement[]> {
+  const since = new Date(Date.now() - ANNOUNCE_WINNER_FOR_DAYS * 24 * 60 * 60 * 1000);
+  const campaigns = await prisma.campaign.findMany({
+    where: {
+      drawnAt: { gte: since },
+      drawWinnerId: { not: null },
+      winnerSeenBy: { none: { userId } },
+    },
+    select: {
+      id: true,
+      name: true,
+      type: true,
+      drawWinnerId: true,
+      drawWinner: { select: { displayName: true } },
+    },
+    orderBy: { drawnAt: "asc" },
+  });
+
+  return campaigns.flatMap((campaign) =>
+    campaign.drawWinner
+      ? [
+          {
+            campaignId: campaign.id,
+            campaignName: campaign.name,
+            campaignType: campaign.type,
+            winnerName: campaign.drawWinner.displayName,
+            isRaffle: isRaffleType(campaign.type),
+            isYou: campaign.drawWinnerId === userId,
+          },
+        ]
+      : [],
+  );
+}
