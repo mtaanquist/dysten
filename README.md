@@ -90,6 +90,13 @@ step campaign means drawing a ticket and on a bike campaign naming whoever got
 out most. Nobody loses the weekend they had not typed up yet, and the prize is
 decided on a complete set of numbers.
 
+**The winner announcement.** Once a winner is settled, everyone gets a popup
+naming the campaign and the winner, with a burst of confetti, the next time
+they open any page, the captain who pressed the button included. It is shown
+once per person, not once per device: closing it is recorded against the
+account. Winners older than 30 days are not announced to people who missed
+them.
+
 **Management.** For captains and admins: create and edit campaigns, manage
 rosters, close a campaign early. Admins can additionally assign roles, delete
 campaigns, and reopen a finished one to correct entries.
@@ -756,7 +763,7 @@ If the repository is private, its images are private too, and pulling needs
 
 ```
 prisma/
-  schema.prisma        Users, campaigns, participation, entries
+  schema.prisma        Users, campaigns, participation, entries, who has seen which winner
   seed.ts              Demo data
 src/
   app/                 Pages and server actions (Next.js App Router)

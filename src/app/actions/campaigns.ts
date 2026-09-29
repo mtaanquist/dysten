@@ -441,7 +441,10 @@ export async function dismissWinnerAnnouncements(campaignIds: string[]): Promise
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: "errors.signedOut" };
 
-  const ids = Array.isArray(campaignIds) ? campaignIds.filter((id) => typeof id === "string") : [];
+  // Closed one at a time, so anything past a handful is not the dialog asking.
+  const ids = Array.isArray(campaignIds)
+    ? campaignIds.filter((id) => typeof id === "string").slice(0, 20)
+    : [];
   const settled = await prisma.campaign.findMany({
     where: { id: { in: ids }, drawnAt: { not: null } },
     select: { id: true },

@@ -843,7 +843,6 @@ const ANNOUNCE_WINNER_FOR_DAYS = 30;
 export interface WinnerAnnouncement {
   campaignId: string;
   campaignName: string;
-  campaignType: string;
   winnerName: string;
   isRaffle: boolean;
   /** The reader is the winner, which gets its own line. */
@@ -881,7 +880,6 @@ export async function getWinnerAnnouncements(userId: string): Promise<WinnerAnno
           {
             campaignId: campaign.id,
             campaignName: campaign.name,
-            campaignType: campaign.type,
             winnerName: campaign.drawWinner.displayName,
             isRaffle: isRaffleType(campaign.type),
             isYou: campaign.drawWinnerId === userId,

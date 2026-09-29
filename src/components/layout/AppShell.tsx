@@ -46,7 +46,7 @@ export async function AppShell({ user, children }: { user: SessionUser; children
       {/* Here rather than on one page so it greets people wherever they land,
           and so the captain who just decided sees it the moment the page
           re-renders. */}
-      {announcements.length > 0 ? <WinnerAnnouncement announcements={announcements} /> : null}
+      {announcements.length > 0 ? <WinnerAnnouncement userId={user.id} announcements={announcements} /> : null}
     </div>
   );
 }

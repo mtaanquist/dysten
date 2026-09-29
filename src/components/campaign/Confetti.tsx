@@ -3,13 +3,18 @@
 import { useEffect, useRef } from "react";
 import styles from "./WinnerAnnouncement.module.css";
 
-/** Palette tokens the pieces are drawn in, read at runtime so dark mode follows. */
-const COLOUR_TOKENS = ["--c-blue", "--c-maroon", "--c-type-step", "--c-type-bike", "--c-chip-bg"];
-const FALLBACK_COLOURS = ["#1789ce", "#a93b4e", "#9adda5", "#ffbbd0", "#f5c542"];
+/**
+ * Fixed rather than read from the theme tokens: several of those are dark
+ * fills in dark mode and vanish against the dark scrim. These are the light
+ * palette's brand and accent colours plus a gold, bright on either ground.
+ */
+const COLOURS = ["#1789ce", "#a93b4e", "#9adda5", "#ffbbd0", "#4fa3d9", "#f5c542"];
 
 const PIECES_PER_CORNER = 90;
+/** Per 60 Hz frame; scaled by the real frame time so a 120 Hz screen is not twice as fast. */
 const GRAVITY = 0.28;
 const DRAG = 0.985;
+const FRAME_MS = 1000 / 60;
 
 interface Piece {
   x: number;
@@ -21,7 +26,7 @@ interface Piece {
   width: number;
   height: number;
   colour: string;
-  /** Frames to wait before launching, so each corner fires in a short volley. */
+  /** 60 Hz frames to wait before launching, so each corner fires in a short volley. */
   delay: number;
 }
 
@@ -40,16 +45,12 @@ export function Confetti() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ratio = window.devicePixelRatio || 1;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    // The canvas's own box rather than innerWidth, which counts the scrollbar.
+    const width = element.clientWidth;
+    const height = element.clientHeight;
     element.width = width * ratio;
     element.height = height * ratio;
     context.scale(ratio, ratio);
-
-    const style = getComputedStyle(document.documentElement);
-    const colours = COLOUR_TOKENS.map(
-      (token, i) => style.getPropertyValue(token).trim() || FALLBACK_COLOURS[i],
-    ).concat("#f5c542");
 
     // Scaled to the viewport so a phone's burst reaches its middle and a
     // desktop's does not stop a third of the way across.
@@ -70,28 +71,35 @@ export function Confetti() {
           spin: (Math.random() - 0.5) * 0.3,
           width: 6 + Math.random() * 6,
           height: 4 + Math.random() * 4,
-          colour: colours[Math.floor(Math.random() * colours.length)],
-          delay: Math.floor(Math.random() * 18),
+          colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+          delay: Math.random() * 18,
         });
       }
     }
 
     let frame = 0;
-    const tick = () => {
+    let last: number | null = null;
+    const tick = (now: number) => {
+      // In 60 Hz frames, capped so a tab left in the background does not
+      // resume with one enormous step.
+      const step = last === null ? 1 : Math.min((now - last) / FRAME_MS, 3);
+      last = now;
+      const drag = Math.pow(DRAG, step);
+
       context.clearRect(0, 0, width, height);
       let alive = false;
 
       for (const piece of pieces) {
         if (piece.delay > 0) {
-          piece.delay--;
+          piece.delay -= step;
           alive = true;
           continue;
         }
-        piece.vx *= DRAG;
-        piece.vy = piece.vy * DRAG + GRAVITY;
-        piece.x += piece.vx;
-        piece.y += piece.vy;
-        piece.angle += piece.spin;
+        piece.vx *= drag;
+        piece.vy = piece.vy * drag + GRAVITY * step;
+        piece.x += piece.vx * step;
+        piece.y += piece.vy * step;
+        piece.angle += piece.spin * step;
         if (piece.y > height + 20) continue;
         alive = true;
 

@@ -1,16 +1,26 @@
-.overlay {
+/* A full-viewport, see-through <dialog> in the top layer; the card is centred
+   in it. Scrolls when the card is taller than the screen (a phone on its side),
+   so the buttons can always be reached. */
+.dialog {
   position: fixed;
   inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--sp-4);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  overflow-y: auto;
+  padding: max(var(--sp-4), env(safe-area-inset-top)) max(var(--sp-4), env(safe-area-inset-right))
+    max(var(--sp-4), env(safe-area-inset-bottom)) max(var(--sp-4), env(safe-area-inset-left));
 }
 
-.scrim {
-  position: absolute;
-  inset: 0;
+.dialog[open] {
+  display: flex;
+}
+
+.dialog::backdrop {
   background: var(--overlay-scrim);
 }
 
@@ -28,6 +38,7 @@
   position: relative;
   z-index: 1;
   width: min(420px, 100%);
+  margin: auto;
   background: var(--c-surface);
   border-radius: var(--r-panel);
   box-shadow: var(--sh-toast);

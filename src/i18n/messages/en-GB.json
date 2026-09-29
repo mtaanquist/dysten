@@ -200,7 +200,7 @@
   },
   "winnerAnnouncement": {
     "drawnTitle": "The winner has been drawn",
-    "decidedTitle": "The winner is decided",
+    "decidedTitle": "The winner has been decided",
     "itsYou": "That's you. Congratulations!",
     "seeResults": "See the results",
     "next": "Next winner",
