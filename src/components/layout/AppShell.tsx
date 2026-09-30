@@ -4,7 +4,8 @@ import { atLeast } from "@/lib/auth";
 import type { SessionUser } from "@/lib/auth/types";
 import { Blobs } from "@/components/ui";
 import { BRAND_NAME, ORG_NAME } from "@/lib/branding";
-import { getDefaultCampaignId } from "@/lib/queries";
+import { getDefaultCampaignId, getWinnerAnnouncements } from "@/lib/queries";
+import { WinnerAnnouncement } from "@/components/campaign/WinnerAnnouncement";
 import { Header } from "./Header";
 import { BottomNav } from "./BottomNav";
 import styles from "./AppShell.module.css";
@@ -18,7 +19,10 @@ export async function AppShell({ user, children }: { user: SessionUser; children
   // Resolved here so the header's "Campaign" link points at a real campaign.
   // Left as /campaigns only when there is none to point at, in which case that
   // route's redirect sends you back to the dashboard.
-  const defaultCampaignId = await getDefaultCampaignId(user.id);
+  const [defaultCampaignId, announcements] = await Promise.all([
+    getDefaultCampaignId(user.id),
+    getWinnerAnnouncements(user.id),
+  ]);
   const campaignHref = defaultCampaignId ? `/campaigns/${defaultCampaignId}` : "/campaigns";
   const canManage = atLeast(user.role, Role.CAPTAIN);
 
@@ -39,6 +43,10 @@ export async function AppShell({ user, children }: { user: SessionUser; children
         {/* Phones only — hidden in CSS above 640px. */}
         <BottomNav canManage={canManage} campaignHref={campaignHref} />
       </div>
+      {/* Here rather than on one page so it greets people wherever they land,
+          and so the captain who just decided sees it the moment the page
+          re-renders. */}
+      {announcements.length > 0 ? <WinnerAnnouncement userId={user.id} announcements={announcements} /> : null}
     </div>
   );
 }

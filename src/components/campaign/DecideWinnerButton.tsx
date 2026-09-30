@@ -38,10 +38,10 @@ export function DecideWinnerButton({ campaignId, isRaffle }: { campaignId: strin
           return;
         }
         startTransition(async () => {
+          // Success needs no toast: the page re-renders with the winner
+          // announcement, which every page carries until it is closed.
           const result = await decideCampaignWinner(campaignId);
-          showToast(
-            result.ok ? (isRaffle ? "toast.winnerDrawn" : "toast.winnerDecided") : result.error,
-          );
+          if (!result.ok) showToast(result.error);
         });
       }}
     >

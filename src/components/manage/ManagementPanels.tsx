@@ -274,14 +274,9 @@ export function CampaignAdminList({
                       : "campaign.confirmDecideWinner";
                     if (!window.confirm(t(confirmKey))) return;
                     startTransition(async () => {
+                      // The winner announcement takes it from here.
                       const result = await decideCampaignWinner(campaign.id);
-                      showToast(
-                        result.ok
-                          ? campaign.isRaffle
-                            ? "toast.winnerDrawn"
-                            : "toast.winnerDecided"
-                          : result.error,
-                      );
+                      if (!result.ok) showToast(result.error);
                     });
                   }}
                 >

@@ -198,6 +198,14 @@
       "optOut": "You can turn these reminders off from your dashboard."
     }
   },
+  "winnerAnnouncement": {
+    "drawnTitle": "The winner has been drawn",
+    "decidedTitle": "The winner has been decided",
+    "itsYou": "That's you. Congratulations!",
+    "seeResults": "See the results",
+    "next": "Next winner",
+    "close": "Close"
+  },
   "toast": {
     "saved": "Saved",
     "entryDeleted": "Entry deleted",
@@ -214,8 +222,6 @@
     "languageChanged": "Language updated",
     "userDeactivated": "Marked as left",
     "userReactivated": "Reactivated",
-    "winnerDrawn": "Winner drawn",
-    "winnerDecided": "Winner named",
     "calculatedCopied": "Copied into Calculated"
   },
   "errors": {

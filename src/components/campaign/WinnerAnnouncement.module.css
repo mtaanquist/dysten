@@ -1,0 +1,144 @@
+/* A full-viewport, see-through <dialog> in the top layer; the card is centred
+   in it. Scrolls when the card is taller than the screen (a phone on its side),
+   so the buttons can always be reached. */
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  overflow-y: auto;
+  padding: max(var(--sp-4), env(safe-area-inset-top)) max(var(--sp-4), env(safe-area-inset-right))
+    max(var(--sp-4), env(safe-area-inset-bottom)) max(var(--sp-4), env(safe-area-inset-left));
+}
+
+.dialog[open] {
+  display: flex;
+}
+
+.dialog::backdrop {
+  background: var(--overlay-scrim);
+}
+
+/* Above the card, so the pieces fall across it rather than behind it. */
+.confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  margin: auto;
+  background: var(--c-surface);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-toast);
+  padding: var(--sp-8) var(--sp-7) var(--sp-7);
+  text-align: center;
+  animation: pop var(--dur-enter) var(--ease-out) both;
+}
+
+.campaign {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  color: var(--c-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.label {
+  margin: var(--sp-2) 0 var(--sp-5);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  color: var(--c-heading);
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--sp-3);
+}
+
+.name {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  color: var(--c-maroon-fg);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.you {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--c-heading);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--sp-7);
+}
+
+.primary,
+.secondary {
+  border-radius: var(--r-pill);
+  padding: 10px 20px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-button);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.primary {
+  background: var(--c-maroon);
+  border: 1.5px solid var(--c-maroon);
+  color: var(--c-on-dark);
+}
+
+.primary:hover {
+  background: var(--c-maroon-dark);
+  border-color: var(--c-maroon-dark);
+}
+
+.secondary {
+  background: var(--c-blue-soft);
+  border: 1.5px solid var(--c-blue-soft);
+  color: var(--c-heading);
+}
+
+.secondary:hover {
+  border-color: var(--c-border-hover);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+}
